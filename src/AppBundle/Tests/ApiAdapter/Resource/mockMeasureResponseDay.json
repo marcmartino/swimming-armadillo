@@ -1,0 +1,14 @@
+{
+   "status": 0,
+   "body": {
+       "date":"2013-04-10",
+       "steps":6523,
+       "distance":4600,
+       "calories":408.52
+       "elevation":18.2,
+       "soft": 5880,
+       "moderate": 1080,
+       "intense": 540,
+       "timezone":"Europe/Berlin"
+    }
+}
