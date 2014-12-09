@@ -21,11 +21,6 @@ class Consumer
     {
         $data = $this->adapter->getTranscribedData();
 
-        $expected = [
-            'device' => 'withings',
-            'measurement' => '',
-            'units' => '',
-            'value' => 0
-        ];
+
     }
 } 

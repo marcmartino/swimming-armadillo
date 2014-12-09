@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\ApiAdapter;
+use GuzzleHttp\Client;
 
 /**
  * Class WithingsApiAdapter
@@ -8,9 +9,15 @@ namespace AppBundle\ApiAdapter;
 class WithingsApiAdapter implements ApiAdapterInterface
 {
 
-    public function __construct()
+    /**
+     * @var Client
+     */
+    protected $guzzle;
+
+    public function __construct(Client $guzzle)
     {
 
+        $this->guzzle = $guzzle;
     }
 
     /**
@@ -18,6 +25,18 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function getTranscribedData()
     {
-        // TODO: Implement getTranscribedData() method.
+        /** @var \GuzzleHttp\Message\Response $response */
+        $response = $this->guzzle->get('google.com');
+
+        $json = $response->json();
+
+        $expected = [
+            'device' => 'withings',
+            'measurement' => 'distance walked',
+            'units' => 'ft',
+            'value' => $json['body']['distance']
+        ];
+
+        return $expected;
     }
 }
