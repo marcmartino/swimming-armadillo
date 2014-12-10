@@ -14,9 +14,11 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     protected $guzzle;
 
+    /**
+     * @param Client $guzzle
+     */
     public function __construct(Client $guzzle)
     {
-
         $this->guzzle = $guzzle;
     }
 
