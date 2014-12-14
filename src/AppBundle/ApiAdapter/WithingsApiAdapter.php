@@ -56,7 +56,7 @@ class WithingsApiAdapter implements ApiAdapterInterface
         $credentials = new Credentials(
             '0513f1d73b6dbf44147357f89b6e9c8921d948c4e884e107cdbcc5fb7d',
             'e4dcdceb32b1f54617c17d2223e522e4405346cb62f0c02729350bc8e605',
-            'http://cmacnv.org'
+            'http://hdlbit.com/'
         );
 
         $serviceFactory = new ServiceFactory();
