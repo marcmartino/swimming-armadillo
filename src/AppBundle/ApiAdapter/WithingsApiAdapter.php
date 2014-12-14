@@ -1,5 +1,7 @@
 <?php
 namespace AppBundle\ApiAdapter;
+
+
 use GuzzleHttp\Client;
 
 /**
@@ -40,5 +42,10 @@ class WithingsApiAdapter implements ApiAdapterInterface
         ];
 
         return $expected;
+    }
+
+    protected function getOauthToken()
+    {
+
     }
 }
