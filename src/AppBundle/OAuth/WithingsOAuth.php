@@ -28,11 +28,15 @@ class WithingsOAuth extends AbstractService
      */
     protected function parseRequestTokenResponse($responseBody)
     {
+        echo PHP_EOL . "Response: " . $responseBody;
+
         parse_str($responseBody, $data);
+
+        print_r($data);
 
         if (null === $data || !is_array($data)) {
             throw new TokenResponseException('Unable to parse response.');
-        } elseif (!isset($data['oauth_callback_confirmed']) || $data['oauth_callback_confirmed'] !== 'true') {
+        } elseif (!isset($data['oauth_token']) || !isset($data['oauth_token_secret'])) {
             throw new TokenResponseException('Error in retrieving token.');
         }
 

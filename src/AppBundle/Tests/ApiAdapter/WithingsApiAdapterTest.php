@@ -37,5 +37,12 @@ class WithingsApiAdapterTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetOAuthAccessToken()
+    {
+        $client = new Client();
+        $adapter = new WithingsApiAdapter($client);
+        $accessToken = $adapter->getOauthAccessToken();
+    }
+
 }
  
