@@ -2,9 +2,9 @@
 namespace AppBundle\Tests\ApiAdapter;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Message\MessageFactory;
 use GuzzleHttp\Subscriber\Mock;
 use PHPUnit_Framework_TestCase;
+use GuzzleHttp\Message\MessageFactory;
 use AppBundle\ApiAdapter\WithingsApiAdapter;
 
 class WithingsApiAdapterTest extends PHPUnit_Framework_TestCase {

@@ -20,7 +20,5 @@ class Consumer
     public function storeData()
     {
         $data = $this->adapter->getTranscribedData();
-
-
     }
 } 
