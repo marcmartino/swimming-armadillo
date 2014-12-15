@@ -1,11 +1,15 @@
 <?php
 namespace AppBundle\OAuth;
 
+use OAuth\Common\Consumer\CredentialsInterface;
+use OAuth\Common\Http\Client\ClientInterface;
 use OAuth\Common\Http\Uri\Uri;
+use OAuth\Common\Storage\TokenStorageInterface;
 use OAuth\Common\Token\TokenInterface;
 use OAuth\Common\Http\Uri\UriInterface;
 use OAuth\OAuth1\Service\AbstractService;
 use OAuth\Common\Http\Exception\TokenResponseException;
+use OAuth\OAuth1\Signature\SignatureInterface;
 use OAuth\OAuth1\Token\StdOAuth1Token;
 
 /**
@@ -14,6 +18,18 @@ use OAuth\OAuth1\Token\StdOAuth1Token;
  */
 class WithingsOAuth extends AbstractService
 {
+    public function __construct(
+        CredentialsInterface $credentials,
+        ClientInterface $httpClient,
+        TokenStorageInterface $storage,
+        SignatureInterface $signature,
+        UriInterface $baseApiUri = null
+    )
+    {
+        parent::__construct($credentials, $httpClient, $storage, $signature, $baseApiUri);
+        $this->baseApiUri = 'http://wbsapi.withings.net';
+    }
+
     /**
      * Parses the request token response and returns a TokenInterface.
      * This is only needed to verify the `oauth_callback_confirmed` parameter. The actual
