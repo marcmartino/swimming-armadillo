@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Session;
 use AppBundle\OAuth\WithingsOAuth;
+use OAuth\Common\Consumer\Credentials;
 use AppBundle\ApiAdapter\WithingsApiAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -60,6 +61,6 @@ class DefaultController extends Controller
 
     public function getRequestToken()
     {
-        
+
     }
 }
