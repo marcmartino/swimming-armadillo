@@ -17,22 +17,11 @@ class DefaultController extends Controller
     public function indexAction()
     {
         if (!empty($_GET['userid'])) {
-
             $storage = new Session();
 
+            $withingsService = $this->getWithingsService();
+
             $token = $storage->retrieveAccessToken('WithingsOAuth');
-
-            $credentials = new Credentials(
-                '0513f1d73b6dbf44147357f89b6e9c8921d948c4e884e107cdbcc5fb7d',
-                'e4dcdceb32b1f54617c17d2223e522e4405346cb62f0c02729350bc8e605',
-                'http://hdlbit.com/'
-            );
-
-            $serviceFactory = new ServiceFactory();
-            $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
-
-            /** @var WithingsOAuth $withingsService */
-            $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $storage);
 
             // This was a callback request from BitBucket, get the token
             $accessToken = $withingsService->requestAccessToken(
@@ -45,7 +34,7 @@ class DefaultController extends Controller
                 INSERT INTO `oauth_access_tokens`(`token`, `secret`)
                 VALUES (:token, :secret)
             ");
-            
+
             $stmt->execute([
                 ':token' => $accessToken->getAccessToken(),
                 ':secret' => $accessToken->getAccessTokenSecret()]
@@ -71,6 +60,10 @@ class DefaultController extends Controller
 
     }
 
+    /**
+     * @return WithingsOAuth
+     * @throws \OAuth\Common\Exception\Exception
+     */
     protected function getWithingsService()
     {
         $storage = new Session();
