@@ -19,9 +19,15 @@ class DefaultController extends Controller
         if (!empty($_GET['userid'])) {
             $storage = new Session();
 
-            $withingsService = $this->getWithingsService();
-
             $token = $storage->retrieveAccessToken('WithingsOAuth');
+
+            echo PHP_EOL;
+                echo "Token: " . $token->getRequestToken();
+            echo PHP_EOL .  "Secret: " .
+                $token->getRequestTokenSecret();
+            echo PHP_EOL;
+
+            $withingsService = $this->getWithingsService();
 
             // This was a callback request from BitBucket, get the token
             $accessToken = $withingsService->requestAccessToken(
@@ -39,8 +45,6 @@ class DefaultController extends Controller
                 ':token' => $accessToken->getAccessToken(),
                 ':secret' => $accessToken->getAccessTokenSecret()]
             );
-
-
 
             return $this->render(
                 'default/data.html.twig',
