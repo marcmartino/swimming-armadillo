@@ -35,16 +35,23 @@ class DefaultController extends Controller
             $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $storage);
 
             // This was a callback request from BitBucket, get the token
-            $withingsService->requestAccessToken(
+            $accessToken = $withingsService->requestAccessToken(
                 $_GET['oauth_token'],
                 $_GET['oauth_verifier'],
                 $token->getRequestTokenSecret()
             );
 
-            // Send a request now that we have access token
-            $result = json_decode($withingsService->request('user/repositories'));
+            $stmt = $this->get("doctrine.dbal.default_connection")->prepare("
+                INSERT INTO `oauth_access_tokens`(`token`, `secret`)
+                VALUES (:token, :secret)
+            ");
+            
+            $stmt->execute([
+                ':token' => $accessToken->getAccessToken(),
+                ':secret' => $accessToken->getAccessTokenSecret()]
+            );
 
-            echo('The first repo in the list is ' . $result[0]->name);
+
 
             return $this->render(
                 'default/data.html.twig',
@@ -59,8 +66,25 @@ class DefaultController extends Controller
         return $this->render('default/index.html.twig', ['authorize_uri' => $withingsAdapter->getAuthorizationUrl()]);
     }
 
-    public function getRequestToken()
+    public function displayWithingData()
     {
 
+    }
+
+    protected function getWithingsService()
+    {
+        $storage = new Session();
+
+        $credentials = new Credentials(
+            '0513f1d73b6dbf44147357f89b6e9c8921d948c4e884e107cdbcc5fb7d',
+            'e4dcdceb32b1f54617c17d2223e522e4405346cb62f0c02729350bc8e605',
+            'http://hdlbit.com/'
+        );
+
+        $serviceFactory = new ServiceFactory();
+        $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
+
+        /** @var WithingsOAuth $withingsService */
+        return $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $storage);
     }
 }
