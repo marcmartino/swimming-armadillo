@@ -34,7 +34,8 @@ svg.append("g")
     .append("circle")
     .attr("cx", function (d, i) {
    		// return timestampData.scale(Date.parse(d.Date));
-   		return timestampData.scale(Date.parse(d.Date));
+   		//return timestampData.scale(d.Date);
+	return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
    	})
     .attr("cy", function (d, i) {
    		return bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
@@ -49,7 +50,7 @@ svg.append("g")
     .append("circle")
     .attr("cx", function (d, i) {
    		// return timestampData.scale(Date.parse(d.Date));
-   		return timestampData.scale(Date.parse(d.Date));
+   		return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
    	})
     .attr("cy", function (d, i) {
    		return bodyMassData.scale(d['Lean mass (%)'] / 100 || 0);
@@ -98,13 +99,16 @@ function getBodyMassData() {
 
 function getTimestampData() {
 	var getTimestampFromJson = function (datum) {
-		return Date.parse(datum.Date);
+	    return Date.parseString(datum,'yyyy-MM-dd H:mm a');
 	};
-	var min = Date.parse(_.min(dataset, getTimestampFromJson).Date),
-		max = Date.parse(_.max(dataset, getTimestampFromJson).Date),
+
+	var dateArr = _.map(_.pluck(dataset, "Date"), getTimestampFromJson),
+           min = d3.min(dateArr),
+                max =d3.max(dateArr),
 		rangePadding = (max - min) * 0.01,
-		scale = d3.scale.linear()
-			.domain([min - rangePadding, max + rangePadding])
+		scale = d3.time.scale()
+			.domain([new Date(min - rangePadding), max])
+    //.domain(dateArr)
 			.range([0 + chartPadding, w - chartPadding]);
 
 	return {min: min, max: max, scale: scale};
