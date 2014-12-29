@@ -7,26 +7,20 @@ _.remove(dataset, function (datum) {
 	return (datum["Fat mass (%)"] === null || datum['Lean mass (%)'] === null);
 });
 
-var svgData = {
-    h: 300,
-    w: d3.min([1100, window.innerWidth]),
-    chartPadding: 50,
-    
-};
-function redrawChart(svgData) {
-    d3.select('#dThree').select("svg").remove();
-    console.log("redrawing");
-var timestampData = getTimestampData(),
+
+var h = 300,
+	w = 1100,
+	chartPadding = 50,
+	timestampData = getTimestampData(),
 	bodyMassData = getBodyMassData(),
 	svg = d3.select("#dThree")
-            //.select("svg").remove()
 	    .append("svg")
-	    .attr("width", svgData.w)
-	    .attr("height", svgData.h),
+	    .attr("width", w)
+	    .attr("height", h),
 	xAxis = d3.svg.axis()
 		.scale(timestampData.scale)
-		.orient("bottom").nice(),
-
+		.orient("bottom").ticks(5)
+		// .tickFormat(d3.time.format("%m/%d/%Y"))
 	yAxis = d3.svg.axis()
     	.scale(bodyMassData.scale)
     	.orient("left")
@@ -39,8 +33,10 @@ svg.append("g")
    	.enter()
     .append("circle")
     .attr("cx", function (d, i) {
-   	return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
-   })
+   		// return timestampData.scale(Date.parse(d.Date));
+   		//return timestampData.scale(d.Date);
+	return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+   	})
     .attr("cy", function (d, i) {
    		return bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
    	})
@@ -76,15 +72,15 @@ svg.append("g")
 
 
 svg.append("g")
-	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
+	.attr("transform", "translate(0," + (h - chartPadding) + ")")
 	.attr("class", "axis")
     .call(xAxis);
 
 svg.append("g")
     .attr("class", "axis")
-    .attr("transform", "translate(" + svgData.chartPadding + ",0)")
+    .attr("transform", "translate(" + chartPadding + ",0)")
     .call(yAxis);
-}
+
 
 function getBodyMassData() {
 	var min = _.min([_.min(dataset, "Fat mass (%)")["Fat mass (%)"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
@@ -94,7 +90,7 @@ function getBodyMassData() {
 
 			//added range padding,but also maxing by zero to make sure no negitive percentage appears on axis
 			.domain([_.min([max + rangePadding,100]), _.max([min - rangePadding,0])])
-			.range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
+			.range([0 + chartPadding, h - chartPadding]);
 
 	console.log("body mass max: ");
 	console.log(max);
@@ -113,15 +109,7 @@ function getTimestampData() {
 		scale = d3.time.scale()
 			.domain([new Date(min - rangePadding), max])
     //.domain(dateArr)
-			.range([0 + svgData.chartPadding, svgData.w - svgData.chartPadding]);
+			.range([0 + chartPadding, w - chartPadding]);
 
 	return {min: min, max: max, scale: scale};
 }
-function resize() {
-    console.log('resizing');
-    svgData.w = d3.min([1100, window.innerWidth]);
-    console.log(svgData);
-    redrawChart(svgData);
-}
-d3.select(window).on('resize', resize);
-redrawChart(svgData);
