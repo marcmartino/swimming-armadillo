@@ -25,7 +25,8 @@ var timestampData = getTimestampData(),
 	    .attr("height", svgData.h),
 	xAxis = d3.svg.axis()
 		.scale(timestampData.scale)
-		.orient("bottom").nice(),
+		.orient("bottom")
+                .ticks(parseInt(svgData.w / 75, 10)),
 
 	yAxis = d3.svg.axis()
     	.scale(bodyMassData.scale)
