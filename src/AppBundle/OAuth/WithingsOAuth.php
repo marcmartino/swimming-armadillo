@@ -27,7 +27,7 @@ class WithingsOAuth extends AbstractService
     )
     {
         parent::__construct($credentials, $httpClient, $storage, $signature, $baseApiUri);
-        $this->baseApiUri = new Uri('http://wbsapi.withings.net');
+        $this->baseApiUri = new Uri('http://wbsapi.withings.net/');
     }
 
     /**
@@ -44,8 +44,6 @@ class WithingsOAuth extends AbstractService
      */
     protected function parseRequestTokenResponse($responseBody)
     {
-        echo PHP_EOL . "Response: " . $responseBody;
-
         parse_str($responseBody, $data);
 
         print_r($data);
@@ -119,5 +117,68 @@ class WithingsOAuth extends AbstractService
     public function getAuthorizationEndpoint()
     {
         return new Uri('https://oauth.withings.com/account/authorize');
+    }
+
+    /**
+     * Sends an authenticated API request to the path provided.
+     * If the path provided is not an absolute URI, the base API Uri (must be passed into constructor) will be used.
+     *
+     * @param string|UriInterface $path
+     * @param string              $method       HTTP method
+     * @param array               $body         Request body if applicable (key/value pairs)
+     * @param array               $extraHeaders Extra headers if applicable.
+     *                                          These will override service-specific any defaults.
+     *
+     * @return string
+     */
+    public function request($path, $method = 'GET', $body = null, array $extraHeaders = array())
+    {
+        $uri = $this->determineRequestUriFromPath($path, $this->baseApiUri);
+
+        /** @var $token StdOAuth1Token */
+        $token = $this->storage->retrieveAccessToken($this->service());
+
+        $realPath = $this->baseApiUri . $path . $this->createUri($method, $uri, $token, $body);
+
+        $uri = new Uri($realPath);
+
+        return $this->httpClient->retrieveResponse($uri, $body, [], $method);
+    }
+
+    /**
+     * Builds the authorization uri parameters for an authenticated API request
+     *
+     * @param string         $method
+     * @param UriInterface   $uri        The uri the request is headed
+     * @param TokenInterface $token
+     * @param array          $bodyParams Request body if applicable (key/value pairs)
+     *
+     * @return string
+     */
+    protected function createUri(
+        $method,
+        UriInterface $uri,
+        TokenInterface $token,
+        $bodyParams = null
+    ) {
+        $this->signature->setTokenSecret($token->getAccessTokenSecret());
+        $parameters = $this->getBasicAuthorizationHeaderInfo();
+        if (isset($parameters['oauth_callback'])) {
+            unset($parameters['oauth_callback']);
+        }
+
+        $parameters = array_merge($parameters, array('oauth_token' => $token->getAccessToken()));
+        $parameters = (is_array($bodyParams)) ? array_merge($parameters, $bodyParams) : $parameters;
+        $parameters['oauth_signature'] = $this->signature->getSignature($uri, $parameters, $method);
+
+        $authorizationHeader = '';
+        $delimiter = '&';
+
+        foreach ($parameters as $key => $value) {
+            $authorizationHeader .= $delimiter . rawurlencode($key) . '=' . rawurlencode($value) . '';
+            $delimiter = '&';
+        }
+
+        return $authorizationHeader;
     }
 }
