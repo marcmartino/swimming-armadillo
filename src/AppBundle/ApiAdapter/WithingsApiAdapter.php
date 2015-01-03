@@ -1,13 +1,13 @@
 <?php
 namespace AppBundle\ApiAdapter;
 
-
-use AppBundle\OAuth\WithingsOAuth;
-use GuzzleHttp\Client;
-use OAuth\Common\Consumer\Credentials;
-use OAuth\Common\Storage\Memory;
-use OAuth\Common\Storage\Session;
 use OAuth\ServiceFactory;
+use OAuth\Common\Storage\Memory;
+use AppBundle\OAuth\WithingsOAuth;
+use OAuth\Common\Consumer\Credentials;
+use OAuth\OAuth1\Service\AbstractService;
+use OAuth\Common\Service\ServiceInterface;
+use OAuth\Common\Storage\TokenStorageInterface;
 
 /**
  * Class WithingsApiAdapter
@@ -15,18 +15,65 @@ use OAuth\ServiceFactory;
  */
 class WithingsApiAdapter implements ApiAdapterInterface
 {
+    /**
+     * @var string
+     */
+    private $callbackUri;
+    /**
+     * @var string
+     */
+    private $consumerSecret;
+    /**
+     * @var string
+     */
+    private $consumerKey;
+    /**
+     * @var TokenStorageInterface
+     */
+    private $storage;
 
     /**
-     * @var Client
+     * @var ServiceInterface
      */
-    protected $guzzle;
+    private $withingsService;
 
     /**
-     * @param Client $guzzle
+     * @param $consumerKey
+     * @param $consumerSecret
+     * @param $callbackUri
+     * @param TokenStorageInterface $storage
      */
-    public function __construct(Client $guzzle)
+    public function __construct(
+        $consumerKey,
+        $consumerSecret,
+        $callbackUri,
+        TokenStorageInterface $storage
+    ) {
+
+        $this->callbackUri = $callbackUri;
+        $this->consumerSecret = $consumerSecret;
+        $this->consumerKey = $consumerKey;
+        $this->storage = $storage;
+
+        $this->withingsService = $this->createWithingsService();
+    }
+
+    /**
+     * @return ServiceInterface
+     */
+    public function createWithingsService()
     {
-        $this->guzzle = $guzzle;
+        $credentials = new Credentials(
+            $this->consumerKey,
+            $this->consumerSecret,
+            $this->callbackUri
+        );
+
+        $serviceFactory = new ServiceFactory();
+        $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
+
+        /** @var WithingsOAuth $withingsService */
+        return $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $this->storage);
     }
 
     /**
@@ -34,38 +81,50 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function getTranscribedData()
     {
-        /** @var \GuzzleHttp\Message\Response $response */
-        $response = $this->guzzle->get('google.com');
-
-        $json = $response->json();
-
         $expected = [
             'device' => 'withings',
             'measurement' => 'distance walked',
             'units' => 'ft',
-            'value' => $json['body']['distance']
+            'value' => 5
         ];
 
         return $expected;
     }
 
+    /**
+     * @return \OAuth\Common\Http\Uri\UriInterface
+     */
     public function getAuthorizationUrl()
     {
-        $storage = new Session();
+        $token = $this->getWithingsService()->requestRequestToken();
 
-        $credentials = new Credentials(
-            '0513f1d73b6dbf44147357f89b6e9c8921d948c4e884e107cdbcc5fb7d',
-            'e4dcdceb32b1f54617c17d2223e522e4405346cb62f0c02729350bc8e605',
-            'http://hdlbit.com/'
+        $authorizationUrl = $this->getWithingsService()->getAuthorizationUri(
+            array('oauth_token' => $token->getRequestToken())
         );
-
-        $serviceFactory = new ServiceFactory();
-        $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
-        $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $storage);
-        $token = $withingsService->requestRequestToken();
-
-        $authorizationUrl = $withingsService->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()));
 
         return $authorizationUrl;
     }
+
+    /**
+     * @param $oauthToken
+     * @param $oauthVerifier
+     * @return \OAuth\Common\Token\TokenInterface|\OAuth\OAuth1\Token\TokenInterface|string
+     */
+    public function getAccessToken($oauthToken, $oauthVerifier)
+    {
+        return $this->getWithingsService()->requestAccessToken(
+            $oauthToken,
+            $oauthVerifier,
+            $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
+        );
+    }
+
+    /**
+     * @return AbstractService
+     */
+    public function getWithingsService()
+    {
+        return $this->withingsService;
+    }
+
 }

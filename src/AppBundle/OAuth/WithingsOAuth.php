@@ -27,7 +27,7 @@ class WithingsOAuth extends AbstractService
     )
     {
         parent::__construct($credentials, $httpClient, $storage, $signature, $baseApiUri);
-        $this->baseApiUri = 'http://wbsapi.withings.net';
+        $this->baseApiUri = new Uri('http://wbsapi.withings.net');
     }
 
     /**
