@@ -96,8 +96,6 @@ class DefaultController extends Controller
         /** @var WithingsApiAdapter $withingsAdapter */
         $withings = $this->get('withings_api_adapter');
 
-        $parameters = $withings->getWithingsService()->publicGetBasicAuthorizationHeaderInfo();
-
         $uri = 'measure?action=getmeas&userid=5702500';
 
         print_r($withings->getWithingsService()->request($uri));
