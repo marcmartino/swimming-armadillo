@@ -67,6 +67,7 @@ class DefaultController extends Controller
     {
         /** @var WithingsApiAdapter $withingsAdapter */
         $withingsAdapter = $this->get('withings_api_adapter');
+        $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
         print_r($withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']));
         print_r($withingsAdapter->getWithingsService()->request('measure?action=getmeas&userid=5702500'));
 
@@ -84,7 +85,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/oauth", name="oauth")
+     * @Route("/withings/data")
      */
     public function displayWithingData()
     {
@@ -92,15 +93,16 @@ class DefaultController extends Controller
 
         $token = $storage->retrieveAccessToken('WithingsOAuth');
 
-        $withings = $this->getWithingsService();
+        /** @var WithingsApiAdapter $withingsAdapter */
+        $withings = $this->get('withings_api_adapter');
 
-        $withings->requestAccessToken(
-            $_GET['oauth_token'],
-            $_GET['oauth_verifier'],
-            $token->getRequestTokenSecret()
-        );
+        $parameters = $withings->getWithingsService()->publicGetBasicAuthorizationHeaderInfo();
 
-        echo "hello"; exit;
+        $uri = 'measure?action=getmeas&userid=5702500';
+
+        print_r($withings->getWithingsService()->request($uri));
+
+        exit;
     }
 
     /**
