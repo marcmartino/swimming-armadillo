@@ -38,15 +38,15 @@ class DefaultController extends Controller
                 $token->getRequestTokenSecret()
             );
 
-            $stmt = $this->get("doctrine.dbal.default_connection")->prepare("
-                INSERT INTO `oauth_access_tokens`(`token`, `secret`)
-                VALUES (:token, :secret)
-            ");
-
-            $stmt->execute([
-                ':token' => $accessToken->getAccessToken(),
-                ':secret' => $accessToken->getAccessTokenSecret()]
-            );
+//            $stmt = $this->get("doctrine.dbal.default_connection")->prepare("
+//                INSERT INTO `oauth_access_tokens`(`token`, `secret`)
+//                VALUES (:token, :secret)
+//            ");
+//
+//            $stmt->execute([
+//                ':token' => $accessToken->getAccessToken(),
+//                ':secret' => $accessToken->getAccessTokenSecret()]
+//            );
 
             return $this->render(
                 'default/data.html.twig',
