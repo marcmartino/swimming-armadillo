@@ -25,11 +25,11 @@ class Version20141218101730 extends AbstractMigration implements ContainerAwareI
 
     public function up(Schema $schema)
     {
-        $this->pdo->query("CREATE TABLE `oauth_access_tokens` (`id` int, `token` VARCHAR(100), `secret` VARCHAR(100))");
+        $this->pdo->query("CREATE TABLE oauth_access_tokens (id int, user_id VARCHAR(100), token VARCHAR(100), secret VARCHAR(100))");
     }
 
     public function down(Schema $schema)
     {
-        $this->pdo->query("DROP TABLE `oauth_access_token`");
+        $this->pdo->query("DROP TABLE oauth_access_token");
     }
 }
