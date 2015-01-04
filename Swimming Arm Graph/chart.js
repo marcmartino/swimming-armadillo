@@ -13,55 +13,41 @@ var svgData = {
     chartPadding: 50,
     
 };
-function redrawChart(svgData) {
-    d3.select('#dThree').select("svg").remove();
-    console.log("redrawing");
-var timestampData = getTimestampData(),
-	bodyMassData = getBodyMassData(),
-	svg = d3.select("#dThree")
-            //.select("svg").remove()
-	    .append("svg")
-	    .attr("width", svgData.w)
-	    .attr("height", svgData.h),
-	xAxis = d3.svg.axis()
-		.scale(timestampData.scale)
-		.orient("bottom")
-                .ticks(parseInt(svgData.w / 75, 10)),
-
-	yAxis = d3.svg.axis()
-    	.scale(bodyMassData.scale)
-    	.orient("left")
-    	.ticks(5)
-    	.tickFormat(d3.format("%"));
-
-svg.append("g")
+function fatChart(drawData) {
+   drawData.svg.append("g")
 	.selectAll("rect")
    	.data(dataset)
    	.enter()
     .append("circle")
     .attr("cx", function (d, i) {
-   	return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+   	return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
    })
     .attr("cy", function (d, i) {
-   		return bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
+   		return drawData.bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
 
-svg.append("g")
+    drawData.legend
+	.insert("text").attr("class", "fatChart")
+	.attr("x", 20).attr("y",20)
+	.text("fat chart");
+}
+function leanChart(drawData) {
+    drawData.svg.append("g").classed("leanChart chartGroup", true)
 	.selectAll("rect")
    	.data(dataset)
    	.enter()
     .append("circle")
     .attr("cx", function (d, i) {
    		// return timestampData.scale(Date.parse(d.Date));
-   		return timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+   		return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
    	})
     .attr("cy", function (d, i) {
-   		return bodyMassData.scale(d['Lean mass (%)'] / 100 || 0);
+   		return drawData.bodyMassData.scale(d['Lean mass (%)'] / 100 || 0);
    	})
    	.attr('r', 2)
-   	.attr('fill', 'orange')
+   	.attr('fill', 'orange');/*
    	.on("mouseover", function (d) {
    		d3.select(this)
    			.transition()
@@ -73,18 +59,56 @@ svg.append("g")
    			.transition()
         	.attr("fill", "orange")
         	.attr("r", 2);
-   	});
+   	});*/
+     drawData.legend
+	.insert("text").classed("leanChart legendItem", true)
+	.attr("x", 100).attr("y",20)
+	.text("lean chart")
+	.on( "click", function () {
+	    console.log("cclicked lean");
+	    d3.select(".leanChart" + ".chartGroup")
+	    .style("visibility", "hidden");
+	});
+}
+function redrawChart(svgData) {
+    d3.select('#dThree').select("svg").remove();
+   // console.log("redrawing");
+    var drawData = {
+	timestampData: getTimestampData(),
+	bodyMassData: getBodyMassData(),
+	svg: d3.select("#dThree")
+	    .append("svg")
+	    .attr("width", svgData.w)
+	    .attr("height", svgData.h)
+    };
+    drawData.legend = drawData.svg.append("g")
+    .attr("class", "svgLegend").attr("x", 10);
+    drawData.xAxis = d3.svg.axis()
+	.scale(drawData.timestampData.scale)
+	.orient("bottom")
+        .ticks(parseInt(svgData.w / 75, 10));
+    drawData.yAxis = d3.svg.axis()
+    	.scale(drawData.bodyMassData.scale)
+    	.orient("left")
+    	.ticks(5)
+    	.tickFormat(d3.format("%"));
 
 
-svg.append("g")
+
+
+
+    leanChart(drawData);
+    fatChart(drawData);
+
+drawData.svg.append("g")
 	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
 	.attr("class", "axis")
-    .call(xAxis);
+    .call(drawData.xAxis);
 
-svg.append("g")
+drawData.svg.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(" + svgData.chartPadding + ",0)")
-    .call(yAxis);
+    .call(drawData.yAxis);
 }
 
 function getBodyMassData() {
@@ -119,9 +143,9 @@ function getTimestampData() {
 	return {min: min, max: max, scale: scale};
 }
 function resize() {
-    console.log('resizing');
+   // console.log('resizing');
     svgData.w = d3.min([1100, window.innerWidth]);
-    console.log(svgData);
+    //console.log(svgData);
     redrawChart(svgData);
 }
 d3.select(window).on('resize', resize);
