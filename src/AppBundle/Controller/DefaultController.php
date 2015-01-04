@@ -68,10 +68,14 @@ class DefaultController extends Controller
         /** @var WithingsApiAdapter $withingsAdapter */
         $withingsAdapter = $this->get('withings_api_adapter');
         $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
-        print_r($withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']));
-        print_r($withingsAdapter->getWithingsService()->request('measure?action=getmeas&userid=5702500'));
 
-        exit;
+        $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+
+        $conn = $this->get('database_connection');
+        $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
+        $conn->query($query);
+
+        return $this->render('default/callback.html.twig');
     }
 
     /**
@@ -85,7 +89,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/withings/data")
+     * @Route("/withings/data", name="withingsdata")
      */
     public function displayWithingData()
     {
