@@ -18,46 +18,8 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-//        if (!empty($_GET['userid'])) {
-            $storage = new Session();
-//
-            $token = $storage->retrieveAccessToken('WithingsOAuth');
-//
-//            echo PHP_EOL;
-//                echo "Token: " . $token->getRequestToken();
-//            echo PHP_EOL .  "Secret: " .
-//                $token->getRequestTokenSecret();
-//            echo PHP_EOL;
-//
-//            $withingsService = $this->getWithingsService();
-//
-//            // This was a callback request from BitBucket, get the token
-//            $accessToken = $withingsService->requestAccessToken(
-//                $_GET['oauth_token'],
-//                $_GET['oauth_verifier'],
-//                $token->getRequestTokenSecret()
-//            );
-//
-////            $stmt = $this->get("doctrine.dbal.default_connection")->prepare("
-////                INSERT INTO `oauth_access_tokens`(`token`, `secret`)
-////                VALUES (:token, :secret)
-////            ");
-////
-////            $stmt->execute([
-////                ':token' => $accessToken->getAccessToken(),
-////                ':secret' => $accessToken->getAccessTokenSecret()]
-////            );
-//
-//            return $this->render(
-//                'default/data.html.twig',
-//                ['access_token' => $_GET['oauth_token'],
-//                    'user_id' => $_GET['userid'],
-//                    'access_token_secret' => $_GET['oauth_verifier']]
-//            );
-//        }
-
-
-
+        echo "Hello There";
+        exit;
     }
 
     /**
@@ -67,10 +29,15 @@ class DefaultController extends Controller
     {
         /** @var WithingsApiAdapter $withingsAdapter */
         $withingsAdapter = $this->get('withings_api_adapter');
-        print_r($withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']));
-        print_r($withingsAdapter->getWithingsService()->request('measure?action=getmeas&userid=5702500'));
+        $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        exit;
+        $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+
+        $conn = $this->get('database_connection');
+        $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
+        $conn->query($query);
+
+        return $this->render('default/callback.html.twig');
     }
 
     /**
@@ -84,23 +51,19 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/oauth", name="oauth")
+     * @Route("/withings/data", name="withingsdata")
      */
     public function displayWithingData()
     {
-        $storage = new Session();
+        /** @var WithingsApiAdapter $withingsAdapter */
+        $withingsAdapter = $this->get('withings_api_adapter');
+        $token = $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        $token = $storage->retrieveAccessToken('WithingsOAuth');
+        // TODO un-hardcode user id
+        $uri = 'measure?action=getmeas&userid=5702500';
 
-        $withings = $this->getWithingsService();
-
-        $withings->requestAccessToken(
-            $_GET['oauth_token'],
-            $_GET['oauth_verifier'],
-            $token->getRequestTokenSecret()
-        );
-
-        echo "hello"; exit;
+        print_r($withingsAdapter->getWithingsService()->request($uri));
+        exit;
     }
 
     /**

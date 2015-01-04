@@ -2,17 +2,18 @@
 
 namespace Application\Migrations;
 
+use AppBundle\Provider\Providers;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\AbstractMigration;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /**
- * Create table for storing oauth access keys
+ * Create table for service providers, add Withings as a service provider
  *
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20141218101730 extends AbstractMigration implements ContainerAwareInterface
+class Version20150103162743 extends AbstractMigration implements ContainerAwareInterface
 {
     private $container;
     private $pdo;
@@ -25,11 +26,14 @@ class Version20141218101730 extends AbstractMigration implements ContainerAwareI
 
     public function up(Schema $schema)
     {
-        $this->pdo->query("CREATE TABLE oauth_access_tokens (id int, user_id VARCHAR(100), token VARCHAR(100), secret VARCHAR(100))");
+        $this->pdo->query("CREATE TABLE service_providers (id SERIAL, slug VARCHAR(30), provider_name VARCHAR(150))");
+
+        $this->pdo->query("INSERT INTO service_providers (slug, provider_name) VALUES ('" . Providers::WITHINGS . "', 'Withings')");
     }
 
     public function down(Schema $schema)
     {
-        $this->pdo->query("DROP TABLE oauth_access_token");
+        $this->pdo->query("DROP TABLE service_providers");
+
     }
 }
