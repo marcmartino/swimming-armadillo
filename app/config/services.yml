@@ -11,7 +11,9 @@ services:
     guzzle:
         class: GuzzleHttp\Client
 
+    token_storage_session:
+        class: OAuth\Common\Storage\Session
 
     withings_api_adapter:
         class: AppBundle\ApiAdapter\WithingsApiAdapter
-        arguments: ["@guzzle"]
+        arguments: ["%withings_consumer_key%", "%withings_consumer_secret%", "%withings_callback_uri%", "@token_storage_session"]

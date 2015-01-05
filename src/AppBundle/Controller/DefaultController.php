@@ -18,72 +18,59 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        if (!empty($_GET['userid'])) {
-            $storage = new Session();
-
-            $token = $storage->retrieveAccessToken('WithingsOAuth');
-
-            echo PHP_EOL;
-                echo "Token: " . $token->getRequestToken();
-            echo PHP_EOL .  "Secret: " .
-                $token->getRequestTokenSecret();
-            echo PHP_EOL;
-
-            $withingsService = $this->getWithingsService();
-
-            // This was a callback request from BitBucket, get the token
-            $accessToken = $withingsService->requestAccessToken(
-                $_GET['oauth_token'],
-                $_GET['oauth_verifier'],
-                $token->getRequestTokenSecret()
-            );
-
-            $stmt = $this->get("doctrine.dbal.default_connection")->prepare("
-                INSERT INTO `oauth_access_tokens`(`token`, `secret`)
-                VALUES (:token, :secret)
-            ");
-
-            $stmt->execute([
-                ':token' => $accessToken->getAccessToken(),
-                ':secret' => $accessToken->getAccessTokenSecret()]
-            );
-
-            return $this->render(
-                'default/data.html.twig',
-                ['access_token' => $_GET['oauth_token'],
-                    'user_id' => $_GET['userid'],
-                    'access_token_secret' => $_GET['oauth_verifier']]
-            );
-        }
-
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-        return $this->render('default/index.html.twig', ['authorize_uri' => $withingsAdapter->getAuthorizationUrl()]);
-    }
-
-    public function displayWithingData()
-    {
-
+        echo "Hello There";
+        exit;
     }
 
     /**
-     * @return WithingsOAuth
-     * @throws \OAuth\Common\Exception\Exception
+     * @Route("/withings/callback")
      */
-    protected function getWithingsService()
+    public function withingsCallback()
     {
-        $storage = new Session();
+        /** @var WithingsApiAdapter $withingsAdapter */
+        $withingsAdapter = $this->get('withings_api_adapter');
+        $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        $credentials = new Credentials(
-            '0513f1d73b6dbf44147357f89b6e9c8921d948c4e884e107cdbcc5fb7d',
-            'e4dcdceb32b1f54617c17d2223e522e4405346cb62f0c02729350bc8e605',
-            'http://hdlbit.com/'
-        );
+        $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
 
-        $serviceFactory = new ServiceFactory();
-        $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
+        $conn = $this->get('database_connection');
+        $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
+        $conn->query($query);
 
-        /** @var WithingsOAuth $withingsService */
-        return $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $storage);
+        return $this->render('default/callback.html.twig');
+    }
+
+    /**
+     * @Route("/withings/authorize")
+     */
+    public function authorizeWithings()
+    {
+        /** @var WithingsApiAdapter $withingsAdapter */
+        $withingsAdapter = $this->get('withings_api_adapter');
+        return $this->render('default/authorize.html.twig', ['authorize_uri' => $withingsAdapter->getAuthorizationUrl()]);
+    }
+
+    /**
+     * @Route("/withings/data", name="withingsdata")
+     */
+    public function displayWithingData()
+    {
+        /** @var WithingsApiAdapter $withingsAdapter */
+        $withingsAdapter = $this->get('withings_api_adapter');
+        $token = $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
+
+        // TODO un-hardcode user id
+        $uri = 'measure?action=getmeas&userid=5702500';
+
+        print_r($withingsAdapter->getWithingsService()->request($uri));
+        exit;
+    }
+
+    /**
+     * @Route("/phpinfo")
+     */
+    public function showPHPInfo()
+    {
+        phpinfo();
     }
 }
