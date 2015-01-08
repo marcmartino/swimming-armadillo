@@ -44,7 +44,7 @@ class WithingsOAuth extends AbstractService
      */
     protected function parseRequestTokenResponse($responseBody)
     {
-w        parse_str($responseBody, $data);
+        parse_str($responseBody, $data);
 
         print_r($data);
 
