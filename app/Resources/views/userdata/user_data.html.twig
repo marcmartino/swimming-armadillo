@@ -1,0 +1,11 @@
+[
+{% for event in measurement_events %}
+    {
+    "Date":"{{ event.time }}",
+    "Weight (lb)":{{ event.weight }},
+    "Fat mass (%)":{{ event.fatmass }},
+    "Lean mass (%)":{{ event.leanmass }},
+    "Comments":""
+    }{% if loop.last %}{% else %},{% endif %}
+{% endfor %}
+]

@@ -17,3 +17,7 @@ services:
     withings_api_adapter:
         class: AppBundle\ApiAdapter\WithingsApiAdapter
         arguments: ["%withings_consumer_key%", "%withings_consumer_secret%", "%withings_callback_uri%", "@token_storage_session"]
+
+    user_data:
+        class: AppBundle\UserData\UserData
+        arguments: ["@database_connection"]
