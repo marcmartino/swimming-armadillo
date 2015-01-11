@@ -61,9 +61,23 @@ class DefaultController extends Controller
         $token = $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
         // TODO un-hardcode user id
-        $uri = 'measure?action=getmeas&userid=5702500';
+        $uri = 'measure?action=getmeas&userid=5575888&meastype=11';
 
-        print_r($withingsAdapter->getWithingsService()->request($uri));
+        $response = $withingsAdapter->getWithingsService()->request($uri);
+
+        print_r($response);
+
+        $json = json_decode($response);
+
+        if ($json['status'] !== 0) {
+            throw new Exception("Request was unsuccessful.");
+        }
+
+        foreach ($json['measuregrps'] as $measureGroup) {
+            $timestamp = $measureGroup['date'];
+            $measures = $measureGroup['measures'];
+        }
+
         exit;
     }
 
