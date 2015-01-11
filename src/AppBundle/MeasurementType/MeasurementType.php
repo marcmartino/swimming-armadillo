@@ -7,5 +7,5 @@ namespace AppBundle\MeasurementType;
  */
 class MeasurementType
 {
-    const HEART_BEAT = 'heartbeat';
+    const HEART_RATE = 'heartrate';
 } 
