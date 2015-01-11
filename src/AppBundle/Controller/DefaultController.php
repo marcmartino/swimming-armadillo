@@ -2,6 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\Provider\Providers;
+use AppBundle\UnitType\UnitType;
 use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Session;
@@ -65,17 +68,38 @@ class DefaultController extends Controller
 
         $response = $withingsAdapter->getWithingsService()->request($uri);
 
-        print_r($response);
+        $json = json_decode($response, true);
 
-        $json = json_decode($response);
+        print_r($json);
 
         if ($json['status'] !== 0) {
             throw new Exception("Request was unsuccessful.");
         }
 
-        foreach ($json['measuregrps'] as $measureGroup) {
-            $timestamp = $measureGroup['date'];
-            $measures = $measureGroup['measures'];
+        /** @var \PDO $conn */
+        $conn = $this->get('database_connection');
+        $eventQuery = 'INSERT INTO measurement_event (event_time, provider_id) VALUES (:event_time, :provider_id)';
+        $eventStmt = $conn->prepare($eventQuery);
+        $measurementQuery = 'INSERT INTO measurement (measurement_event_id, measurement_type_id, units_type_id, units) VALUES (:measurement_event_id, :measurement_type_id, :units_type_id, :units)';
+        $measurementStmt = $conn->prepare($measurementQuery);
+
+        foreach ($json['body']['measuregrps'] as $measureGroup) {
+            $datetime = date("Y-m-d H:i:s", $measureGroup['date']);
+            $measurements = $measureGroup['measures'];
+            $eventStmt->execute([
+                ':event_time' => $datetime,
+                ':provider_id' => 1
+            ]);
+
+            foreach ($measurements as $measurement) {
+                $measurementStmt->execute([
+                    ':measurement_event_id' => $conn->lastInsertId('id'),
+                    ':measurement_type_id' => 1,
+                    ':units_type_id' => 1,
+                    ':units' => $measurement['value']
+                ]);
+            }
+
         }
 
         exit;
