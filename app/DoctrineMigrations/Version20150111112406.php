@@ -27,7 +27,7 @@ class Version20150111112406 extends AbstractMigration implements ContainerAwareI
     {
         $this->pdo->query("CREATE TABLE measurement_event (id SERIAL, event_time DATETIME, provider_id INT)");
 
-        $this->pdo->query("CREATE TABLE measurement (id SERIAL, measurement_event_id INT, units_type_id INT, units FLOAT)");
+        $this->pdo->query("CREATE TABLE measurement (id SERIAL, measurement_event_id INT, measurement_type_id INT, units_type_id INT, units FLOAT)");
     }
 
     public function down(Schema $schema)
