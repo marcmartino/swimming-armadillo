@@ -64,7 +64,7 @@ class DefaultController extends Controller
         $token = $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
         // TODO un-hardcode user id
-        $uri = 'measure?action=getmeas&userid=5575888&meastype=11';
+        $uri = 'measure?action=getmeas&userid=5575888';
 
         $response = $withingsAdapter->getWithingsService()->request($uri);
 
@@ -83,6 +83,8 @@ class DefaultController extends Controller
         $measurementQuery = 'INSERT INTO measurement (measurement_event_id, measurement_type_id, units_type_id, units) VALUES (:measurement_event_id, :measurement_type_id, :units_type_id, :units)';
         $measurementStmt = $conn->prepare($measurementQuery);
 
+        $types = [];
+
         foreach ($json['body']['measuregrps'] as $measureGroup) {
             $datetime = date("Y-m-d H:i:s", $measureGroup['date']);
             $measurements = $measureGroup['measures'];
@@ -91,12 +93,52 @@ class DefaultController extends Controller
                 ':provider_id' => 1
             ]);
 
+            $eventId = $conn->lastInsertId('id');
+
             foreach ($measurements as $measurement) {
+
+                $measurementTypeId = false;
+                $unitsTypeId = false;
+                $units = $measurement['value'];
+
+                switch ($measurement['type']) {
+                    case 1:  // weight
+                        $measurementTypeId = 2;
+                        $unitsTypeId = 3;
+                        $units = $measurement['value'];
+                        break;
+                    case 4:  // height
+                        $measurementTypeId = 3;
+                        $unitsTypeId = 4;
+                        break;
+                    case 5:  // fat free mass
+                        $measurementTypeId = 4;
+                        $unitsTypeId = 3;
+                        $units = $measurement['value'];
+                        break;
+                    case 6:  // fat ratio
+                        $measurementTypeId = 5;
+                        $unitsTypeId = 2;
+                        $units = $measurement['value'] * pow(10, $measurement['unit']);
+                        break;
+                    case 8:  // fat mass weight
+                        $measurementTypeId = 6;
+                        $unitsTypeId = 3;
+                        break;
+                    case 11: // heart pulse
+                        $measurementTypeId = 1;
+                        $unitsTypeId = 1;
+                        break;
+                    default:
+                        throw new \Exception("Measurement type (" . $measurement['type'] . ") not handled");
+
+                }
+
                 $measurementStmt->execute([
-                    ':measurement_event_id' => $conn->lastInsertId('id'),
-                    ':measurement_type_id' => 1,
-                    ':units_type_id' => 1,
-                    ':units' => $measurement['value']
+                    ':measurement_event_id' => $eventId,
+                    ':measurement_type_id' => $measurementTypeId,
+                    ':units_type_id' => $unitsTypeId,
+                    ':units' => $units
                 ]);
             }
 
