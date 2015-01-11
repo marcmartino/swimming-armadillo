@@ -11,7 +11,7 @@ class MeasurementType
     WEIGHT = 'weight',
     HEIGHT = 'height',
     FAT_FREE_MASS = 'fatfreemass',
-    FAT_RATION = 'fatratio',
+    FAT_RATIO = 'fatratio',
     FAT_MASS_WEIGHT = 'fatmassweight',
     DIASTOLIC_BLOOD_PREASSURE = 'diastolicbloodpressure',
     SYSTOLIC_BLOOD_PREASSURE = 'sysstolicbloodpressure',
