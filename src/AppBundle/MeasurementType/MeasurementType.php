@@ -7,5 +7,13 @@ namespace AppBundle\MeasurementType;
  */
 class MeasurementType
 {
-    const HEART_RATE = 'heartrate';
+    const HEART_RATE = 'heartrate',
+    WEIGHT = 'weight',
+    HEIGHT = 'height',
+    FAT_FREE_MASS = 'fatfreemass',
+    FAT_RATION = 'fatratio',
+    FAT_MASS_WEIGHT = 'fatmassweight',
+    DIASTOLIC_BLOOD_PREASSURE = 'diastolicbloodpressure',
+    SYSTOLIC_BLOOD_PREASSURE = 'sysstolicbloodpressure',
+    SPO2 = 'spo2';
 } 
