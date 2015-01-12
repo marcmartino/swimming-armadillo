@@ -73,7 +73,7 @@ class DefaultController extends Controller
         print_r($json);
 
         if ($json['status'] !== 0) {
-            throw new Exception("Request was unsuccessful.");
+            throw new \Exception("Request was unsuccessful.");
         }
 
         /** @var \PDO $conn */
