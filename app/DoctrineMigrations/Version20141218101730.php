@@ -30,6 +30,6 @@ class Version20141218101730 extends AbstractMigration implements ContainerAwareI
 
     public function down(Schema $schema)
     {
-        $this->pdo->query("DROP TABLE oauth_access_token");
+        $this->pdo->query("DROP TABLE oauth_access_tokens");
     }
 }
