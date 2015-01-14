@@ -27,11 +27,19 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route("/login")
      */
     public function loginAction()
     {
         return $this->render("default/login.html.twig");
+    }
+
+    /**
+     * @Route("/services")
+     */
+    public function servicesAction()
+    {
+        return $this->render("default/services.html.twig");
     }
 
     /**
