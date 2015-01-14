@@ -1,0 +1,20 @@
+{
+  "name": "swimming-armadillo",
+  "version": "0.0.0",
+  "homepage": "https://github.com/marcmartino/swimming-armadillo",
+  "authors": [
+    "swimming-armadillo"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "zurb/bower-foundation#~5.5.0"
+  }
+}
