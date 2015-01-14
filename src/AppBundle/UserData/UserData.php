@@ -32,7 +32,6 @@ class UserData
         FROM measurement_event me INNER JOIN measurement m
         ON me.id = m.measurement_event_id
         WHERE m.measurement_type_id = 2 OR m.measurement_type_id = 4 OR m.measurement_type_id = 6
-        GROUP BY me.id
         ");
         $stmt->execute();
 
