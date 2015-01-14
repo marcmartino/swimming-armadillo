@@ -35,11 +35,28 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/register")
+     */
+    public function registerAction()
+    {
+        return $this->render("default/register.html.twig");
+    }
+
+
+    /**
      * @Route("/services")
      */
     public function servicesAction()
     {
         return $this->render("default/services.html.twig");
+    }
+
+    /**
+     * @Route("/view/data")
+     */
+    public function viewDataAction()
+    {
+        return $this->render("default/view_data.html.twig");
     }
 
     /**

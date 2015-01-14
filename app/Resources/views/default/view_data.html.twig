@@ -1,0 +1,40 @@
+{% extends '::base.html.twig' %}
+{% block body %}
+    <style type="text/css">
+        .data-graph {
+            background-color: #CCC;
+            width: 100%;
+        }
+        .top-bar {
+            margin-bottom: 10px;
+        }
+        iframe body img {
+            width: 100%;
+        }
+    </style>
+    <div class="center row">
+        <div class="large-12 columns">
+            <h2>View</h2>
+        </div>
+    </div>
+    <nav class="top-bar" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="#">Withings</a></h1>
+            </li>
+        </ul>
+    </nav>
+    <div class="center row">
+        <div class="large-12 columns">
+            <iframe class="data-graph" src="https://chart.googleapis.com/chart?cht=p3&chd=t:60,40&chs=250x100&chl=Hello|World">Datas</iframe>
+        </div>
+        <div class="large-12 columns">
+            <ul class="circle">
+                <li>Body Fat (%)</li>
+                <li>Body Lean (%)</li>
+                <li>Weight (m)</li>
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}
