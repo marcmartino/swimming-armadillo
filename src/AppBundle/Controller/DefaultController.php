@@ -23,7 +23,40 @@ class DefaultController extends Controller
     public function indexAction()
     {
         echo "Hello There";
-        exit;
+        return $this->render('default/index.html.twig');
+    }
+
+    /**
+     * @Route("/login")
+     */
+    public function loginAction()
+    {
+        return $this->render("default/login.html.twig");
+    }
+
+    /**
+     * @Route("/register")
+     */
+    public function registerAction()
+    {
+        return $this->render("default/register.html.twig");
+    }
+
+
+    /**
+     * @Route("/services")
+     */
+    public function servicesAction()
+    {
+        return $this->render("default/services.html.twig");
+    }
+
+    /**
+     * @Route("/view/data")
+     */
+    public function viewDataAction()
+    {
+        return $this->render("default/view_data.html.twig");
     }
 
     /**
@@ -93,7 +126,7 @@ class DefaultController extends Controller
                 ':provider_id' => 1
             ]);
 
-            $eventId = $conn->lastInsertId('id');
+            $eventId = $conn->lastInsertId('measurement_event_id_seq');
 
             foreach ($measurements as $measurement) {
 
@@ -156,8 +189,8 @@ class DefaultController extends Controller
         $withingsAdapter = $this->get('withings_api_adapter');
 
         $token = new StdOAuth1Token();
-        $token->setAccessToken('d3c14c35646714efec8ce1552484615c7453e5212064d82fc87f349f');
-        $token->setAccessTokenSecret('0048ee0d58343d704c21be647587ee63e011474e4c8de4386e7d14e7822');
+        $token->setAccessToken('318dc8541257c51654462e3df777ffdd2fd81430301e7c806379bd769cbc');
+        $token->setAccessTokenSecret('20e4e4e76d19936fefcd0bfd7ef803f6690c7089768f2d37e5cffce393bee');
 
         $withingsAdapter->getWithingsService()->getStorage()->storeAccessToken('WithingsOAuth', $token);
         exit;

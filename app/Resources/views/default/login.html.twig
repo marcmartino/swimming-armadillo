@@ -1,0 +1,87 @@
+{% extends '::base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        .center.row {
+            height: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 5%;
+            max-width: 500px;
+        }
+
+        .signup-panel {
+            padding: 15px;
+        }
+
+        .signup-panel i {
+            font-size: 30px;
+            line-height: 50px;
+            color: #999;
+        }
+
+        .signup-panel form input, .signup-panel form span {
+            height: 50px;
+        }
+
+        .signup-panel .welcome {
+            font-size: 26px;
+            text-align: center;
+            margin-left: 0;
+        }
+
+        .signup-panel .button {
+            margin-left: 35%;
+        }
+
+        section.active {
+            padding-top: 75px !important;
+        }
+
+        p.title {
+            border-bottom: 1px solid #cccccc !important;
+        }
+
+        .content{
+            height: 450px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="center row">
+        <div class="section-container tabs" data-section="tabs">
+            <section>
+                <p class="title" data-section-title><a href="#">Sign In</a></p>
+                <div class="content" data-section-content>
+                    <p>
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <div class="signup-panel">
+                                <p class="welcome">Welcome back!</p>
+                                <form>
+                                    <div class="row collapse">
+                                        <div class="small-2 columns">
+                                            <span class="prefix"><i class="fi-mail"></i></span>
+                                        </div>
+                                        <div class="small-10  columns">
+                                            <input type="text" placeholder="Email">
+                                        </div>
+                                    </div>
+                                    <div class="row collapse">
+                                        <div class="small-2 columns ">
+                                            <span class="prefix"><i class="fi-lock"></i></span>
+                                        </div>
+                                        <div class="small-10 columns ">
+                                            <input type="text" placeholder="Password">
+                                        </div>
+                                    </div>
+                                </form>
+                                <a href="#" class="button ">Sign Up! </a>
+                            </div>
+                        </div>
+                    </div></p>
+                </div>
+            </section>
+        </div>
+        <div>
+{% endblock %}

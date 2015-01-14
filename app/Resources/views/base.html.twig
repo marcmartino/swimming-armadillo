@@ -3,11 +3,27 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% javascripts
+            '@AppBundle/Resources/public/vendor/modernizr/modernizr.js'
+            %}
+            <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+        {% block stylesheets %}
+            {% stylesheets '@AppBundle/Resources/public/vendor/foundation/css/*.css' filter='cssrewrite' %}
+                <link rel="stylesheet" href="{{ asset_url }}" />
+            {% endstylesheets %}
+        {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        {% block javascripts%}
+            {% javascripts
+            '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
+            '@AppBundle/Resources/public/vendor/foundation/js/foundation.js'
+            %}
+            <script src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        {% endblock %}
     </body>
 </html>
