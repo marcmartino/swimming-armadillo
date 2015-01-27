@@ -22,24 +22,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        echo "Hello There";
         return $this->render('default/index.html.twig');
-    }
-
-    /**
-     * @Route("/login")
-     */
-    public function loginAction()
-    {
-        return $this->render("default/login.html.twig");
-    }
-
-    /**
-     * @Route("/register")
-     */
-    public function registerAction()
-    {
-        return $this->render("default/register.html.twig");
     }
 
 
