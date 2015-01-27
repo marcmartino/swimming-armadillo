@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class UserDataController extends Controller
 {
     /**
-     * @Route("/userdata")
+     * @Route("/userdata", name="userdata")
      */
     public function userData()
     {
