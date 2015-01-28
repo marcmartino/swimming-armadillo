@@ -11,6 +11,92 @@ console.log("module poo running");
 
 //export default {poo:"poo"};
   export default  {
-    poo: "poo",
-    fun: (s) => {"hello, " + s}
+    unit: "bpm",
+    dateMinMaxFunc:  () => {
+	
+    },
+    prom: new Promise(function(resolve, reject) {
+  // do a thing, possibly async, then…
+
+  if (/* everything turned out fine */true) {
+    resolve("Stuff worked!");
   }
+  else {
+    reject(Error("It broke"));
+  }
+}),
+    fun: (function () {
+	var remoteData;
+	 var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata";
+	    $.ajax({
+		type: "GET",
+		url: url,
+		success: (data) => {
+		    console.log("get success");
+		    console.log(data);
+		    remoteData = data;
+		    if (drawDataTemp) {
+			drawFunc(drawDataTemp);
+			drawDataTemp = undefined;
+		    }
+		},
+		error: (d) => {
+		    console.log("ajax errored");
+		    console.log(d);
+		}
+	    });
+	
+	var drawDataTemp;
+	var drawFunc = (drawData) => {
+	    console.log("drawFuncEx");
+	    console.log(drawData);
+	    drawData.svg.append("g")
+		.selectAll("rect")
+   		.data(dataset)
+   		.enter()
+		.append("circle")
+		.attr("cx", function (d, i) {
+   		    return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+		})
+		.attr("cy", function (d, i) {
+   		    return drawData.bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
+   		})
+   		.attr('r', 2)
+   		.attr('fill', 'brown');
+
+	    /*drawData.legend
+		.insert("text").attr("class", "fatChart")
+		.attr("x", 20).attr("y",20)
+		.text("fat chart");*/
+	};
+	return function(drawData) {
+	    console.log("about tto draw");
+	    console.log(remoteData);
+
+	    if (remoteData) {
+		drawFunc(drawData);
+	    } else {
+		console.log("defering draw call");
+		drawDataTemp = drawData;
+	    }
+	   // return 'poo';
+	};
+    }())
+  }
+
+function getBodyMassData() {
+	var min = _.min([_.min(dataset, "Fat mass (%)")["Fat mass (%)"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+		max = _.max([_.max(dataset, "Fat mass (%)")["Fat mass (%)"], _.max(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+		rangePadding = (max - min) * 0.25;
+		scale = d3.scale.linear()
+
+			//added range padding,but also maxing by zero to make sure no negitive percentage appears on axis
+			.domain([_.min([max + rangePadding,100]), _.max([min - rangePadding,0])])
+			.range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
+
+	console.log("body mass max: ");
+	console.log(max);
+	return {min: min, max: max, scale: scale};
+}
+
+
