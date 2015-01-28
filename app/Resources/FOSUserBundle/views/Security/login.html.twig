@@ -1,4 +1,6 @@
-{% extends '::layout.html.twig' %}
+{% extends "layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
+
 {% block stylesheets %}
     {{ parent() }}
     <style type="text/css">
@@ -12,6 +14,7 @@
 
         .signup-panel {
             padding: 15px;
+            text-align: center;
         }
 
         .signup-panel i {
@@ -30,10 +33,6 @@
             margin-left: 0;
         }
 
-        .signup-panel .button {
-            margin-left: 35%;
-        }
-
         section.active {
             padding-top: 75px !important;
         }
@@ -48,6 +47,9 @@
     </style>
 {% endblock %}
 {% block body %}
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
     <div class="center row">
         <div class="section-container tabs" data-section="tabs">
             <section>
@@ -58,30 +60,25 @@
                         <div class="large-12 columns">
                             <div class="signup-panel">
                                 <p class="welcome">Welcome back!</p>
-                                <form>
+                                <form action="{{ path("fos_user_security_check") }}" method="post">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
                                     <div class="row collapse">
-                                        <div class="small-2 columns">
-                                            <span class="prefix"><i class="fi-mail"></i></span>
-                                        </div>
-                                        <div class="small-10  columns">
-                                            <input type="text" placeholder="Email">
+                                        <div class="small-12  columns">
+                                            <input type="text" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email" />
                                         </div>
                                     </div>
                                     <div class="row collapse">
-                                        <div class="small-2 columns ">
-                                            <span class="prefix"><i class="fi-lock"></i></span>
-                                        </div>
-                                        <div class="small-10 columns ">
-                                            <input type="text" placeholder="Password">
+                                        <div class="small-12 columns ">
+                                            <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
                                         </div>
                                     </div>
+                                    <input type="submit" id="_submit" name="_submit" class="button" value="{{ 'security.login.submit'|trans }}">
                                 </form>
-                                <a href="#" class="button ">Sign Up! </a>
                             </div>
                         </div>
                     </div></p>
                 </div>
             </section>
         </div>
-        <div>
+    <div>
 {% endblock %}
