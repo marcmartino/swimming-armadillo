@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Provider;
 use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\Provider\Providers;
 use AppBundle\UnitType\UnitType;
@@ -13,6 +14,7 @@ use OAuth\Common\Consumer\Credentials;
 use AppBundle\ApiAdapter\WithingsApiAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 
 class DefaultController extends Controller
@@ -27,11 +29,13 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/services")
+     * @Route("/providers")
      */
     public function servicesAction()
     {
-        return $this->render("default/services.html.twig");
+        /** @var Provider $provider */
+        $provider = $this->get('entity_provider');
+        return $this->render("default/providers.html.twig", ['providers' => $provider->getProviders()]);
     }
 
     /**
@@ -57,17 +61,18 @@ class DefaultController extends Controller
         $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
         $conn->query($query);
 
-        return $this->render('default/callback.html.twig');
+        return $this->redirect($this->generateUrl('providers'));
     }
 
     /**
-     * @Route("/withings/authorize")
+     * @Route("/withings/authorize", name="withingsauthorize")
      */
     public function authorizeWithings()
     {
         /** @var WithingsApiAdapter $withingsAdapter */
         $withingsAdapter = $this->get('withings_api_adapter');
-        return $this->render('default/authorize.html.twig', ['authorize_uri' => $withingsAdapter->getAuthorizationUrl()]);
+        $url = $withingsAdapter->getAuthorizationUrl();
+        return new RedirectResponse((string) $url);
     }
 
     /**
@@ -85,8 +90,6 @@ class DefaultController extends Controller
         $response = $withingsAdapter->getWithingsService()->request($uri);
 
         $json = json_decode($response, true);
-
-        print_r($json);
 
         if ($json['status'] !== 0) {
             throw new \Exception("Request was unsuccessful.");

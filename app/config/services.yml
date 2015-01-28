@@ -21,3 +21,7 @@ services:
     user_data:
         class: AppBundle\UserData\UserData
         arguments: ["@database_connection"]
+
+    entity_provider:
+        class: AppBundle\Entity\Provider
+        arguments: ["@database_connection"]

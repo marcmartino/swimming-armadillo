@@ -1,4 +1,4 @@
-{% extends '::layout.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% block body %}
     <div class="center row">
         <div class="large-12 columns">
@@ -8,10 +8,9 @@
     <form>
         <div class="center row">
             <div class="large-12 columns">
-                <a href="#" class="button expand">Withings</a>
-                <a href="#" class="button expand">Jawbone</a>
-                <a href="#" class="button expand">Fitbit</a>
-                <a href="#" class="button expand">Basis</a>
+            {% for provider in providers %}
+                <a href="{{ path('withingsauthorize') }}" class="button expand">{{ provider.provider_name }}</a>
+            {% endfor %}
             </div>
         </div>
     </form>
