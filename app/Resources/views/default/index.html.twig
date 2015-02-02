@@ -1,10 +1,6 @@
 {% extends '::layout.html.twig' %}
 {% block body %}
-    {% if app.user %}
-        Logged In!
-    {% else %}
-        <h2 class="text-center">Please log in to continue</h2>
-        {% render controller("FOSUserBundle:Security:login") %}
-    {% endif %}
+    <h2 class="text-center">Please log in to continue</h2>
+    {% render controller("FOSUserBundle:Security:login") %}
     {% block fos_user_content %}{% endblock %}
 {% endblock %}

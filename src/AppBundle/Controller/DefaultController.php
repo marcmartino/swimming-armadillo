@@ -24,6 +24,9 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
+        if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->forward('AppBundle:Default:services');
+        }
         return $this->render('default/index.html.twig');
     }
 
