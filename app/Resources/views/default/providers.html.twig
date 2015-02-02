@@ -9,7 +9,14 @@
         <div class="center row">
             <div class="large-12 columns">
             {% for provider in providers %}
-                <a href="{{ path('withingsauthorize') }}" class="button expand">{{ provider.provider_name }}</a>
+                {% if provider.secret is null %}
+                    <span class="label">Still need to authenticate</span>
+                {% else %}
+                    <span class="success label">Already Authenticated</span>
+                {% endif %}
+                <a href="{% if provider.secret is null %}{{ path('withingsauthorize') }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.secret is not null %} success{% endif %}">
+                    {{ provider.provider_name }}
+                </a>
             {% endfor %}
             </div>
         </div>

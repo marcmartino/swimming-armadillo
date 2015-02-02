@@ -32,13 +32,15 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/providers")
+     * @Route("/providers", name="providers")
      */
     public function servicesAction()
     {
         /** @var Provider $provider */
         $provider = $this->get('entity_provider');
-        return $this->render("default/providers.html.twig", ['providers' => $provider->getProviders()]);
+        return $this->render("default/providers.html.twig", [
+            'providers' => $provider->getProviders($this->getUser()->getId())
+        ]);
     }
 
     /**
@@ -60,9 +62,18 @@ class DefaultController extends Controller
 
         $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
 
+        /** @var Provider $provider */
+        $provider = $this->get('entity_provider');
+
         $conn = $this->get('database_connection');
-        $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
-        $conn->query($query);
+        $stmt = $conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
+        $stmt->execute([
+            ':userId' => $this->getUser()->getId(),
+            ':providerId' => $provider->getProvider(Providers::WITHINGS)[0]['id'],
+            ':foreignUserId' => $_GET['userid'],
+            ':accessToken' => $accessToken->getAccessToken(),
+            ':accessTokenSecret' => $accessToken->getAccessTokenSecret(),
+        ]);
 
         return $this->redirect($this->generateUrl('providers'));
     }
