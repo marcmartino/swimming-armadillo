@@ -3,18 +3,12 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Provider;
-use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\Provider\Providers;
-use AppBundle\UnitType\UnitType;
 use OAuth\OAuth1\Token\StdOAuth1Token;
-use OAuth\ServiceFactory;
-use OAuth\Common\Storage\Session;
-use AppBundle\OAuth\WithingsOAuth;
-use OAuth\Common\Consumer\Credentials;
 use AppBundle\ApiAdapter\WithingsApiAdapter;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // Leave for @Annotations
 
 
 class DefaultController extends Controller

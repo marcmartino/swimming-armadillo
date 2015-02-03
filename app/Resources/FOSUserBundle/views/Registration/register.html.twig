@@ -1,0 +1,75 @@
+{% extends "layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        .center.row {
+            height: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 5%;
+            max-width: 500px;
+        }
+
+        .signup-panel {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .signup-panel i {
+            font-size: 30px;
+            line-height: 50px;
+            color: #999;
+        }
+
+        .signup-panel form input, .signup-panel form span {
+            height: 50px;
+        }
+
+        .signup-panel .welcome {
+            font-size: 26px;
+            text-align: center;
+            margin-left: 0;
+        }
+
+        section.active {
+            padding-top: 75px !important;
+        }
+
+        p.title {
+            border-bottom: 1px solid #cccccc !important;
+        }
+
+        div#fos_user_registration_form label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+<div class="center row">
+    <div class="section-container tabs" data-section="tabs">
+        <section>
+            <p class="title" data-section-title><a href="#">Sign In</a></p>
+            <div class="content" data-section-content>
+                <p>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <div class="signup-panel">
+                            <p class="welcome">Welcome back!</p>
+                            <form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
+                                {{ form_widget(form) }}
+                                <div>
+                                    <input type="submit" class="button" value="{{ 'Submit'|trans }}" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div></p>
+            </div>
+        </section>
+    </div>
+    <div>
+    <a href="{{ path('homepage') }}">Login</a>
+
+{% endblock body %}
