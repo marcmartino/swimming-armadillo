@@ -173,28 +173,4 @@ class DefaultController extends Controller
 
         exit;
     }
-
-    /**
-     * @Route("/withings/store_token")
-     */
-    public function withingsStoreToken()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-
-        $token = new StdOAuth1Token();
-        $token->setAccessToken('318dc8541257c51654462e3df777ffdd2fd81430301e7c806379bd769cbc');
-        $token->setAccessTokenSecret('20e4e4e76d19936fefcd0bfd7ef803f6690c7089768f2d37e5cffce393bee');
-
-        $withingsAdapter->getWithingsService()->getStorage()->storeAccessToken('WithingsOAuth', $token);
-        exit;
-    }
-
-    /**
-     * @Route("/phpinfo")
-     */
-    public function showPHPInfo()
-    {
-        phpinfo();
-    }
 }
