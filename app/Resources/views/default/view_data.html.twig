@@ -1,5 +1,12 @@
 {% extends '::layout.html.twig' %}
 {% block body %}
+    <script type="text/javascript">
+        function iframeLoaded() {
+            var iframe = document.getElementById('iframeId');
+            iframe.height = "";
+            iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
+        }
+    </script>
     <style type="text/css">
         .data-graph {
             background-color: #CCC;
@@ -14,7 +21,7 @@
     </style>
     <div class="center row">
         <div class="large-12 columns">
-            <h2>View</h2>
+            <h2>Your Data</h2>
         </div>
     </div>
     <nav class="top-bar" data-topbar role="navigation">
@@ -26,14 +33,7 @@
     </nav>
     <div class="center row">
         <div class="large-12 columns">
-            <iframe class="data-graph" src="https://chart.googleapis.com/chart?cht=p3&chd=t:60,40&chs=250x100&chl=Hello|World">Datas</iframe>
-        </div>
-        <div class="large-12 columns">
-            <ul class="circle">
-                <li>Body Fat (%)</li>
-                <li>Body Lean (%)</li>
-                <li>Weight (m)</li>
-            </ul>
+            <iframe id="iframeId" class="data-graph" src="http://localhost:8000/Swimming%20Arm%20Graph/index.html" onload="iframeLoaded()" scrolling="no">Datas</iframe>
         </div>
     </div>
 

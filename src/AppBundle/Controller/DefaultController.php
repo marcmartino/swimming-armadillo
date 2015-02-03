@@ -44,7 +44,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/view/data")
+     * @Route("/view/data", name="graphs")
      */
     public function viewDataAction()
     {
