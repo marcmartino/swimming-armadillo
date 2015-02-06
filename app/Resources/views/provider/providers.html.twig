@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    <div class="center row">
+        <div class="large-12 columns">
+            <h2>What services do you have?</h2>
+        </div>
+    </div>
+    <form>
+        <div class="center row">
+            <div class="large-12 columns">
+            {% for provider in providers %}
+                {% if provider.secret is null %}
+                    <span class="label">Still need to authenticate</span>
+                {% else %}
+                    <span class="success label">Already Authenticated</span>
+                {% endif %}
+                <a href="{% if provider.secret is null %}{{ path('providerauthorize', {'providerSlug': provider.slug}) }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.secret is not null %} success{% endif %}">
+                    {{ provider.provider_name }}
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+    </form>
+    <div class="center row">
+        <div class="large-12 columns">
+            <a href="{{ path("graphs") }}">See my data.</a>
+        </div>
+    </div>
+{% endblock %}

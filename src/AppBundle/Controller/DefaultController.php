@@ -2,17 +2,13 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
-use AppBundle\UnitType\UnitType;
 use OAuth\OAuth1\Token\StdOAuth1Token;
-use OAuth\ServiceFactory;
-use OAuth\Common\Storage\Session;
-use AppBundle\OAuth\WithingsOAuth;
-use OAuth\Common\Consumer\Credentials;
 use AppBundle\ApiAdapter\WithingsApiAdapter;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // Leave for @Annotations
 
 
 class DefaultController extends Controller
@@ -22,69 +18,18 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        echo "Hello There";
+        if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->forward('AppBundle:Provider:providers');
+        }
         return $this->render('default/index.html.twig');
     }
 
     /**
-     * @Route("/login")
-     */
-    public function loginAction()
-    {
-        return $this->render("default/login.html.twig");
-    }
-
-    /**
-     * @Route("/register")
-     */
-    public function registerAction()
-    {
-        return $this->render("default/register.html.twig");
-    }
-
-
-    /**
-     * @Route("/services")
-     */
-    public function servicesAction()
-    {
-        return $this->render("default/services.html.twig");
-    }
-
-    /**
-     * @Route("/view/data")
+     * @Route("/view/data", name="graphs")
      */
     public function viewDataAction()
     {
         return $this->render("default/view_data.html.twig");
-    }
-
-    /**
-     * @Route("/withings/callback")
-     */
-    public function withingsCallback()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-        $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
-
-        $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
-
-        $conn = $this->get('database_connection');
-        $query = "INSERT INTO oauth_access_tokens (user_id, token, secret) VALUES ('" . $_GET['userid'] . "', '" . $accessToken->getAccessToken() . "', '" . $accessToken->getAccessTokenSecret() . "')";
-        $conn->query($query);
-
-        return $this->render('default/callback.html.twig');
-    }
-
-    /**
-     * @Route("/withings/authorize")
-     */
-    public function authorizeWithings()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-        return $this->render('default/authorize.html.twig', ['authorize_uri' => $withingsAdapter->getAuthorizationUrl()]);
     }
 
     /**
@@ -102,8 +47,6 @@ class DefaultController extends Controller
         $response = $withingsAdapter->getWithingsService()->request($uri);
 
         $json = json_decode($response, true);
-
-        print_r($json);
 
         if ($json['status'] !== 0) {
             throw new \Exception("Request was unsuccessful.");
@@ -178,29 +121,5 @@ class DefaultController extends Controller
         }
 
         exit;
-    }
-
-    /**
-     * @Route("/withings/store_token")
-     */
-    public function withingsStoreToken()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-
-        $token = new StdOAuth1Token();
-        $token->setAccessToken('318dc8541257c51654462e3df777ffdd2fd81430301e7c806379bd769cbc');
-        $token->setAccessTokenSecret('20e4e4e76d19936fefcd0bfd7ef803f6690c7089768f2d37e5cffce393bee');
-
-        $withingsAdapter->getWithingsService()->getStorage()->storeAccessToken('WithingsOAuth', $token);
-        exit;
-    }
-
-    /**
-     * @Route("/phpinfo")
-     */
-    public function showPHPInfo()
-    {
-        phpinfo();
     }
 }

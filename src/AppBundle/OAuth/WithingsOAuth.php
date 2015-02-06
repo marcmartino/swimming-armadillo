@@ -46,8 +46,6 @@ class WithingsOAuth extends AbstractService
     {
         parse_str($responseBody, $data);
 
-        print_r($data);
-
         if (null === $data || !is_array($data)) {
             throw new TokenResponseException('Unable to parse response.');
         } elseif (!isset($data['oauth_token']) || !isset($data['oauth_token_secret'])) {

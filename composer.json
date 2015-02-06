@@ -12,7 +12,7 @@
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "twig/extensions": "~1.0",
-        "symfony/assetic-bundle": "~2.3",
+        "symfony/assetic-bundle": "dev-master",
         "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
         "sensio/distribution-bundle": "~3.0",
@@ -21,7 +21,8 @@
         "guzzlehttp/guzzle": "~5.0",
 	    "lusitanian/oauth": "0.3.5",
         "doctrine/migrations": "1.0.*@dev",
-        "doctrine/doctrine-migrations-bundle": "2.1.*@dev"
+        "doctrine/doctrine-migrations-bundle": "2.1.*@dev",
+        "friendsofsymfony/user-bundle": "~2.0@dev"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
