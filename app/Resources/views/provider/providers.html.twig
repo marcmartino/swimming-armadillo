@@ -14,7 +14,7 @@
                 {% else %}
                     <span class="success label">Already Authenticated</span>
                 {% endif %}
-                <a href="{% if provider.secret is null %}{{ path('withingsauthorize') }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.secret is not null %} success{% endif %}">
+                <a href="{% if provider.secret is null %}{{ path('providerauthorize', {'providerSlug': provider.slug}) }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.secret is not null %} success{% endif %}">
                     {{ provider.provider_name }}
                 </a>
             {% endfor %}

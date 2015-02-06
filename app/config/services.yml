@@ -14,9 +14,9 @@ services:
     token_storage_session:
         class: OAuth\Common\Storage\Session
 
-    withings_api_adapter:
-        class: AppBundle\ApiAdapter\WithingsApiAdapter
-        arguments: ["%withings_consumer_key%", "%withings_consumer_secret%", "%withings_callback_uri%", "@token_storage_session"]
+    api_adapter_factory:
+        class: AppBundle\ApiAdapter\ProviderApiAdapterFactory
+        arguments: ["@service_container"]
 
     user_data:
         class: AppBundle\UserData\UserData

@@ -19,7 +19,7 @@ class DefaultController extends Controller
     public function indexAction()
     {
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            return $this->forward('AppBundle:Default:services');
+            return $this->forward('AppBundle:Provider:providers');
         }
         return $this->render('default/index.html.twig');
     }
@@ -30,33 +30,6 @@ class DefaultController extends Controller
     public function viewDataAction()
     {
         return $this->render("default/view_data.html.twig");
-    }
-
-    /**
-     * @Route("/withings/callback")
-     */
-    public function withingsCallback()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-        $withingsAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
-
-        $accessToken = $withingsAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
-
-        /** @var Provider $provider */
-        $provider = $this->get('entity_provider');
-
-        $conn = $this->get('database_connection');
-        $stmt = $conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
-        $stmt->execute([
-            ':userId' => $this->getUser()->getId(),
-            ':providerId' => $provider->getProvider(Providers::WITHINGS)[0]['id'],
-            ':foreignUserId' => $_GET['userid'],
-            ':accessToken' => $accessToken->getAccessToken(),
-            ':accessTokenSecret' => $accessToken->getAccessTokenSecret(),
-        ]);
-
-        return $this->redirect($this->generateUrl('providers'));
     }
 
     /**

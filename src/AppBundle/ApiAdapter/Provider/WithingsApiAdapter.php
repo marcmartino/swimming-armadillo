@@ -1,6 +1,7 @@
 <?php
-namespace AppBundle\ApiAdapter;
+namespace AppBundle\ApiAdapter\Provider;
 
+use AppBundle\ApiAdapter\ApiAdapterInterface;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Memory;
 use AppBundle\OAuth\WithingsOAuth;
@@ -8,6 +9,7 @@ use OAuth\Common\Consumer\Credentials;
 use OAuth\OAuth1\Service\AbstractService;
 use OAuth\Common\Service\ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class WithingsApiAdapter
@@ -36,26 +38,26 @@ class WithingsApiAdapter implements ApiAdapterInterface
      * @var ServiceInterface
      */
     private $withingsService;
+    /**
+     * @var Container
+     */
+    private $container;
 
     /**
-     * @param $consumerKey
-     * @param $consumerSecret
-     * @param $callbackUri
-     * @param TokenStorageInterface $storage
+     * @param Container $container
      */
     public function __construct(
-        $consumerKey,
-        $consumerSecret,
-        $callbackUri,
-        TokenStorageInterface $storage
+        Container $container
     ) {
+        $this->container = $container;
 
-        $this->callbackUri = $callbackUri;
-        $this->consumerSecret = $consumerSecret;
-        $this->consumerKey = $consumerKey;
-        $this->storage = $storage;
+        $this->consumerKey = $this->container->getParameter('withings_consumer_key');
+        $this->consumerSecret = $this->container->getParameter('withings_consumer_secret');
+        $this->callbackUri = $this->container->getParameter('withings_callback_uri');
+        $this->storage = $this->container->get('token_storage_session');;
 
         $this->withingsService = $this->createWithingsService();
+        $this->container = $container;
     }
 
     /**
@@ -92,20 +94,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * @return \OAuth\Common\Http\Uri\UriInterface
-     */
-    public function getAuthorizationUrl()
-    {
-        $token = $this->getWithingsService()->requestRequestToken();
-
-        $authorizationUrl = $this->getWithingsService()->getAuthorizationUri(
-            array('oauth_token' => $token->getRequestToken())
-        );
-
-        return $authorizationUrl;
-    }
-
-    /**
      * @param $oauthToken
      * @param $oauthVerifier
      * @return \OAuth\Common\Token\TokenInterface|\OAuth\OAuth1\Token\TokenInterface|string
@@ -127,4 +115,20 @@ class WithingsApiAdapter implements ApiAdapterInterface
         return $this->withingsService;
     }
 
+    /**
+     * Return URI for oauth authorization
+     *
+     * @return string
+     */
+    public function getAuthorizationUri()
+    {
+
+        $token = $this->getWithingsService()->requestRequestToken();
+
+        $authorizationUrl = $this->getWithingsService()->getAuthorizationUri(
+            array('oauth_token' => $token->getRequestToken())
+        );
+
+        return $authorizationUrl;
+    }
 }
