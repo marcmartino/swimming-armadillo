@@ -42,7 +42,7 @@ function leanChart(drawData) {
 	});
 	*/
 }
-function redrawChart(svgData) {
+function redrawChart(svgData, xChartFuncs) {
     d3.select('#dThree').select("svg").remove();
    // console.log("redrawing");
     var drawData = {
@@ -56,11 +56,11 @@ function redrawChart(svgData) {
     drawData.legend = drawData.svg.append("g")
     .attr("class", "svgLegend").attr("x", 10);
     drawData.xAxis = d3.svg.axis()
-	.scale(drawData.timestampData.scale)
+	//.scale(drawData.timestampData.scale)
 	.orient("bottom")
         .ticks(parseInt(svgData.w / 75, 10));
     drawData.yAxis = d3.svg.axis()
-    	.scale(drawData.bodyMassData.scale)
+    	//.scale(drawData.bodyMassData.scale)
     	.orient("left")
     	.ticks(5)
     	.tickFormat(d3.format("%"));
@@ -71,7 +71,10 @@ function redrawChart(svgData) {
 
     //leanChart(drawData);
     //fatChart(drawData);
-    withingsBf.fun(drawData);
+//    withingsBf.fun(drawData);
+    drawData.xAxis.scale(xChartFuncs[0].xScale);
+    drawData.yAxis.scale(xChartFuncs[0].yScale);
+    xChartFuncs[0].chart(drawData);
 
 drawData.svg.append("g")
 	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
@@ -108,7 +111,7 @@ function resize() {
     redrawChart(svgData);
 }
 d3.select(window).on('resize', resize);
-redrawChart(svgData);
+//redrawChart(svgData);
 
 ///var withingsBf = System.load('lib/chartModules/withingsBf');
 /*console.log('about to load poo');
@@ -121,4 +124,14 @@ System.import( 'lib/chartModules/withingsBf')
 })*/
 import withingsBf from './chartModules/withingsBf';
 //withingsBf.fun("draw data string");
-console.log(withingsBf);
+//console.log(withingsBf);
+//console.log("promise next");
+//console.log(withingsBf.promm);
+withingsBf.prom.then(function (result) {
+    console.log("promise success");
+  //  console.log(result);
+    redrawChart(svgData, [result]);
+}, function (err) {
+    console.log("promise err");
+    console.log(err);
+});

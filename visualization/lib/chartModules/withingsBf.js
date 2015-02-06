@@ -10,6 +10,32 @@ console.log("module poo running");
 };*/
 
 //export default {poo:"poo"};
+var remoteData;
+var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata";	   
+	
+var drawDataTemp;
+var drawFunc = (drawData) => {
+    console.log("drawFuncEx");
+    console.log(drawData);
+    drawData.svg.append("g")
+	.selectAll("rect")
+   	.data(dataset)
+   	.enter()
+	.append("circle")
+	.attr("cx", function (d, i) {
+   	    return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+	})
+	.attr("cy", function (d, i) {
+   	    return drawData.bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
+   	})
+   	.attr('r', 2)
+   	.attr('fill', 'brown');
+
+	    /*drawData.legend
+		.insert("text").attr("class", "fatChart")
+		.attr("x", 20).attr("y",20)
+		.text("fat chart");*/
+};
   export default  {
     unit: "bpm",
     dateMinMaxFunc:  () => {
@@ -18,57 +44,34 @@ console.log("module poo running");
     prom: new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
 
-  if (/* everything turned out fine */true) {
-    resolve("Stuff worked!");
-  }
-  else {
-    reject(Error("It broke"));
-  }
-}),
-    fun: (function () {
-	var remoteData;
-	 var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata";
-	    $.ajax({
+	$.ajax({
 		type: "GET",
 		url: url,
 		success: (data) => {
-		    console.log("get success");
-		    console.log(data);
+		    //console.log("get success");
+		   //  console.log(data);
 		    remoteData = data;
-		    if (drawDataTemp) {
+		    resolve({
+			chart: drawFunc,
+			xScale: 10,
+			yScale: 12
+		    });
+		    
+		    
+		    /*if (drawDataTemp) {
 			drawFunc(drawDataTemp);
 			drawDataTemp = undefined;
-		    }
+		    }*/
 		},
 		error: (d) => {
 		    console.log("ajax errored");
 		    console.log(d);
+		    reject(Error(d));
 		}
 	    });
+}),
+    fun: (function () {
 	
-	var drawDataTemp;
-	var drawFunc = (drawData) => {
-	    console.log("drawFuncEx");
-	    console.log(drawData);
-	    drawData.svg.append("g")
-		.selectAll("rect")
-   		.data(dataset)
-   		.enter()
-		.append("circle")
-		.attr("cx", function (d, i) {
-   		    return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
-		})
-		.attr("cy", function (d, i) {
-   		    return drawData.bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
-   		})
-   		.attr('r', 2)
-   		.attr('fill', 'brown');
-
-	    /*drawData.legend
-		.insert("text").attr("class", "fatChart")
-		.attr("x", 20).attr("y",20)
-		.text("fat chart");*/
-	};
 	return function(drawData) {
 	    console.log("about tto draw");
 	    console.log(remoteData);
