@@ -12,39 +12,38 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class UserDataController extends Controller
 {
     /**
-     * @Route("/userdata", name="userdata")
+     * @Route("/userdata/{measurementTypeSlug}", name="userdata")
      */
-    public function userData()
+    public function userData($measurementTypeSlug)
     {
         $formattedData = [];
 
         /** @var UserData $userData */
         $userData = $this->get('user_data');
 
-        foreach ($userData->getUserData() as $measurementEvent) {
+        foreach ($userData->getUserData($measurementTypeSlug) as $measurementEvent) {
 
-            $weight = 0;
-            $fatmass = 0;
-            $leanmass = 0;
+//            $weight = 0;
+//            $fatmass = 0;
+//            $leanmass = 0;
+//
+//            foreach ($measurementEvent['measurements'] as $measurement) {
+//                if ($measurement['type'] == 2) {
+//                    $weight = $measurement['units'] * 0.00220462;
+//                } else if ($measurement['type'] == 4) {
+//                    $leanmass = $measurement['units'] * 0.00220462;
+//                } else if ($measurement['type'] == 6) {
+//                    $fatmass = $measurement['units'] * 0.00220462;
+//                }
+//            }
 
-            foreach ($measurementEvent['measurements'] as $measurement) {
-                if ($measurement['type'] == 2) {
-                    $weight = $measurement['units'] * 0.00220462;
-                } else if ($measurement['type'] == 4) {
-                    $leanmass = $measurement['units'] * 0.00220462;
-                } else if ($measurement['type'] == 6) {
-                    $fatmass = $measurement['units'] * 0.00220462;
-                }
-            }
-
-            $dateTime = new \DateTime($measurementEvent['time']);
+            $dateTime = new \DateTime($measurementEvent['event_time']);
 
             $formattedData[] = [
                 'time' => $dateTime->format('Y-m-d g:i A'),
-                'weight' => $weight,
-                'fatmass' => $fatmass,
-                'leanmass' => $leanmass
+                'units' => $measurementEvent['units'],
             ];
+
         }
 
         return $this->render('userdata/user_data.html.twig', ['measurement_events' => $formattedData]);

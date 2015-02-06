@@ -24,19 +24,6 @@ class DefaultController extends Controller
         return $this->render('default/index.html.twig');
     }
 
-
-    /**
-     * @Route("/providers", name="providers")
-     */
-    public function servicesAction()
-    {
-        /** @var Provider $provider */
-        $provider = $this->get('entity_provider');
-        return $this->render("default/providers.html.twig", [
-            'providers' => $provider->getProviders($this->getUser()->getId())
-        ]);
-    }
-
     /**
      * @Route("/view/data", name="graphs")
      */
@@ -70,17 +57,6 @@ class DefaultController extends Controller
         ]);
 
         return $this->redirect($this->generateUrl('providers'));
-    }
-
-    /**
-     * @Route("/withings/authorize", name="withingsauthorize")
-     */
-    public function authorizeWithings()
-    {
-        /** @var WithingsApiAdapter $withingsAdapter */
-        $withingsAdapter = $this->get('withings_api_adapter');
-        $url = $withingsAdapter->getAuthorizationUrl();
-        return new RedirectResponse((string) $url);
     }
 
     /**
