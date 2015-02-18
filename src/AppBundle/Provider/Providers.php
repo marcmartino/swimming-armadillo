@@ -7,5 +7,7 @@ namespace AppBundle\Provider;
  */
 class Providers
 {
-    const WITHINGS = 'withings';
+    const
+        WITHINGS = 'withings',
+        AUTOMATIC = 'automatic';
 } 

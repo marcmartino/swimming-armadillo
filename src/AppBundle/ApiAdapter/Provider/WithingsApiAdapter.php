@@ -64,7 +64,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
         $this->storage = $this->container->get('token_storage_session');;
 
         $this->withingsService = $this->createWithingsService();
-        $this->container = $container;
     }
 
     /**
@@ -106,7 +105,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function getAuthorizationUri()
     {
-
         $token = $this->getService()->requestRequestToken();
 
         $authorizationUrl = $this->getService()->getAuthorizationUri(
