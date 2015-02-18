@@ -72,11 +72,12 @@ function redrawChart(svgData, xChartFuncs) {
     //leanChart(drawData);
     //fatChart(drawData);
 //    withingsBf.fun(drawData);
+    ///console.log(xChartFuncs[0]);
     drawData.xAxis.scale(xChartFuncs[0].xScale);
     drawData.yAxis.scale(xChartFuncs[0].yScale);
     xChartFuncs[0].chart(drawData);
 
-drawData.svg.append("g")
+/*drawData.svg.append("g")
 	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
 	.attr("class", "axis")
     .call(drawData.xAxis);
@@ -84,7 +85,7 @@ drawData.svg.append("g")
 drawData.svg.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(" + svgData.chartPadding + ",0)")
-    .call(drawData.yAxis);
+    .call(drawData.yAxis);*/
 }
 
 function getTimestampData() {
