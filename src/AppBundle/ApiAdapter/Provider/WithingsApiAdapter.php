@@ -6,6 +6,7 @@ use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
+use AppBundle\Provider\Providers;
 use DateTime;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Memory;
@@ -15,6 +16,7 @@ use OAuth\OAuth1\Service\AbstractService;
 use OAuth\Common\Service\ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class WithingsApiAdapter
@@ -207,9 +209,12 @@ class WithingsApiAdapter implements ApiAdapterInterface
         /** @var OAuthAccessToken $accessTokenService */
         $accessTokenService = $this->container->get('entity.oauth_access_token');
 
+        /** @var SecurityContext $securityContext */
+        $securityContext = $this->container->get('security.context');
+
         // Store the newly created access token
         $accessTokenService->store(
-            $this->getUser()->getId(),
+            $securityContext->getToken()->getUser()->getId(),
             $provider->getProvider(Providers::WITHINGS)[0]['id'],
             $_GET['userid'],
             $accessToken->getAccessToken(),

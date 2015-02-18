@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Entity;
 
+use Doctrine\DBAL\Connection;
+
 /**
  * Class OAuthAccessToken
  * @package AppBundle\Entity
@@ -13,7 +15,7 @@ class OAuthAccessToken
     private $conn;
 
     /**
-     * @param Connection|\PDO $conn
+     * @param Connection $conn
      */
     public function __construct(Connection $conn)
     {
