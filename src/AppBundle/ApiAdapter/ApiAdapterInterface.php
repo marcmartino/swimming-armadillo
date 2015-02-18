@@ -8,14 +8,14 @@ namespace AppBundle\ApiAdapter;
 interface ApiAdapterInterface
 {
     /**
-     * @return array
-     */
-    public function getTranscribedData();
-
-    /**
      * Return URI for oauth authorization
      *
      * @return string
      */
     public function getAuthorizationUri();
+
+    /**
+     * @return mixed
+     */
+    public function consumeData();
 }

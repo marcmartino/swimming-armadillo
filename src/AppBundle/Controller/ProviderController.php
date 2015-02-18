@@ -2,10 +2,10 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
 use AppBundle\Entity\Provider;
-use AppBundle\ApiAdapter\ApiAdapterInterface;
 use AppBundle\Provider\Providers;
+use AppBundle\ApiAdapter\ApiAdapterInterface;
+use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -63,6 +63,8 @@ class ProviderController extends Controller
             ':accessToken' => $accessToken->getAccessToken(),
             ':accessTokenSecret' => $accessToken->getAccessTokenSecret(),
         ]);
+
+        $apiAdapter->consumeData();
 
         return $this->redirect($this->generateUrl('providers'));
     }

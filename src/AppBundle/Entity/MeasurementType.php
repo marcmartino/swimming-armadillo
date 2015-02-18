@@ -1,7 +1,8 @@
 <?php
 namespace AppBundle\Entity;
-use AppBundle\Exception\MeasurementTypeNotFoundException;
+
 use Doctrine\DBAL\Driver\Connection;
+use AppBundle\Exception\MeasurementTypeNotFoundException;
 
 /**
  * Class MeasurementType

@@ -2,6 +2,9 @@
 namespace AppBundle\ApiAdapter\Provider;
 
 use AppBundle\ApiAdapter\ApiAdapterInterface;
+use AppBundle\Entity\Measurement;
+use AppBundle\Entity\MeasurementEvent;
+use DateTime;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Memory;
 use AppBundle\OAuth\WithingsOAuth;
@@ -79,21 +82,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * @return array
-     */
-    public function getTranscribedData()
-    {
-        $expected = [
-            'device' => 'withings',
-            'measurement' => 'distance walked',
-            'units' => 'ft',
-            'value' => 5
-        ];
-
-        return $expected;
-    }
-
-    /**
      * @param $oauthToken
      * @param $oauthVerifier
      * @return \OAuth\Common\Token\TokenInterface|\OAuth\OAuth1\Token\TokenInterface|string
@@ -130,5 +118,78 @@ class WithingsApiAdapter implements ApiAdapterInterface
         );
 
         return $authorizationUrl;
+    }
+
+    /**
+     * @return mixed|void
+     * @throws \Exception
+     */
+    public function consumeData()
+    {
+        /** @var MeasurementEvent $measurementEventService */
+        $measurementEventService = $this->container->get('entity.measurement_event');
+        /** @var Measurement $measurementService */
+        $measurementService = $this->container->get('entity.measurement');
+
+//        $token = $this->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
+
+        // TODO un-hardcode user id
+        $uri = 'measure?action=getmeas&userid=5575888';
+
+        $response = $this->getWithingsService()->request($uri);
+
+        $json = json_decode($response, true);
+
+        if ($json['status'] !== 0) {
+            throw new \Exception("Request was unsuccessful.");
+        }
+
+        foreach ($json['body']['measuregrps'] as $measureGroup) {
+            $datetime = new DateTime(date("Y-m-d H:i:s", $measureGroup['date']));
+            $measurements = $measureGroup['measures'];
+            $eventId = $measurementEventService->store($datetime, 1);
+
+            foreach ($measurements as $measurement) {
+
+                $measurementTypeId = false;
+                $unitsTypeId = false;
+                $units = $measurement['value'];
+
+                switch ($measurement['type']) {
+                    case 1:  // weight
+                        $measurementTypeId = 2;
+                        $unitsTypeId = 3;
+                        $units = $measurement['value'];
+                        break;
+                    case 4:  // height
+                        $measurementTypeId = 3;
+                        $unitsTypeId = 4;
+                        break;
+                    case 5:  // fat free mass
+                        $measurementTypeId = 4;
+                        $unitsTypeId = 3;
+                        $units = $measurement['value'];
+                        break;
+                    case 6:  // fat ratio
+                        $measurementTypeId = 5;
+                        $unitsTypeId = 2;
+                        $units = $measurement['value'] * pow(10, $measurement['unit']);
+                        break;
+                    case 8:  // fat mass weight
+                        $measurementTypeId = 6;
+                        $unitsTypeId = 3;
+                        break;
+                    case 11: // heart pulse
+                        $measurementTypeId = 1;
+                        $unitsTypeId = 1;
+                        break;
+                    default:
+                        throw new \Exception("Measurement type (" . $measurement['type'] . ") not handled");
+
+                }
+
+                $measurementService->store($eventId, $measurementTypeId, $unitsTypeId, $units);
+            }
+        }
     }
 }

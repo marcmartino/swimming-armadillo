@@ -29,3 +29,11 @@ services:
     entity_measurement_type:
         class: AppBundle\Entity\MeasurementType
         arguments: ["@database_connection"]
+
+    entity.measurement:
+        class: AppBundle\Entity\Measurement
+        arguments: ["@database_connection"]
+
+    entity.measurement_event:
+        class: AppBundle\Entity\MeasurementEvent
+        arguments: ["@database_connection"]
