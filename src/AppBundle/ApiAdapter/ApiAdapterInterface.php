@@ -9,11 +9,6 @@ use OAuth\Common\Service\AbstractService;
 interface ApiAdapterInterface
 {
     /**
-     * @return array
-     */
-    public function getTranscribedData();
-
-    /**
      * Return URI for oauth authorization
      *
      * @return string
