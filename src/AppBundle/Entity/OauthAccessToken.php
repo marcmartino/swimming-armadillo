@@ -2,10 +2,10 @@
 namespace AppBundle\Entity;
 
 /**
- * Class Oauth_Access_Token
+ * Class OAuthAccessToken
  * @package AppBundle\Entity
  */
-class Oauth_Access_Token
+class OAuthAccessToken
 {
     /**
      * @var \PDO
@@ -48,5 +48,29 @@ class Oauth_Access_Token
         ");
         $stmt->execute([':userId' => $userId]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * @param $userId
+     * @param $providerId
+     * @param $foreignUserId
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function store(
+        $userId,
+        $providerId,
+        $foreignUserId,
+        $accessToken,
+        $accessTokenSecret
+    ) {
+        $stmt = $this->conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
+        $stmt->execute([
+            ':userId' => $userId,
+            ':providerId' => $providerId,
+            ':foreignUserId' => $foreignUserId,
+            ':accessToken' => $accessToken,
+            ':accessTokenSecret' => $accessTokenSecret,
+        ]);
     }
 } 

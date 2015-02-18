@@ -96,14 +96,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * @return AbstractService
-     */
-    public function getWithingsService()
-    {
-        return $this->withingsService;
-    }
-
-    /**
      * Return URI for oauth authorization
      *
      * @return string
@@ -191,5 +183,13 @@ class WithingsApiAdapter implements ApiAdapterInterface
                 $measurementService->store($eventId, $measurementTypeId, $unitsTypeId, $units);
             }
         }
+    }
+
+    /**
+     * @return \OAuth\Common\Service\AbstractService
+     */
+    public function getService()
+    {
+        return $this->withingsService;
     }
 }

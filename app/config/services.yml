@@ -30,6 +30,10 @@ services:
         class: AppBundle\Entity\MeasurementType
         arguments: ["@database_connection"]
 
+    entity.oauth_access_token:
+        class: AppBundle\Entity\OAuthAccessToken
+        arguments: ["@database_connection"]
+
     entity.measurement:
         class: AppBundle\Entity\Measurement
         arguments: ["@database_connection"]

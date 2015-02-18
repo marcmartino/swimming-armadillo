@@ -2,6 +2,7 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
@@ -47,23 +48,27 @@ class ProviderController extends Controller
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
         $apiAdapter = $factory->getApiAdapter($providerSlug);
-        $apiAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
+        
+        $apiAdapter->getService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
         $accessToken = $apiAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
 
         /** @var Provider $provider */
         $provider = $this->get('entity_provider');
 
-        $conn = $this->get('database_connection');
-        $stmt = $conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
-        $stmt->execute([
-            ':userId' => $this->getUser()->getId(),
-            ':providerId' => $provider->getProvider(Providers::WITHINGS)[0]['id'],
-            ':foreignUserId' => $_GET['userid'],
-            ':accessToken' => $accessToken->getAccessToken(),
-            ':accessTokenSecret' => $accessToken->getAccessTokenSecret(),
-        ]);
+        /** @var OAuthAccessToken $accessTokenService */
+        $accessTokenService = $this->get('entity.oauth_access_token');
 
+        // Store the newly created access token
+        $accessTokenService->store(
+            $this->getUser()->getId(),
+            $provider->getProvider(Providers::WITHINGS)[0]['id'],
+            $_GET['userid'],
+            $accessToken->getAccessToken(),
+            $accessToken->getAccessTokenSecret()
+        );
+
+        // Store the data associated with this provider
         $apiAdapter->consumeData();
 
         return $this->redirect($this->generateUrl('providers'));
