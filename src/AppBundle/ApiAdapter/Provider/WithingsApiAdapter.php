@@ -4,6 +4,8 @@ namespace AppBundle\ApiAdapter\Provider;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Entity\OAuthAccessToken;
+use AppBundle\Entity\Provider;
 use DateTime;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Memory;
@@ -88,7 +90,7 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function getAccessToken($oauthToken, $oauthVerifier)
     {
-        return $this->getWithingsService()->requestAccessToken(
+        return $this->getService()->requestAccessToken(
             $oauthToken,
             $oauthVerifier,
             $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
@@ -103,9 +105,9 @@ class WithingsApiAdapter implements ApiAdapterInterface
     public function getAuthorizationUri()
     {
 
-        $token = $this->getWithingsService()->requestRequestToken();
+        $token = $this->getService()->requestRequestToken();
 
-        $authorizationUrl = $this->getWithingsService()->getAuthorizationUri(
+        $authorizationUrl = $this->getService()->getAuthorizationUri(
             array('oauth_token' => $token->getRequestToken())
         );
 
@@ -123,12 +125,9 @@ class WithingsApiAdapter implements ApiAdapterInterface
         /** @var Measurement $measurementService */
         $measurementService = $this->container->get('entity.measurement');
 
-//        $token = $this->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
-
-        // TODO un-hardcode user id
         $uri = 'measure?action=getmeas&userid=5575888';
 
-        $response = $this->getWithingsService()->request($uri);
+        $response = $this->getService()->request($uri);
 
         $json = json_decode($response, true);
 
@@ -186,10 +185,35 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * @return \OAuth\Common\Service\AbstractService
+     * @return \OAuth\OAuth1\Service\AbstractService
      */
     public function getService()
     {
         return $this->withingsService;
+    }
+
+    /**
+     * Capture and store the access token from oauth handshake callback
+     */
+    public function handleCallback()
+    {
+        $this->getService()->getStorage()->retrieveAccessToken('WithingsOAuth');
+
+        $accessToken = $this->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+
+        /** @var Provider $provider */
+        $provider = $this->container->get('entity_provider');
+
+        /** @var OAuthAccessToken $accessTokenService */
+        $accessTokenService = $this->container->get('entity.oauth_access_token');
+
+        // Store the newly created access token
+        $accessTokenService->store(
+            $this->getUser()->getId(),
+            $provider->getProvider(Providers::WITHINGS)[0]['id'],
+            $_GET['userid'],
+            $accessToken->getAccessToken(),
+            $accessToken->getAccessTokenSecret()
+        );
     }
 }

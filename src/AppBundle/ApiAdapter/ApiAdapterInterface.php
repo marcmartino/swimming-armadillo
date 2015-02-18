@@ -25,8 +25,5 @@ interface ApiAdapterInterface
      */
     public function consumeData();
 
-    /**
-     * @return AbstractService
-     */
-    public function getService();
+    public function handleCallback();
 }
