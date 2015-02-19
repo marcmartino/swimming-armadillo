@@ -54,8 +54,6 @@ class AutomaticApiAdapter implements ApiAdapterInterface
 
     public function handleCallback()
     {
-        $this->getService()->getStorage()->retrieveAccessToken('AutomaticOAuth2');
-
         $accessToken = $this->getService()->requestAccessToken($_GET['code']);
 
         /** @var Provider $provider */
