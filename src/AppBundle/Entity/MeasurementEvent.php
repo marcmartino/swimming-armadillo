@@ -2,27 +2,13 @@
 namespace AppBundle\Entity;
 
 use DateTime;
-use Doctrine\DBAL\Connection;
 
 /**
  * Class MeasurementEvent
  * @package AppBundle\Entity
  */
-class MeasurementEvent
+class MeasurementEvent extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection|\PDO $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
-
     /**
      * @param DateTime $eventTime
      * @param $providerId

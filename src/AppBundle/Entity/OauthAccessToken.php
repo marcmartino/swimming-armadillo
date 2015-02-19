@@ -1,27 +1,12 @@
 <?php
 namespace AppBundle\Entity;
 
-use Doctrine\DBAL\Connection;
-
 /**
  * Class OAuthAccessToken
  * @package AppBundle\Entity
  */
-class OAuthAccessToken
+class OAuthAccessToken extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
-
     /**
      * Check to see if a user already has an access token stored for given service provider
      *
