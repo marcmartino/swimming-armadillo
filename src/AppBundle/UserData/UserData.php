@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\UserData;
+
 use AppBundle\Entity\MeasurementType;
+use Doctrine\DBAL\Connection;
 
 /**
  * Class UserData
@@ -18,10 +20,10 @@ class UserData
     private $measurementType;
 
     /**
-     * @param \Doctrine\DBAL\Connection $con
+     * @param Connection $conn
      * @param MeasurementType $measurementType
      */
-    public function __construct(\Doctrine\DBAL\Connection $conn, MeasurementType $measurementType)
+    public function __construct(Connection $conn, MeasurementType $measurementType)
     {
         $this->conn = $conn;
         $this->measurementType = $measurementType;
