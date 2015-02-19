@@ -99,6 +99,7 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         $serviceFactory = new ServiceFactory();
         $serviceFactory->registerService('AutomaticOAuth2', 'AppBundle\\OAuth\\AutomaticOAuth2');
 
+        // Commented out scopes do not seem to work at this time.
         /** @var AutomaticOAuth2 $service */
         return $service = $serviceFactory->createService('AutomaticOAuth2', $credentials, $this->storage, [
             AutomaticOAuth2::SCOPE_PUBLIC,

@@ -9,10 +9,8 @@ use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use DateTime;
 use OAuth\ServiceFactory;
-use OAuth\Common\Storage\Memory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
-use OAuth\OAuth1\Service\AbstractService;
 use OAuth\Common\Service\ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -120,12 +118,30 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function consumeData()
     {
+        $uri = 'measure?action=getmeas&userid=';
+
+        /** @var SecurityContext $securityContext */
+        $securityContext = $this->container->get('security.context');
+        /** @var Provider $provider */
+        $provider = $this->container->get('entity_provider');
+
+        /** @var OAuthAccessToken $accessTokenService */
+        $accessTokenService = $this->container->get('entity.oauth_access_token');
+        $userTokens = $accessTokenService->getOAuthAccessTokenForUserAndServiceProvider(
+            $securityContext->getToken()->getUser()->getId(),
+            $provider->getProvider(Providers::WITHINGS)
+        );
+
+        if (count($userTokens) < 1) {
+            throw new \Exception("User has not authenticated service provider: " . Providers::WITHINGS);
+        }
+
+        $uri .= $userTokens[0]['foreign_user_id'];
+
         /** @var MeasurementEvent $measurementEventService */
         $measurementEventService = $this->container->get('entity.measurement_event');
         /** @var Measurement $measurementService */
         $measurementService = $this->container->get('entity.measurement');
-
-        $uri = 'measure?action=getmeas&userid=5575888';
 
         $response = $this->getService()->request($uri);
 

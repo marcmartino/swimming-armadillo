@@ -51,7 +51,10 @@ class OAuthAccessToken extends AbstractEntity
         $accessToken,
         $accessTokenSecret
     ) {
-        $stmt = $this->conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
+        $stmt = $this->conn->prepare("
+            INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret)
+            VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)
+        ");
         $stmt->execute([
             ':userId' => $userId,
             ':providerId' => $providerId,
@@ -59,5 +62,21 @@ class OAuthAccessToken extends AbstractEntity
             ':accessToken' => $accessToken,
             ':accessTokenSecret' => $accessTokenSecret,
         ]);
+    }
+
+    /**
+     * @param $userId
+     * @param $serviceProviderId
+     * @return array
+     */
+    public function getOAuthAccessTokenForUserAndServiceProvider($userId, $serviceProviderId)
+    {
+        $stmt = $this->conn->prepare("
+            SELECT * FROM oauth_access_tokens
+            WHERE user_id = :userId && service_provider_id = :serviceProviderId
+            ");
+        $stmt->execute([':userId' => $userId, ':serviceProviderId' => $serviceProviderId]);
+
+        return $stmt->fetchAll();
     }
 } 
