@@ -129,7 +129,7 @@ class WithingsApiAdapter implements ApiAdapterInterface
         $accessTokenService = $this->container->get('entity.oauth_access_token');
         $userTokens = $accessTokenService->getOAuthAccessTokenForUserAndServiceProvider(
             $securityContext->getToken()->getUser()->getId(),
-            $provider->getProvider(Providers::WITHINGS)
+            $provider->getProvider(Providers::WITHINGS)[0]['id']
         );
 
         if (count($userTokens) < 1) {

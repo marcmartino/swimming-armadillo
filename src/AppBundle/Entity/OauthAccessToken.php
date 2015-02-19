@@ -73,7 +73,7 @@ class OAuthAccessToken extends AbstractEntity
     {
         $stmt = $this->conn->prepare("
             SELECT * FROM oauth_access_tokens
-            WHERE user_id = :userId && service_provider_id = :serviceProviderId
+            WHERE user_id = :userId AND service_provider_id = :serviceProviderId
             ");
         $stmt->execute([':userId' => $userId, ':serviceProviderId' => $serviceProviderId]);
 
