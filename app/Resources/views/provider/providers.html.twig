@@ -9,12 +9,12 @@
         <div class="center row">
             <div class="large-12 columns">
             {% for provider in providers %}
-                {% if provider.secret is null %}
+                {% if provider.token is null %}
                     <span class="label">Still need to authenticate</span>
                 {% else %}
                     <span class="success label">Already Authenticated</span>
                 {% endif %}
-                <a href="{% if provider.secret is null %}{{ path('providerauthorize', {'providerSlug': provider.slug}) }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.secret is not null %} success{% endif %}">
+                <a href="{% if provider.token is null %}{{ path('providerauthorize', {'providerSlug': provider.slug}) }}{% else %}javascript:alert('already authenicated');{% endif %}" class="button expand{% if provider.token is not null %} success{% endif %}">
                     {{ provider.provider_name }}
                 </a>
             {% endfor %}
