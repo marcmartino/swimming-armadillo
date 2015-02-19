@@ -85,20 +85,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * @param $oauthToken
-     * @param $oauthVerifier
-     * @return \OAuth\Common\Token\TokenInterface|\OAuth\OAuth1\Token\TokenInterface|string
-     */
-    public function getAccessToken($oauthToken, $oauthVerifier)
-    {
-        return $this->getService()->requestAccessToken(
-            $oauthToken,
-            $oauthVerifier,
-            $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
-        );
-    }
-
-    /**
      * Return URI for oauth authorization
      *
      * @return string
@@ -199,7 +185,11 @@ class WithingsApiAdapter implements ApiAdapterInterface
     {
         $this->getService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        $accessToken = $this->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+        $accessToken = $this->getService()->requestAccessToken(
+            $_GET['oauth_token'],
+            $_GET['oauth_verifier'],
+            $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
+        );
 
         /** @var Provider $provider */
         $provider = $this->container->get('entity_provider');
