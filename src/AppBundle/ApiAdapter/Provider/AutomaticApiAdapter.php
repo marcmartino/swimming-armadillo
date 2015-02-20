@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
+use AppBundle\Entity\Measurement;
+use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
@@ -49,6 +51,26 @@ class AutomaticApiAdapter implements ApiAdapterInterface
      */
     public function consumeData()
     {
+        /** @var MeasurementEvent $measurementEventService */
+        $measurementEventService = $this->container->get('entity.measurement_event');
+        /** @var Measurement $measurementService */
+        $measurementService = $this->container->get('entity.measurement');
+        /** @var Provider $provider */
+        $provider = $this->container->get('entity_provider');
+
+        $response = $this->getService()->request('/trips');
+
+        $trips = $this->consumeTrips($response);
+
+        foreach ($trips as $measurementEvent) {
+            $measurementEventId = $measurementEventService->store(
+                new \DateTime($measurementEvent['event_time']),
+                $provider->getProvider(Providers::AUTOMATIC)[0]['id']
+            );
+            foreach ($measurementEvent['measurements']) {
+                // TODO finish storing measurements
+            }
+        }
     }
 
     public function handleCallback()
