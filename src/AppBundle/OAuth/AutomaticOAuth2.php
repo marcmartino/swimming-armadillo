@@ -1,7 +1,10 @@
 <?php
 namespace AppBundle\OAuth;
 
+use OAuth\Common\Consumer\CredentialsInterface;
+use OAuth\Common\Http\Client\ClientInterface;
 use OAuth\Common\Http\Uri\Uri;
+use OAuth\Common\Storage\TokenStorageInterface;
 use OAuth\Common\Token\TokenInterface;
 use OAuth\Common\Http\Uri\UriInterface;
 use OAuth\OAuth2\Service\AbstractService;
@@ -25,6 +28,18 @@ class AutomaticOAuth2 extends AbstractService
         SCOPE_VEHICLE_VIN = 'scope:vehicle:vin',
         SCOPE_TRIP = 'scope:trip',
         SCOPE_BEHAVIOR = 'scope:behavior';
+
+    public function __construct(
+        CredentialsInterface $credentials,
+        ClientInterface $httpClient,
+        TokenStorageInterface $storage,
+        $scopes = array(),
+        UriInterface $baseApiUri = null,
+        $stateParameterInAutUrl = false
+    ) {
+        parent::__construct($credentials, $httpClient, $storage, $scopes, $baseApiUri, $stateParameterInAutUrl);
+        $this->baseApiUri = new Uri('https://api.automatic.com/v1/');
+    }
 
     /**
      * Parses the access token response and returns a TokenInterface.

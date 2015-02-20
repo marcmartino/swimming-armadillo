@@ -3,9 +3,13 @@ namespace AppBundle\ApiAdapter\Provider;
 
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Entity\MeasurementType as MeasurementTypeService;
+use AppBundle\Entity\UnitType as UnitTypeService;
+use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
+use AppBundle\UnitType\UnitType;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\AutomaticOAuth2;
 use OAuth\Common\Consumer\Credentials;
@@ -27,6 +31,10 @@ class AutomaticApiAdapter implements ApiAdapterInterface
      * @var AutomaticOAuth2
      */
     protected $service;
+    /**
+     * @var UnitTypeService
+     */
+    protected $unitTypeService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -34,6 +42,7 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         $this->storage = $this->container->get('token_storage_session');;
 
         $this->service = $this->createService();
+        $this->unitTypeService = $this->container->get('entity_unit_type');
     }
 
     /**
@@ -55,6 +64,9 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         $measurementEventService = $this->container->get('entity.measurement_event');
         /** @var Measurement $measurementService */
         $measurementService = $this->container->get('entity.measurement');
+        /** @var MeasurementTypeService $measurementTypeService */
+        $measurementTypeService = $this->container->get('entity_measurement_type');
+
         /** @var Provider $provider */
         $provider = $this->container->get('entity_provider');
 
@@ -62,15 +74,33 @@ class AutomaticApiAdapter implements ApiAdapterInterface
 
         $trips = $this->consumeTrips($response);
 
-        foreach ($trips as $measurementEvent) {
+        foreach ($trips['events'] as $measurementEvent) {
             $measurementEventId = $measurementEventService->store(
                 new \DateTime($measurementEvent['event_time']),
                 $provider->getProvider(Providers::AUTOMATIC)[0]['id']
             );
-            foreach ($measurementEvent['measurements']) {
-                // TODO finish storing measurements
-            }
+            $measurement = $measurementEvent['measurements'];
+            // Store drive distance
+            $distance = $measurement['distance'];
+            $measurementTypeId = $measurementTypeService->getMeasurementType(MeasurementType::DRIVE_DISTANCE)['id'];
+            $measurementService->store(
+                $measurementEventId,
+                $measurementTypeId,
+                $this->unitTypeService->getUnitType(UnitType::METERS)['id'],
+                $distance
+            );
+            // Store drive time
+            $driveTime = $measurement['drive_time'];
+            $measurementTypeId = $measurementTypeService->getMeasurementType(MeasurementType::DRIVE_TIME)['id'];
+            $measurementService->store(
+                $measurementEventId,
+                $measurementTypeId,
+                $this->unitTypeService->getUnitType(UnitType::SECONDS)['id'],
+                $driveTime
+            );
         }
+
+
     }
 
     public function handleCallback()
@@ -143,9 +173,10 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         $tripEvents = ['events' => []];
         $json = json_decode($responseBody, true);
         foreach ($json as $event) {
+            $driveTime = ($event['end_time'] - $event['start_time']) / 1000;
             $tripEvent = [
-                'event_time' => date('Y-m-d H:i:s', $event['start_time']),
-                'measurements' => ['distance' => $event['distance_m']]
+                'event_time' => date('Y-m-d H:i:s', $event['start_time'] / 1000),
+                'measurements' => ['distance' => $event['distance_m'], 'drive_time' => $driveTime]
             ];
             $tripEvents['events'][] = $tripEvent;
         }

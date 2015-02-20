@@ -15,5 +15,8 @@ class MeasurementType
     FAT_MASS_WEIGHT = 'fatmassweight',
     DIASTOLIC_BLOOD_PREASSURE = 'diastolicbloodpressure',
     SYSTOLIC_BLOOD_PREASSURE = 'sysstolicbloodpressure',
-    SPO2 = 'spo2';
+    SPO2 = 'spo2',
+
+    DRIVE_DISTANCE = 'drivedistance',
+    DRIVE_TIME = 'drivetime';
 } 
