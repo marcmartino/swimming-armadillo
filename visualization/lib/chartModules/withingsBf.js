@@ -16,13 +16,12 @@ var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/
 var drawDataTemp;
 var drawFunc = (drawData) => {
     console.log("drawFuncEx");
-    console.log(drawData);
     console.warn(drawData);
    // console.log(getXMinMax(remoteData));
    // console.log([drawData.chartPadding, drawData.w - drawData.chartPadding]);
-
-    
-
+//    console.log(getYMinMax(remoteData));
+    var yFreq = [];
+    var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
     drawData.svg.append("g")
 	.selectAll("rect")
 	.data(remoteData)
@@ -38,12 +37,17 @@ var drawFunc = (drawData) => {
 	    //return drawData.xAxis.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
 	})
 	.attr("cy", function (d, i) {
-	    return 30;
-   	    return drawData.yAxis(d['Fat mass (%)'] / 100 || 0);
+	    var fatVal = d['Fat mass (%)'] || 0;
+	    var intFat = parseInt(fatVal, 10);
+
+	    //console.log(thisYScale(d['Fat mass (%)']  || 0));
+//	    console.log(d);
+	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
+   	    return thisYScale(d['Fat mass (%)']  || 0);
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
-
+    console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
 		.attr("x", 20).attr("y",20)

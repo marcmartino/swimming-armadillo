@@ -79,6 +79,8 @@ function redrawChart(svgData, xChartFuncs) {
 	.domain(xChartFuncs[0].xScale)
 	.range([0 + svgData.chartPadding, svgData.w - svgData.chartPadding]);
 
+    drawData.yScale = d3.scale.linear()
+	.range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
 
     drawData.xAxis.scale(drawData.xScale);
     drawData.yAxis.scale(xChartFuncs[0].yScale);
