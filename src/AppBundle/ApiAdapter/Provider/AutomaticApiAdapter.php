@@ -49,7 +49,6 @@ class AutomaticApiAdapter implements ApiAdapterInterface
      */
     public function consumeData()
     {
-        // TODO: Implement consumeData() method.
     }
 
     public function handleCallback()
@@ -111,5 +110,24 @@ class AutomaticApiAdapter implements ApiAdapterInterface
             AutomaticOAuth2::SCOPE_TRIP,
             AutomaticOAuth2::SCOPE_BEHAVIOR
         ]);
+    }
+
+    /**
+     * @param $responseBody
+     * @return array
+     */
+    public function consumeTrips($responseBody)
+    {
+        $tripEvents = ['events' => []];
+        $json = json_decode($responseBody, true);
+        foreach ($json as $event) {
+            $tripEvent = [
+                'event_time' => date('Y-m-d H:i:s', $event['start_time']),
+                'measurements' => ['distance' => $event['distance_m']]
+            ];
+            $tripEvents['events'][] = $tripEvent;
+        }
+
+        return $tripEvents;
     }
 }
