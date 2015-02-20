@@ -24,9 +24,10 @@ class AutomaticApiAdapterTest extends WebTestCase
         $expected = [
             'events' => [
                 [
-                    'event_time' => '2015-02-19 16:06:33',
+                    'event_time' => '2015-02-19 16:53:00',
                     'measurements' => [
-                        'distance' => '6573.416666666661'
+                        'distance' => '6573.416666666661',
+                        'drive_time' => '254.986'
                     ]
                 ]
             ]
