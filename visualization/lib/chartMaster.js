@@ -73,7 +73,14 @@ function redrawChart(svgData, xChartFuncs) {
     //fatChart(drawData);
 //    withingsBf.fun(drawData);
     ///console.log(xChartFuncs[0]);
-    drawData.xAxis.scale(xChartFuncs[0].xScale);
+    
+
+    drawData.xScale = d3.time.scale()
+	.domain(xChartFuncs[0].xScale)
+	.range([0 + svgData.chartPadding, svgData.w - svgData.chartPadding]);
+
+
+    drawData.xAxis.scale(drawData.xScale);
     drawData.yAxis.scale(xChartFuncs[0].yScale);
     xChartFuncs[0].chart(drawData);
 

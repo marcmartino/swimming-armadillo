@@ -17,17 +17,29 @@ var drawDataTemp;
 var drawFunc = (drawData) => {
     console.log("drawFuncEx");
     console.log(drawData);
-console.warn(d3);
+    console.warn(drawData);
+   // console.log(getXMinMax(remoteData));
+   // console.log([drawData.chartPadding, drawData.w - drawData.chartPadding]);
+
+    
+
     drawData.svg.append("g")
 	.selectAll("rect")
 	.data(remoteData)
    	.enter()
 	.append("circle")
 	.attr("cx", function (d, i) {
-   	    return drawData.xScale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+	    //drawData.xAxis.scale(
+	   
+	   // console.log(drawData.xAxis.scale());
+	    //console.log(drawData.xAxis.scale(new Date()));
+	    return drawData.xScale(Date.parseString(d.Date, 'yyyy-MM-dd H:mm a'));
+	    
+	    //return drawData.xAxis.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
 	})
 	.attr("cy", function (d, i) {
-   	    return drawData.yScale(d['Fat mass (%)'] / 100 || 0);
+	    return 30;
+   	    return drawData.yAxis(d['Fat mass (%)'] / 100 || 0);
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
@@ -39,6 +51,7 @@ console.warn(d3);
 };
 function getXMinMax (data) {
     var dateAccessor = (el) => {
+	return Date.parseString(el.Date,'yyyy-MM-dd H:mm a');
 	return (new Date(el.Date));
     };
     return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
