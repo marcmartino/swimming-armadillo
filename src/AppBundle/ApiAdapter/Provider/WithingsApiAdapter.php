@@ -8,6 +8,7 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use DateTime;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
@@ -234,5 +235,19 @@ class WithingsApiAdapter implements ApiAdapterInterface
             $accessToken->getAccessToken(),
             $accessToken->getAccessTokenSecret()
         );
+    }
+
+    /**
+     * Set user access token in storage
+     *
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function setDatabaseAccessToken($accessToken, $accessTokenSecret)
+    {
+        $token = new StdOAuth1Token();
+        $token->setAccessToken($accessToken);
+        $token->setAccessTokenSecret($accessTokenSecret);
+        $this->storage->storeAccessToken('WithingsOAuth', $token);
     }
 }
