@@ -11,7 +11,7 @@ console.log("module poo running");
 
 //export default {poo:"poo"};
 var remoteData;
-var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata";	   
+var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";	   
 	
 var drawDataTemp;
 var drawFunc = (drawData) => {
