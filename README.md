@@ -13,3 +13,11 @@ swimming-armadillo
 3. 'php app/console doctrine:schema:update --force'
 4. 'php app/console server:run'
 5. http://localhost:8000/withings/authorize
+
+## Some API Stuff
+http://localhost:8000/userdata/fatfreemass
+http://localhost:8000/userdata/weight
+http://localhost:8000/userdata/heartrate
+http://localhost:8000/userdata/fatratio
+http://localhost:8000/userdata/height
+http://localhost:8000/userdata/....

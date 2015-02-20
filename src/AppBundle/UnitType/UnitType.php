@@ -11,5 +11,7 @@ class UnitType
     PERCENT = 'percent',
     GRAMS = 'grams',
     METERS = 'meters',
-    MILLIMETERS_MERCURY = 'mmhg';
+    MILLIMETERS_MERCURY = 'mmhg',
+
+    SECONDS = 's';
 }

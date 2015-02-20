@@ -2,10 +2,8 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
 use AppBundle\Entity\Provider;
-use AppBundle\ApiAdapter\ApiAdapterInterface;
-use AppBundle\Provider\Providers;
+use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -47,23 +45,24 @@ class ProviderController extends Controller
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
         $apiAdapter = $factory->getApiAdapter($providerSlug);
-        $apiAdapter->getWithingsService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        $accessToken = $apiAdapter->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+        // Handle the callback (store oauth token, ..., ...)
+        $apiAdapter->handleCallback();
 
-        /** @var Provider $provider */
-        $provider = $this->get('entity_provider');
-
-        $conn = $this->get('database_connection');
-        $stmt = $conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
-        $stmt->execute([
-            ':userId' => $this->getUser()->getId(),
-            ':providerId' => $provider->getProvider(Providers::WITHINGS)[0]['id'],
-            ':foreignUserId' => $_GET['userid'],
-            ':accessToken' => $accessToken->getAccessToken(),
-            ':accessTokenSecret' => $accessToken->getAccessTokenSecret(),
-        ]);
+        // Store the data associated with this provider
+        $apiAdapter->consumeData();
 
         return $this->redirect($this->generateUrl('providers'));
+    }
+
+    /**
+     * @Route("/{providerSlug}/consume")
+     */
+    public function providerConsume($providerSlug)
+    {
+        /** @var ProviderApiAdapterFactory $factory */
+        $factory = $this->get('api_adapter_factory');
+        $apiAdapter = $factory->getApiAdapter($providerSlug);
+        var_dump($apiAdapter->consumeData()); exit;
     }
 }

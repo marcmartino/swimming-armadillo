@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\ApiAdapter;
+use OAuth\Common\Service\AbstractService;
 
 /**
  * Interface ApiAdapterInterface
@@ -8,14 +9,16 @@ namespace AppBundle\ApiAdapter;
 interface ApiAdapterInterface
 {
     /**
-     * @return array
-     */
-    public function getTranscribedData();
-
-    /**
      * Return URI for oauth authorization
      *
      * @return string
      */
     public function getAuthorizationUri();
+
+    /**
+     * @return mixed
+     */
+    public function consumeData();
+
+    public function handleCallback();
 }
