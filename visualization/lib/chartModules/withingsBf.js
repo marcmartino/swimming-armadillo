@@ -37,13 +37,13 @@ var drawFunc = (drawData) => {
 	    //return drawData.xAxis.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
 	})
 	.attr("cy", function (d, i) {
-	    var fatVal = d['Fat mass (%)'] || 0;
+	    var fatVal = d['Units'] || 0;
 	    var intFat = parseInt(fatVal, 10);
 
-	    //console.log(thisYScale(d['Fat mass (%)']  || 0));
+	    //console.log(thisYScale(d['Units']  || 0));
 //	    console.log(d);
 	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
-   	    return thisYScale(d['Fat mass (%)']  || 0);
+   	    return thisYScale(d['Units']  || 0);
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
@@ -62,7 +62,7 @@ function getXMinMax (data) {
 }
 function getYMinMax (data) {
     var fatAccessor  = (el) => {
-	return el['Fat mass (%)'];
+	return el['Units'];
     };
     return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
 
@@ -78,7 +78,7 @@ function getYMinMax (data) {
 		success: (data) => {
 		    //console.log("get success");
 		   // console.log(data);
-		    remoteData = data;
+		    remoteData = typeof data == 'object' ? data : JSON.parse(data);
 //console.log(getYMinMax(remoteData));
 		    resolve({
 			chart: drawFunc,
@@ -117,8 +117,8 @@ function getYMinMax (data) {
   }
 
 /*function getBodyMassData() {
-	var min = _.min([_.min(dataset, "Fat mass (%)")["Fat mass (%)"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
-		max = _.max([_.max(dataset, "Fat mass (%)")["Fat mass (%)"], _.max(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+	var min = _.min([_.min(dataset, "Units")["Units"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+		max = _.max([_.max(dataset, "Units")["Units"], _.max(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
 		rangePadding = (max - min) * 0.25;
 		scale = d3.scale.linear()
 
