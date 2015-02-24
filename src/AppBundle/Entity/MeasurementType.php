@@ -27,7 +27,8 @@ class MeasurementType extends AbstractEntity
 
     /**
      * @param $slug
-     * @return array
+     * @return mixed
+     * @throws MeasurementTypeNotFoundException
      */
     public function getMeasurementType($slug)
     {
@@ -39,5 +40,13 @@ class MeasurementType extends AbstractEntity
             throw new MeasurementTypeNotFoundException("Measurement type '$slug' not found");
         }
         return $stmt->fetch();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->conn->query("SELECT * FROM measurement_types")->fetchAll();
     }
 } 

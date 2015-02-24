@@ -1,0 +1,12 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+<div class="center row">
+    <div class="large-12 columns">
+        {% for measurement_type in measurement_types %}
+            <a href="{{ path('graph_measurement_type', {'measurementTypeSlug': measurement_type.slug}) }}" class="button expand">
+                {{ measurement_type.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
