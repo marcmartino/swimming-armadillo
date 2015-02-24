@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {% javascripts
             '@AppBundle/Resources/public/vendor/modernizr/modernizr.js'
+            '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
             %}
             <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
@@ -21,7 +22,6 @@
     {% block body %}{% endblock %}
         {% block javascripts%}
             {% javascripts
-            '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
             '@AppBundle/Resources/public/vendor/foundation/js/foundation.js'
             %}
             <script src="{{ asset_url }}"></script>

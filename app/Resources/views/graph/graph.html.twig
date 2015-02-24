@@ -1,12 +1,30 @@
 {% extends 'layout.html.twig' %}
 {% block body %}
-<div class="center row">
-    <div class="large-12 columns">
-        {% for measurement_type in measurement_types %}
-            <a href="{{ path('graph_measurement_type', {'measurementTypeSlug': measurement_type.slug}) }}" class="button expand">
-                {{ measurement_type.name }}
-            </a>
-        {% endfor %}
+    <div class="center row">
+        <div class="large-12 columns" id="measurementTypeList">
+            {% for measurement_type in measurement_types %}
+                <a class="button expand secondary" data-slug="{{ measurement_type.slug }}">
+                    {{ measurement_type.name }}
+                </a>
+            {% endfor %}
+            <button class="expand" id="getGraphs">Go</button>
+        </div>
     </div>
-</div>
+    <script>
+        $("#measurementTypeList").on("click", "a", function() {
+            $(this).toggleClass('success');
+        });
+        $("#getGraphs").on("click", function() {
+            var queryString = '?measure=';
+            $.each($("#measurementTypeList a.success"), function(index) {
+                queryString = queryString + $(this).data("slug");
+                if (index !== $("#measurementTypeList a.success").length - 1) {
+                    queryString = queryString + '-';
+                }
+            });
+            if (queryString !== '?measure=') {
+                location.replace("{{ path('graph_measurement_type', { 'measurementTypeSlug': 'asdf'}) }}".replace("/asdf","") + queryString);
+            }
+        });
+    </script>
 {% endblock %}
