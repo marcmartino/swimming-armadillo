@@ -23,7 +23,7 @@
                 }
             });
             if (queryString !== '?measure=') {
-                location.replace("{{ path('graph_measurement_type', { 'measurementTypeSlug': 'asdf'}) }}".replace("/asdf","") + queryString);
+                location.replace("{{ path('graph_measurement_type') }}" + queryString);
             }
         });
     </script>

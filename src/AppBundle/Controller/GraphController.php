@@ -25,10 +25,10 @@ class GraphController extends Controller
     }
 
     /**
-     * @Route("/graph/{measurementTypeSlug}", name="graph_measurement_type")
+     * @Route("/graph/measure", name="graph_measurement_type")
      */
-    public function graphMeasurementType($measurementTypeSlug)
+    public function graphMeasurementType()
     {
-        return $this->render('graph/graph_measurement_type.html.twig', ['measurementTypeSlug' => $measurementTypeSlug]);
+        return $this->render('graph/graph_measurement_type.html.twig', ['measurementTypeSlug' => $_GET['measure']]);
     }
 } 
