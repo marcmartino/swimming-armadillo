@@ -6,9 +6,11 @@ var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/weight.json" : 
 	
 var drawDataTemp;
 var drawFunc = (drawData) => {
+    console.log("weight draw func executing");
     var yFreq = [];
     var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
     drawData.svg.append("g")
+	.attr("class", "weightPlot")
 	.selectAll("rect")
 	.data(remoteData)
    	.enter()
@@ -23,8 +25,8 @@ var drawFunc = (drawData) => {
 	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
    	    return thisYScale(d['Units']  || 0);
    	})
-   	.attr('r', 2)
-   	.attr('fill', 'brown');
+   	.attr('r', 3)
+   	.attr('fill', 'green');
    // console.log(yFreq);
 };
 function getXMinMax (data) {

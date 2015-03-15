@@ -51,18 +51,18 @@ function leanChart(drawData) {
 	*/
 }
 function redrawChart(svgData, xChartFuncs) {
-    d3.select('#dThree').select("svg").remove();
+    d3.select('#dThree').select("svg");//.remove();
    // console.log("redrawing");
     var drawData = {
 	//timestampData: getTimestampData(),
 //	bodyMassData: getBodyMassData(),
-	svg: d3.select("#dThree")
-	    .append("svg")
+	svg: d3.select("#dThree svg")
+	    //.append("svg") 
 	    .attr("width", svgData.w)
 	    .attr("height", svgData.h)
     };
-    drawData.legend = drawData.svg.append("g")
-    .attr("class", "svgLegend").attr("x", 10);
+    //drawData.legend = drawData.svg.append("g")
+	//.attr("class", "svgLegend").attr("x", 10);
     drawData.xAxis = d3.svg.axis()
 	//.scale(drawData.timestampData.scale)
 	.orient("bottom")
@@ -136,9 +136,11 @@ import weight from './chartModules/weight';
 var dataMods = [withingsBf, weight];
 
 dataMods.forEach(function (dataMod) {
+    //console.log("datamod promising");
     dataMod.prom.then(function (result) {
-	//console.log("promise success");
-	//  console.log(result);
+	
+	console.log("promise success");
+	  console.log(result);
 	redrawChart(svgData, [result]);
     }, function (err) {
 	console.log("promise err");
