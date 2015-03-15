@@ -1,10 +1,13 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
+
 use AppBundle\ApiAdapter\ApiAdapterInterface;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use OAuth\Common\Consumer\Credentials;
+use OAuth\Common\Http\Client\CurlClient;
+use OAuth\Common\Storage\Session;
 use OAuth\OAuth1\Service\FitBit;
 use OAuth\ServiceFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,6 +27,10 @@ class FitbitApiAdapter implements ApiAdapterInterface
      * @var FitBit
      */
     protected $service;
+    /**
+     * @var Session
+     */
+    protected $storage;
 
     public function __construct(ContainerInterface $container)
     {
@@ -42,6 +49,7 @@ class FitbitApiAdapter implements ApiAdapterInterface
         );
 
         $serviceFactory = new ServiceFactory();
+        $serviceFactory->registerService('FitBit', 'AppBundle\\OAuth\\FitBit');
 
         /** @var $fitbitService FitBit */
         return $fitbitService = $serviceFactory->createService('FitBit', $credentials, $this->storage);
@@ -72,20 +80,13 @@ class FitbitApiAdapter implements ApiAdapterInterface
      */
     public function consumeData()
     {
-        // TODO: Implement consumeData() method.
+
     }
 
     public function handleCallback()
     {
         $token = $this->storage->retrieveAccessToken('FitBit');
 
-        // This was a callback request from fitbit, get the token
-        echo $_GET['oauth_token'];
-        echo "-----";
-        echo $_GET['oauth_verifier'];
-        echo "-----";
-        echo $token->getRequestTokenSecret();
-//        exit;
         $accessToken = $this->getService()->requestAccessToken(
             $_GET['oauth_token'],
             $_GET['oauth_verifier'],
