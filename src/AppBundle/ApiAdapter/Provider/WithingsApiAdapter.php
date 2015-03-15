@@ -8,6 +8,7 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use DateTime;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
@@ -80,20 +81,6 @@ class WithingsApiAdapter implements ApiAdapterInterface
 
         /** @var WithingsOAuth $withingsService */
         return $withingsService = $serviceFactory->createService('WithingsOAuth', $credentials, $this->storage);
-    }
-
-    /**
-     * @param $oauthToken
-     * @param $oauthVerifier
-     * @return \OAuth\Common\Token\TokenInterface|\OAuth\OAuth1\Token\TokenInterface|string
-     */
-    public function getAccessToken($oauthToken, $oauthVerifier)
-    {
-        return $this->getService()->requestAccessToken(
-            $oauthToken,
-            $oauthVerifier,
-            $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
-        );
     }
 
     /**
@@ -215,7 +202,11 @@ class WithingsApiAdapter implements ApiAdapterInterface
     {
         $this->getService()->getStorage()->retrieveAccessToken('WithingsOAuth');
 
-        $accessToken = $this->getAccessToken($_GET['oauth_token'], $_GET['oauth_verifier']);
+        $accessToken = $this->getService()->requestAccessToken(
+            $_GET['oauth_token'],
+            $_GET['oauth_verifier'],
+            $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
+        );
 
         /** @var Provider $provider */
         $provider = $this->container->get('entity_provider');
@@ -234,5 +225,19 @@ class WithingsApiAdapter implements ApiAdapterInterface
             $accessToken->getAccessToken(),
             $accessToken->getAccessTokenSecret()
         );
+    }
+
+    /**
+     * Set user access token in storage
+     *
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function setDatabaseAccessToken($accessToken, $accessTokenSecret)
+    {
+        $token = new StdOAuth1Token();
+        $token->setAccessToken($accessToken);
+        $token->setAccessTokenSecret($accessTokenSecret);
+        $this->storage->storeAccessToken('WithingsOAuth', $token);
     }
 }

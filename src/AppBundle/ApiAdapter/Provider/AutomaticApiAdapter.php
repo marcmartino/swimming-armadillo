@@ -10,6 +10,7 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use AppBundle\UnitType\UnitType;
+use OAuth\OAuth2\Token\StdOAuth2Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\AutomaticOAuth2;
 use OAuth\Common\Consumer\Credentials;
@@ -182,5 +183,17 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         }
 
         return $tripEvents;
+    }
+
+    /**
+     * Set user access token in storage
+     *
+     * @param $accessToken
+     */
+    public function setDatabaseAccessToken($accessToken)
+    {
+        $token = new StdOAuth2Token();
+        $token->setAccessToken($accessToken);
+        $this->storage->storeAccessToken('AutomaticOAuth2', $token);
     }
 }

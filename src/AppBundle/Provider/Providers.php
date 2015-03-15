@@ -9,5 +9,6 @@ class Providers
 {
     const
         WITHINGS = 'withings',
-        AUTOMATIC = 'automatic';
+        AUTOMATIC = 'automatic',
+        FITBIT = 'fitbit';
 } 

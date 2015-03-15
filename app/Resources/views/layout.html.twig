@@ -3,8 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {% javascripts
             '@AppBundle/Resources/public/vendor/modernizr/modernizr.js'
+            '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
             %}
             <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
@@ -16,10 +18,10 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
+    {% include 'layout/header.html.twig' %}
     {% block body %}{% endblock %}
         {% block javascripts%}
             {% javascripts
-            '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
             '@AppBundle/Resources/public/vendor/foundation/js/foundation.js'
             %}
             <script src="{{ asset_url }}"></script>
