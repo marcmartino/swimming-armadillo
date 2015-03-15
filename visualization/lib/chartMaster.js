@@ -7,6 +7,14 @@ _.remove(dataset, function (datum) {
 	return (datum["Fat mass (%)"] === null || datum['Lean mass (%)'] === null);
 });*/
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+var fetchModName = getParameterByName('measure');
+
 var svgData = {
     h: 300,
     w: d3.min([1100, window.innerWidth]),
@@ -121,27 +129,21 @@ function resize() {
     redrawChart(svgData);
 }
 d3.select(window).on('resize', resize);
-//redrawChart(svgData);
 
-///var withingsBf = System.load('lib/chartModules/withingsBf');
-/*console.log('about to load poo');
-System.import( 'lib/chartModules/withingsBf')
-    .then(function (withingsBf) {
-	console.log("poo loaded");
-	console.log(withingsBf.default.poo);
-	console.log(withingsBf.default.fun);
-	//console.log(withingsBf.poo);
-})*/
 import withingsBf from './chartModules/withingsBf';
-//withingsBf.fun("draw data string");
-//console.log(withingsBf);
-//console.log("promise next");
-//console.log(withingsBf.promm);
-withingsBf.prom.then(function (result) {
-    console.log("promise success");
-  //  console.log(result);
-    redrawChart(svgData, [result]);
-}, function (err) {
-    console.log("promise err");
-    console.log(err);
+import weight from './chartModules/weight';
+
+var dataMods = [withingsBf, weight];
+
+dataMods.forEach(function (dataMod) {
+    dataMod.prom.then(function (result) {
+	//console.log("promise success");
+	//  console.log(result);
+	redrawChart(svgData, [result]);
+    }, function (err) {
+	console.log("promise err");
+	console.log(err);
+    });
 });
+
+

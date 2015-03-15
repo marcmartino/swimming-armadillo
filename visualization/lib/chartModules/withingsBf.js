@@ -1,5 +1,5 @@
 "format es6";
-console.log("module poo running");
+console.log("module fatmass running");
 //export default = "poo";
 /*export {
     unit: "bpm",
@@ -16,10 +16,7 @@ var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/
 var drawDataTemp;
 var drawFunc = (drawData) => {
     console.log("drawFuncEx");
-    console.warn(drawData);
-   // console.log(getXMinMax(remoteData));
-   // console.log([drawData.chartPadding, drawData.w - drawData.chartPadding]);
-//    console.log(getYMinMax(remoteData));
+    //console.warn(drawData);
     var yFreq = [];
     var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
     drawData.svg.append("g")
@@ -47,7 +44,7 @@ var drawFunc = (drawData) => {
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
-    console.log(yFreq);
+    //console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
 		.attr("x", 20).attr("y",20)
