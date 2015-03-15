@@ -1,27 +1,12 @@
 <?php
 namespace AppBundle\Entity;
 
-use Doctrine\DBAL\Connection;
-
 /**
  * Class OAuthAccessToken
  * @package AppBundle\Entity
  */
-class OAuthAccessToken
+class OAuthAccessToken extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
-
     /**
      * Check to see if a user already has an access token stored for given service provider
      *
@@ -66,7 +51,10 @@ class OAuthAccessToken
         $accessToken,
         $accessTokenSecret
     ) {
-        $stmt = $this->conn->prepare("INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret) VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)");
+        $stmt = $this->conn->prepare("
+            INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret)
+            VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)
+        ");
         $stmt->execute([
             ':userId' => $userId,
             ':providerId' => $providerId,
@@ -74,5 +62,21 @@ class OAuthAccessToken
             ':accessToken' => $accessToken,
             ':accessTokenSecret' => $accessTokenSecret,
         ]);
+    }
+
+    /**
+     * @param $userId
+     * @param $serviceProviderId
+     * @return array
+     */
+    public function getOAuthAccessTokenForUserAndServiceProvider($userId, $serviceProviderId)
+    {
+        $stmt = $this->conn->prepare("
+            SELECT * FROM oauth_access_tokens
+            WHERE user_id = :userId AND service_provider_id = :serviceProviderId
+            ");
+        $stmt->execute([':userId' => $userId, ':serviceProviderId' => $serviceProviderId]);
+
+        return $stmt->fetchAll();
     }
 } 

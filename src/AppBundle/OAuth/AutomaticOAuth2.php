@@ -1,7 +1,10 @@
 <?php
 namespace AppBundle\OAuth;
 
+use OAuth\Common\Consumer\CredentialsInterface;
+use OAuth\Common\Http\Client\ClientInterface;
 use OAuth\Common\Http\Uri\Uri;
+use OAuth\Common\Storage\TokenStorageInterface;
 use OAuth\Common\Token\TokenInterface;
 use OAuth\Common\Http\Uri\UriInterface;
 use OAuth\OAuth2\Service\AbstractService;
@@ -26,6 +29,18 @@ class AutomaticOAuth2 extends AbstractService
         SCOPE_TRIP = 'scope:trip',
         SCOPE_BEHAVIOR = 'scope:behavior';
 
+    public function __construct(
+        CredentialsInterface $credentials,
+        ClientInterface $httpClient,
+        TokenStorageInterface $storage,
+        $scopes = array(),
+        UriInterface $baseApiUri = null,
+        $stateParameterInAutUrl = false
+    ) {
+        parent::__construct($credentials, $httpClient, $storage, $scopes, $baseApiUri, $stateParameterInAutUrl);
+        $this->baseApiUri = new Uri('https://api.automatic.com/v1/');
+    }
+
     /**
      * Parses the access token response and returns a TokenInterface.
      *
@@ -48,7 +63,6 @@ class AutomaticOAuth2 extends AbstractService
 
         $token = new StdOAuth2Token();
         $token->setAccessToken($data['access_token']);
-        // Github tokens evidently never expire...
         $token->setEndOfLife(StdOAuth2Token::EOL_NEVER_EXPIRES);
         unset($data['access_token']);
 

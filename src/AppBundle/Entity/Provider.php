@@ -1,26 +1,12 @@
 <?php
 namespace AppBundle\Entity;
-use Doctrine\DBAL\Connection;
 
 /**
  * Class Provider
  * @package AppBundle\Entity
  */
-class Provider
+class Provider extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection|\PDO $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
-
     /**
      * @return array
      */

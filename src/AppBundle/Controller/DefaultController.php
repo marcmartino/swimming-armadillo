@@ -18,12 +18,4 @@ class DefaultController extends Controller
         }
         return $this->render('default/index.html.twig');
     }
-
-    /**
-     * @Route("/view/data", name="graphs")
-     */
-    public function viewDataAction()
-    {
-        return $this->render("default/view_data.html.twig");
-    }
 }

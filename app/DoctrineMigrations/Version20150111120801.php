@@ -20,7 +20,8 @@ class Version20150111120801 extends AbstractMigration implements ContainerAwareI
         UnitType::PERCENT => 'Percent',
         UnitType::GRAMS => 'Grams',
         UnitTYpe::METERS => 'Meters',
-        UnitType::MILLIMETERS_MERCURY => 'Millimeters Mercury'
+        UnitType::MILLIMETERS_MERCURY => 'Millimeters Mercury',
+        UnitType::SECONDS => 'Seconds'
     ];
 
     public function setContainer(ContainerInterface $container = null)

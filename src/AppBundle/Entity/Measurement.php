@@ -1,26 +1,12 @@
 <?php
 namespace AppBundle\Entity;
 
-use Doctrine\DBAL\Connection;
-
 /**
  * Class Measurement
  * @package AppBundle\Entity
  */
-class Measurement
+class Measurement extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection|\PDO $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
 
     /**
      * @param $measurementEventId

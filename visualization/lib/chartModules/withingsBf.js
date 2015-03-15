@@ -11,36 +11,64 @@ console.log("module poo running");
 
 //export default {poo:"poo"};
 var remoteData;
-var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata";	   
+var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";	   
 	
 var drawDataTemp;
 var drawFunc = (drawData) => {
     console.log("drawFuncEx");
-    console.log(drawData);
+    console.warn(drawData);
+   // console.log(getXMinMax(remoteData));
+   // console.log([drawData.chartPadding, drawData.w - drawData.chartPadding]);
+//    console.log(getYMinMax(remoteData));
+    var yFreq = [];
+    var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
     drawData.svg.append("g")
 	.selectAll("rect")
-   	.data(dataset)
+	.data(remoteData)
    	.enter()
 	.append("circle")
 	.attr("cx", function (d, i) {
-   	    return drawData.timestampData.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
+	    //drawData.xAxis.scale(
+	   
+	   // console.log(drawData.xAxis.scale());
+	    //console.log(drawData.xAxis.scale(new Date()));
+	    return drawData.xScale(Date.parseString(d.Date, 'yyyy-MM-dd H:mm a'));
+	    
+	    //return drawData.xAxis.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
 	})
 	.attr("cy", function (d, i) {
-   	    return drawData.bodyMassData.scale(d['Fat mass (%)'] / 100 || 0);
+	    var fatVal = d['Units'] || 0;
+	    var intFat = parseInt(fatVal, 10);
+
+	    //console.log(thisYScale(d['Units']  || 0));
+//	    console.log(d);
+	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
+   	    return thisYScale(d['Units']  || 0);
    	})
    	.attr('r', 2)
    	.attr('fill', 'brown');
-
+    console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
 		.attr("x", 20).attr("y",20)
 		.text("fat chart");*/
 };
+function getXMinMax (data) {
+    var dateAccessor = (el) => {
+	return Date.parseString(el.Date,'yyyy-MM-dd H:mm a');
+	return (new Date(el.Date));
+    };
+    return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
+}
+function getYMinMax (data) {
+    var fatAccessor  = (el) => {
+	return el['Units'];
+    };
+    return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
+
+};
   export default  {
     unit: "bpm",
-    dateMinMaxFunc:  () => {
-	
-    },
     prom: new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
 
@@ -49,12 +77,13 @@ var drawFunc = (drawData) => {
 		url: url,
 		success: (data) => {
 		    //console.log("get success");
-		   //  console.log(data);
-		    remoteData = data;
+		   // console.log(data);
+		    remoteData = typeof data == 'object' ? data : JSON.parse(data);
+//console.log(getYMinMax(remoteData));
 		    resolve({
 			chart: drawFunc,
-			xScale: 10,
-			yScale: 12
+			xScale: getXMinMax(remoteData),
+			yScale: getYMinMax(remoteData)
 		    });
 		    
 		    
@@ -87,9 +116,9 @@ var drawFunc = (drawData) => {
     }())
   }
 
-function getBodyMassData() {
-	var min = _.min([_.min(dataset, "Fat mass (%)")["Fat mass (%)"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
-		max = _.max([_.max(dataset, "Fat mass (%)")["Fat mass (%)"], _.max(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+/*function getBodyMassData() {
+	var min = _.min([_.min(dataset, "Units")["Units"], _.min(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
+		max = _.max([_.max(dataset, "Units")["Units"], _.max(dataset, "Lean mass (%)")["Lean mass (%)"]]) / 100,
 		rangePadding = (max - min) * 0.25;
 		scale = d3.scale.linear()
 
@@ -100,6 +129,6 @@ function getBodyMassData() {
 	console.log("body mass max: ");
 	console.log(max);
 	return {min: min, max: max, scale: scale};
-}
+}*/
 
 

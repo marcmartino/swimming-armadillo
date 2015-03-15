@@ -26,7 +26,9 @@ class Version20150111120759 extends AbstractMigration implements ContainerAwareI
         MeasurementType::FAT_MASS_WEIGHT => 'Fat Mass Weight',
         MeasurementType::DIASTOLIC_BLOOD_PREASSURE => 'Diastolic Blood Pressure',
         MeasurementType::SYSTOLIC_BLOOD_PREASSURE => 'Systolic Blood Pressure',
-        MeasurementType::SPO2 => 'SPO2'
+        MeasurementType::SPO2 => 'SPO2',
+        MeasurementType::DRIVE_DISTANCE => 'Drive Distance',
+        MeasurementType::DRIVE_TIME => 'Drive Time'
     ];
 
     public function setContainer(ContainerInterface $container = null)

@@ -54,4 +54,15 @@ class ProviderController extends Controller
 
         return $this->redirect($this->generateUrl('providers'));
     }
+
+    /**
+     * @Route("/{providerSlug}/consume")
+     */
+    public function providerConsume($providerSlug)
+    {
+        /** @var ProviderApiAdapterFactory $factory */
+        $factory = $this->get('api_adapter_factory');
+        $apiAdapter = $factory->getApiAdapter($providerSlug);
+        var_dump($apiAdapter->consumeData()); exit;
+    }
 }

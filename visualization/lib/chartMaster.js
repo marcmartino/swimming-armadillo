@@ -72,11 +72,21 @@ function redrawChart(svgData, xChartFuncs) {
     //leanChart(drawData);
     //fatChart(drawData);
 //    withingsBf.fun(drawData);
-    drawData.xAxis.scale(xChartFuncs[0].xScale);
+    ///console.log(xChartFuncs[0]);
+    
+
+    drawData.xScale = d3.time.scale()
+	.domain(xChartFuncs[0].xScale)
+	.range([0 + svgData.chartPadding, svgData.w - svgData.chartPadding]);
+
+    drawData.yScale = d3.scale.linear()
+	.range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
+
+    drawData.xAxis.scale(drawData.xScale);
     drawData.yAxis.scale(xChartFuncs[0].yScale);
     xChartFuncs[0].chart(drawData);
 
-drawData.svg.append("g")
+/*drawData.svg.append("g")
 	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
 	.attr("class", "axis")
     .call(drawData.xAxis);
@@ -84,7 +94,7 @@ drawData.svg.append("g")
 drawData.svg.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(" + svgData.chartPadding + ",0)")
-    .call(drawData.yAxis);
+    .call(drawData.yAxis);*/
 }
 
 function getTimestampData() {

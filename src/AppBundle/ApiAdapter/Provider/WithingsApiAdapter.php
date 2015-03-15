@@ -8,11 +8,10 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use DateTime;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
-use OAuth\Common\Storage\Memory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
-use OAuth\OAuth1\Service\AbstractService;
 use OAuth\Common\Service\ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -106,12 +105,30 @@ class WithingsApiAdapter implements ApiAdapterInterface
      */
     public function consumeData()
     {
+        $uri = 'measure?action=getmeas&userid=';
+
+        /** @var SecurityContext $securityContext */
+        $securityContext = $this->container->get('security.context');
+        /** @var Provider $provider */
+        $provider = $this->container->get('entity_provider');
+
+        /** @var OAuthAccessToken $accessTokenService */
+        $accessTokenService = $this->container->get('entity.oauth_access_token');
+        $userTokens = $accessTokenService->getOAuthAccessTokenForUserAndServiceProvider(
+            $securityContext->getToken()->getUser()->getId(),
+            $provider->getProvider(Providers::WITHINGS)[0]['id']
+        );
+
+        if (count($userTokens) < 1) {
+            throw new \Exception("User has not authenticated service provider: " . Providers::WITHINGS);
+        }
+
+        $uri .= $userTokens[0]['foreign_user_id'];
+
         /** @var MeasurementEvent $measurementEventService */
         $measurementEventService = $this->container->get('entity.measurement_event');
         /** @var Measurement $measurementService */
         $measurementService = $this->container->get('entity.measurement');
-
-        $uri = 'measure?action=getmeas&userid=5575888';
 
         $response = $this->getService()->request($uri);
 
@@ -208,5 +225,19 @@ class WithingsApiAdapter implements ApiAdapterInterface
             $accessToken->getAccessToken(),
             $accessToken->getAccessTokenSecret()
         );
+    }
+
+    /**
+     * Set user access token in storage
+     *
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function setDatabaseAccessToken($accessToken, $accessTokenSecret)
+    {
+        $token = new StdOAuth1Token();
+        $token->setAccessToken($accessToken);
+        $token->setAccessTokenSecret($accessTokenSecret);
+        $this->storage->storeAccessToken('WithingsOAuth', $token);
     }
 }

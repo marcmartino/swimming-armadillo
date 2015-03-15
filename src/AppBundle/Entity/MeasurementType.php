@@ -1,28 +1,14 @@
 <?php
 namespace AppBundle\Entity;
 
-use Doctrine\DBAL\Driver\Connection;
 use AppBundle\Exception\MeasurementTypeNotFoundException;
 
 /**
  * Class MeasurementType
  * @package AppBundle\Entity
  */
-class MeasurementType
+class MeasurementType extends AbstractEntity
 {
-    /**
-     * @var \PDO
-     */
-    private $conn;
-
-    /**
-     * @param Connection|\PDO $conn
-     */
-    public function __construct(Connection $conn)
-    {
-        $this->conn = $conn;
-    }
-
     /**
      * @return array
      */
@@ -41,7 +27,8 @@ class MeasurementType
 
     /**
      * @param $slug
-     * @return array
+     * @return mixed
+     * @throws MeasurementTypeNotFoundException
      */
     public function getMeasurementType($slug)
     {
@@ -53,5 +40,13 @@ class MeasurementType
             throw new MeasurementTypeNotFoundException("Measurement type '$slug' not found");
         }
         return $stmt->fetch();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->conn->query("SELECT * FROM measurement_types")->fetchAll();
     }
 } 
