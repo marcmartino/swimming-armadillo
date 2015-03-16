@@ -37,13 +37,13 @@ var drawFunc = (drawData) => {
 	    //return drawData.xAxis.scale(Date.parseString(d.Date,'yyyy-MM-dd H:mm a'));
 	})
 	.attr("cy", function (d, i) {
-	    var fatVal = d['Fat mass (%)'] || 0;
+	    var fatVal = d['Units'] || 0;
 	    var intFat = parseInt(fatVal, 10);
 
 	    //console.log(thisYScale(d['Units']  || 0));
 	    //console.log(fatVal);
 	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
-   	    return thisYScale(d['Fat mass (%)']  || 0);
+   	    return thisYScale(d['Units']  || 0);
    	})
    	.attr('r', 3) 
    	.attr('fill', 'brown');
@@ -63,7 +63,7 @@ function getXMinMax (data) {
 }
 function getYMinMax (data) {
     var fatAccessor  = (el) => {
-	return el['Fat mass (%)'];
+	return el['Units'];
     };
     return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
 
