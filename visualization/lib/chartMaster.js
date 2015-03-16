@@ -94,9 +94,10 @@ function redrawChart(svgData, xChartFuncs) {
     drawData.yAxis.scale(xChartFuncs[0].yScale);
     xChartFuncs[0].chart(drawData);
 
-drawData.svg.append("g")
+    drawData.svg.select("g.xAxis").remove();
+    drawData.svg.append("g")
 	.attr("transform", "translate(0," + (svgData.h - svgData.chartPadding) + ")")
-	.attr("class", "axis")
+	.attr("class", "xAxis")
     .call(drawData.xAxis);
 /*
 drawData.svg.append("g")
