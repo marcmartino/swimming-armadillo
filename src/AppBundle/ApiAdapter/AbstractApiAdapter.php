@@ -1,17 +1,20 @@
 <?php
 namespace AppBundle\ApiAdapter;
 
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AbstractApiAdapter {
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(
-        Container $container
+        ContainerInterface $container
     ) {
         $this->container = $container;
     }
