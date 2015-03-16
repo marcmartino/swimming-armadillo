@@ -10,5 +10,6 @@ class Providers
     const
         WITHINGS = 'withings',
         AUTOMATIC = 'automatic',
-        FITBIT = 'fitbit';
+        FITBIT = 'fitbit',
+        FATSECRET = 'fatsecret';
 } 
