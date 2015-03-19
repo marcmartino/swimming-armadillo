@@ -120,7 +120,7 @@ class FitBit extends AbstractService
         $bodyParams = null;
 
         $authorizationHeader = array(
-            'Authorization' => $this->buildAuthorizationHeaderForAPIRequest(
+            'Authorization' => $this->buildAuthorizationHeaderForAccessTokenRequest(
                 'POST',
                 $this->getAccessTokenEndpoint(),
                 $this->storage->retrieveAccessToken($this->service()),
@@ -138,7 +138,7 @@ class FitBit extends AbstractService
         return $token;
     }
 
-    protected function buildAuthorizationHeaderForAPIRequest(
+    protected function buildAuthorizationHeaderForAccessTokenRequest(
         $method,
         UriInterface $uri,
         TokenInterface $token,
