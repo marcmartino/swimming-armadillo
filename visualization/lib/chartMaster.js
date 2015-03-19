@@ -98,15 +98,17 @@ import weight from './chartModules/weight';
 var dataMods = convertGetParams({weight: weight, withingsBf: withingsBf});
 
 dataMods.forEach(function (dataMod) {
-    dataMod.prom.then(function (result) {
-	
-	console.log("promise success");
-	  console.log(result);
-	redrawChart(svgData, [result]);
-    }, function (err) {
-	console.log("promise err");
-	console.log(err);
-    });
+    if (dataMod) {
+	dataMod.prom.then(function (result) {
+	    
+	    console.log("promise success");
+	    console.log(result);
+	    redrawChart(svgData, [result]);
+	}, function (err) {
+	    console.log("promise err");
+	    console.log(err);
+	});
+    }
 });
 
 
