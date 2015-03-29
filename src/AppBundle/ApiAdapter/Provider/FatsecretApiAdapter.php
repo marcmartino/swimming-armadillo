@@ -12,6 +12,7 @@ namespace AppBundle\ApiAdapter\Provider;
 use AppBundle\ApiAdapter\AbstractApiAdapter;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
 use AppBundle\OAuth\FatSecret;
+use AppBundle\Provider\Providers;
 use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Http\Client\CurlClient;
 use OAuth\ServiceFactory;
@@ -79,6 +80,30 @@ class FatsecretApiAdapter extends AbstractApiAdapter implements ApiAdapterInterf
 
     public function handleCallback()
     {
-        // TODO: Implement handleCallback() method.
+        $token = $this->storage->retrieveAccessToken('FatSecret');
+
+        $accessToken = $this->getService()->requestAccessToken(
+            $_GET['oauth_token'],
+            $_GET['oauth_verifier'],
+            $token->getRequestTokenSecret()
+        );
+
+        /** @var Provider $provider */
+        $provider = $this->container->get('entity_provider');
+
+        /** @var OAuthAccessToken $accessTokenService */
+        $accessTokenService = $this->container->get('entity.oauth_access_token');
+
+        /** @var SecurityContext $securityContext */
+        $securityContext = $this->container->get('security.context');
+
+        // Store the newly created access token
+        $accessTokenService->store(
+            $securityContext->getToken()->getUser()->getId(),
+            $provider->getProvider(Providers::FATSECRET)[0]['id'],
+            null,
+            $accessToken->getAccessToken(),
+            $accessToken->getAccessTokenSecret()
+        );
     }
 }
