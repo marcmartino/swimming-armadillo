@@ -1,5 +1,5 @@
 "format es6";
-console.log("module poo running");
+console.log("module fatmass running");
 //export default = "poo";
 /*export {
     unit: "bpm",
@@ -15,14 +15,14 @@ var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/
 	
 var drawDataTemp;
 var drawFunc = (drawData) => {
-    console.log("drawFuncEx");
-    console.warn(drawData);
-   // console.log(getXMinMax(remoteData));
-   // console.log([drawData.chartPadding, drawData.w - drawData.chartPadding]);
-//    console.log(getYMinMax(remoteData));
+    console.log("fatmass drawFuncEx");
+    //console.warn(drawData);
     var yFreq = [];
     var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
+    //drawData.svg.append("g").attr("class", "fattyTest");
+
     drawData.svg.append("g")
+	.attr("class", "fatmassPlot")
 	.selectAll("rect")
 	.data(remoteData)
    	.enter()
@@ -41,13 +41,14 @@ var drawFunc = (drawData) => {
 	    var intFat = parseInt(fatVal, 10);
 
 	    //console.log(thisYScale(d['Units']  || 0));
-//	    console.log(d);
+	    //console.log(fatVal);
 	    yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
    	    return thisYScale(d['Units']  || 0);
    	})
-   	.attr('r', 2)
+   	.attr('r', 3) 
    	.attr('fill', 'brown');
-    console.log(yFreq);
+
+    //console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
 		.attr("x", 20).attr("y",20)

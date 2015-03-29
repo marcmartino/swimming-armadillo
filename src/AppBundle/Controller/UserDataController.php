@@ -46,6 +46,8 @@ class UserDataController extends Controller
 
         }
 
-        return $this->render('userdata/user_data.html.twig', ['measurement_events' => $formattedData]);
+        $response = $this->render('userdata/user_data.html.twig', ['measurement_events' => $formattedData]);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 } 
