@@ -1,8 +1,5 @@
-{% extends "layout.html.twig" %}
 {% trans_default_domain 'FOSUserBundle' %}
 
-{% block stylesheets %}
-    {{ parent() }}
     <style type="text/css">
         .center.row {
             height: 300px;
@@ -41,8 +38,6 @@
             border-bottom: 1px solid #cccccc !important;
         }
     </style>
-{% endblock %}
-{% block body %}
     {% if error %}
         <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -78,4 +73,3 @@
         </div>
     <div>
     <a href="{{ path('fos_user_registration_register') }}">Register</a>
-{% endblock %}
