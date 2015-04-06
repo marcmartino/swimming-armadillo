@@ -48,6 +48,12 @@ var drawFunc = (drawData) => {
    	.attr('r', 3) 
    	.attr('fill', 'brown');
 
+    $("#legend .withingsBf").text("body fat")
+	.off("click")
+	.on("click", (e) => {
+	    console.log("poo");
+	    $("g.fatmassPlot").toggle();
+	});
     //console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
@@ -84,7 +90,8 @@ function getYMinMax (data) {
 		    resolve({
 			chart: drawFunc,
 			xScale: getXMinMax(remoteData),
-			yScale: getYMinMax(remoteData)
+			yScale: getYMinMax(remoteData),
+			name: "withingsBf"
 		    });
 		    
 		    
