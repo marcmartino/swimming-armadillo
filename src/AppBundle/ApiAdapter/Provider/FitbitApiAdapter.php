@@ -42,7 +42,11 @@ class FitbitApiAdapter implements ApiAdapterInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->storage = $this->container->get('token_storage_session');;
+        $this->storage = $this->container->get('token_storage_session');
+
+        $this->consumerKey = $this->container->getParameter('fitbit_consumer_key');
+        $this->consumerSecret = $this->container->getParameter('fitbit_consumer_secret');
+        $this->callbackUri = $this->container->getParameter('fitbit_callback_uri');
 
         $this->service = $this->createService();
     }
@@ -50,9 +54,9 @@ class FitbitApiAdapter implements ApiAdapterInterface
     protected function createService()
     {
         $credentials = new Credentials(
-            '32ae69ab40734adeaaa3e7c099b7b772',
-            '2c6aff81110b470fa5d2b94ef0b276a6',
-            'http://hdlbit.com/fitbit/callback'
+            $this->consumerKey,
+            $this->consumerSecret,
+            $this->callbackUri
         );
 
         $serviceFactory = new ServiceFactory();
