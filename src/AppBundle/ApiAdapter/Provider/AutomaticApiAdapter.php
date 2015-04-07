@@ -188,16 +188,4 @@ class AutomaticApiAdapter implements ApiAdapterInterface
 
         return $tripEvents;
     }
-
-    /**
-     * Set user access token in storage
-     *
-     * @param $accessToken
-     */
-    public function setDatabaseAccessToken($accessToken)
-    {
-        $token = new StdOAuth2Token();
-        $token->setAccessToken($accessToken);
-        $this->storage->storeAccessToken('AutomaticOAuth2', $token);
-    }
 }

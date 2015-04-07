@@ -226,18 +226,4 @@ class WithingsApiAdapter implements ApiAdapterInterface
             $accessToken->getAccessTokenSecret()
         );
     }
-
-    /**
-     * Set user access token in storage
-     *
-     * @param $accessToken
-     * @param $accessTokenSecret
-     */
-    public function setDatabaseAccessToken($accessToken, $accessTokenSecret)
-    {
-        $token = new StdOAuth1Token();
-        $token->setAccessToken($accessToken);
-        $token->setAccessTokenSecret($accessTokenSecret);
-        $this->storage->storeAccessToken('WithingsOAuth', $token);
-    }
 }
