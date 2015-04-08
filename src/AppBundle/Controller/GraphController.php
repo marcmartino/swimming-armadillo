@@ -14,7 +14,7 @@ class GraphController extends Controller
     /**
      * @Route("/graph", name="graph")
      */
-    public function graph()
+    public function graphAction()
     {
         /** @var MeasurementType $measurementTypeService */
         $measurementTypeService = $this->get('entity_measurement_type');
