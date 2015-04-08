@@ -2,7 +2,7 @@
 {% block body %}
     <style type="text/css">
         .data-graph {
-            background-color: #CCC;
+            border: none;
             width: 100%;
         }
         iframe body img {
@@ -11,8 +11,7 @@
     </style>
     <div class="center row">
         <div class="large-12 columns">
-            <h2>Your Data</h2>
-            <a href="#">Withings</a>
+            <h2>Your {% for measurement_type in measurement_types %}{{ measurement_type.name }}{% if loop.last %}{% else %}, {% endif %}{% endfor %}</h2>
         </div>
     </div>
     <div class="center row">
