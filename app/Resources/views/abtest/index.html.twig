@@ -1,0 +1,31 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    <div class="large-12 columns">
+
+        <div class="panel callout radius">
+            <p>Use A/B testing to find out what lifestyle changes work for you, and which ones you should avoid.</p>
+        </div>
+
+        <a href="{{ path('abtestcreate') }}" class="button">Create a new test</a>
+        <table>
+            <thead>
+                <tr>
+                    <th width="200">Name</th>
+                    <th>Description</th>
+                    <th width="150">Start Date</th>
+                    <th width="150">End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for abtest in abtests %}
+                <tr>
+                    <td><a href="{{ path('abtestview', {'slug': abtest.id}) }}">{{ abtest.name }}</a></td>
+                    <td>{{ abtest.description }}</td>
+                    <td>{{ abtest.startDate|date('M d, Y') }}</td>
+                    <td>{{ abtest.endDate|date('M d, Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
