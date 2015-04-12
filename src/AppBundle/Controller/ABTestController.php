@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\Controller;
+use AppBundle\ABTest\ABTestService;
 use AppBundle\Entity\ABTest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,9 +54,13 @@ class ABTestController extends Controller {
      */
     public function viewAction($slug)
     {
+        /** @var ABTestService $abTestService */
+        $abTestService = $this->get('abtest');
+        $abTestService->setUser($this->getUser());
         $abTest = $this->getDoctrine()
             ->getRepository('AppBundle:ABTest')
             ->find($slug);
-        return $this->render('abtest/view.html.twig', ['abtest' => $abTest]);
+        $insights = $abTestService->getInsights($abTest);
+        return $this->render('abtest/view.html.twig', ['abtest' => $abTest, 'insights' => $insights]);
     }
 }

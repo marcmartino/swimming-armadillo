@@ -10,12 +10,9 @@
         <h2>Insights</h2>
 
         <ul>
-            <li>Weight increased by approximately 5% a day.</li>
-            <li>Lean mass did not increase proportionately to fat mass.</li>
-            <li>Increased restless sleep.</li>
-            <li>Blood pressure increase.</li>
-            <li>Blood glucose levels rose.</li>
-            <li>List item</li>
+            {% for insight in insights %}
+                <li>{{ insight.description }}</li>
+            {% endfor %}
         </ul>
     </div>
 {% endblock %}
