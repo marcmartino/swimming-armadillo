@@ -40,6 +40,7 @@ function getYMinMax (data) {
     var fatAccessor  = (el) => {
 	return el['Units'];
     };
+    console.log([d3.min(data, fatAccessor), d3.max(data, fatAccessor)]);
     return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
 
 };

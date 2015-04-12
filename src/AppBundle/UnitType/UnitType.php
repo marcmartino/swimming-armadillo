@@ -12,6 +12,7 @@ class UnitType
     GRAMS = 'grams',
     METERS = 'meters',
     MILLIMETERS_MERCURY = 'mmhg',
-
-    SECONDS = 's';
+    SECONDS = 's',
+    LITERS = 'L',
+    CALORIES = 'cal';
 }
