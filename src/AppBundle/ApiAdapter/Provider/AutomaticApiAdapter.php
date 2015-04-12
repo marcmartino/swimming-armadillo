@@ -37,10 +37,17 @@ class AutomaticApiAdapter implements ApiAdapterInterface
      */
     protected $unitTypeService;
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->storage = $this->container->get('token_storage_session');;
+        $this->storage = $this->container->get('token_storage_session');
+
+        $this->consumerKey = $this->container->getParameter('automatic_consumer_key');
+        $this->consumerSecret = $this->container->getParameter('automatic_consumer_secret');
+        $this->callbackUri = $this->container->getParameter('automatic_callback_uri');
 
         $this->service = $this->createService();
         $this->unitTypeService = $this->container->get('entity_unit_type');
@@ -141,9 +148,9 @@ class AutomaticApiAdapter implements ApiAdapterInterface
     public function createService()
     {
         $credentials = new Credentials(
-            '553f2bc0a03cd495b70e',
-            'a093caba2cf0cf959acd82732beaca0c648f19ac',
-            'http://hdlbit.com/automatic/callback'
+            $this->consumerKey,
+            $this->consumerSecret,
+            $this->callbackUri
         );
 
         $serviceFactory = new ServiceFactory();
@@ -183,17 +190,5 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         }
 
         return $tripEvents;
-    }
-
-    /**
-     * Set user access token in storage
-     *
-     * @param $accessToken
-     */
-    public function setDatabaseAccessToken($accessToken)
-    {
-        $token = new StdOAuth2Token();
-        $token->setAccessToken($accessToken);
-        $this->storage->storeAccessToken('AutomaticOAuth2', $token);
     }
 }

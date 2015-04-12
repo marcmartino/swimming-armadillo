@@ -1,19 +1,9 @@
 {% extends '::layout.html.twig' %}
 {% block body %}
-    <script type="text/javascript">
-        function iframeLoaded() {
-            var iframe = document.getElementById('iframeId');
-            iframe.height = "";
-            iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
-        }
-    </script>
     <style type="text/css">
         .data-graph {
-            background-color: #CCC;
+            border: none;
             width: 100%;
-        }
-        .top-bar {
-            margin-bottom: 10px;
         }
         iframe body img {
             width: 100%;
@@ -21,14 +11,21 @@
     </style>
     <div class="center row">
         <div class="large-12 columns">
-            <h2>Your Data</h2>
-            <a href="#">Withings</a>
+            <h2>Your {% for measurement_type in measurement_types %}{{ measurement_type.name }}{% if loop.last %}{% else %}, {% endif %}{% endfor %}</h2>
         </div>
     </div>
     <div class="center row">
         <div class="large-12 columns">
-            <iframe id="iframeId" class="data-graph" src="http://hdlbit.com/visualization/index.html?measure={{ measurementTypeSlug }}" onload="iframeLoaded()" scrolling="no">Datas</iframe>
+            <iframe id="iframeId" class="data-graph" height="400px" src="http://hdlbit.com/visualization/index.html?measure={{ measurementTypeSlug }}" onload="iframeLoaded()" scrolling="no">Datas</iframe>
         </div>
     </div>
-
+    <script type="text/javascript">
+        function iframeLoaded() {
+            setTimeout(function(){
+                var iframe = document.getElementById('iframeId');
+                iframe.height = "";
+                iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
+            }, 1200);
+        }
+    </script>
 {% endblock %}

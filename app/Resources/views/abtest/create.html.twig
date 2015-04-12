@@ -1,0 +1,18 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    <div class="center row">
+        <div class="large-12 columns">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+    <style>
+        select {
+            width: 30%;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
