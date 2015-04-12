@@ -48,16 +48,52 @@ var drawFunc = (drawData) => {
    	.attr('r', 3) 
    	.attr('fill', 'brown');
 
+    $("#legend .withingsBf").text("body fat")
+	.off("click")
+	.on("click", (e) => {
+	    //console.log("poo");
+	    $("g.fatmassPlot").toggle();
+	});
     //console.log(yFreq);
 	    /*drawData.legend
 		.insert("text").attr("class", "fatChart")
 		.attr("x", 20).attr("y",20)
 		.text("fat chart");*/
+    var lineFunction = d3.svg.line()
+	.x((d) => {return drawData.xScale(new Date(d.Date));})
+	.y((d) => {return drawData.yScale(d.Units);})
+	.interpolate('basis');
+    
+    var grouped = remoteData.reduce(groupByDate,{});
+    var pluckedGroups = _.reduce(grouped, arrayToObj, []); 
+    drawData.svg.select("g.fatmassPlot")
+	.append("path")
+	.attr("d", lineFunction(pluckedGroups))
+        .attr("stroke", "gray")
+        .attr("stroke-width", 4)
+        .attr("fill", "none");
 };
+function groupByDate(prev, curr, index, arr) {
+    var itemDate = Date.parseString(curr.Date, 'yyyy-MM-dd h:mm a');
+    itemDate = itemDate.setDate(parseInt(itemDate.getDate() / 2, 10) *2);
+    itemDate = (new Date(itemDate)).setHours(12,0,0,0);
+    var prevItem = prev[itemDate];
+    
+    if (prevItem) {
+	prev[itemDate].Units = ((prevItem.Units * prevItem.count) + parseInt(curr.Units,10)) / (prevItem.count + 1);
+	prev[itemDate].count++;
+    } else {
+	prev[itemDate] = {Units: parseInt(curr.Units, 10), count: 1};
+    }
+    return prev;
+}
+function arrayToObj(prev, curr, index, arr) {
+    prev.push({Units: curr.Units, Date: parseInt(index,10)});
+    return prev;
+}
 function getXMinMax (data) {
     var dateAccessor = (el) => {
 	return Date.parseString(el.Date,'yyyy-MM-dd H:mm a');
-	return (new Date(el.Date));
     };
     return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
 }
@@ -84,7 +120,8 @@ function getYMinMax (data) {
 		    resolve({
 			chart: drawFunc,
 			xScale: getXMinMax(remoteData),
-			yScale: getYMinMax(remoteData)
+			yScale: getYMinMax(remoteData),
+			name: "withingsBf"
 		    });
 		    
 		    

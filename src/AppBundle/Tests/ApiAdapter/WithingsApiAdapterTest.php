@@ -1,47 +1,20 @@
 <?php
 namespace AppBundle\Tests\ApiAdapter;
 
+use AppBundle\ApiAdapter\Provider\WithingsApiAdapter;
 use GuzzleHttp\Client;
 use GuzzleHttp\Subscriber\Mock;
 use PHPUnit_Framework_TestCase;
 use GuzzleHttp\Message\MessageFactory;
-use AppBundle\ApiAdapter\WithingsApiAdapter;
 
 class WithingsApiAdapterTest extends PHPUnit_Framework_TestCase {
 
-    public function testGetTranscribedData()
+    public function testConsumeData()
     {
-        $client = new Client();
-        $mock = new Mock();
-        $f = new MessageFactory();
-
-        $response = $f->createResponse(200, ['foo' => 'bar'], file_get_contents(__DIR__ . '/Resource/mockMeasureResponseDay.json'), [
-            'protocol_version' => 1.0
-        ]);
-
-        $mock->addResponse($response);
-
-        $client->getEmitter()->attach($mock);
-
-        $adapter = new WithingsApiAdapter($client);
-
-        $actual = $adapter->getTranscribedData();
-
-        $expected = [
-            'device' => 'withings',
-            'measurement' => 'distance walked',
-            'units' => 'ft',
-            'value' => 4600
-        ];
-
-        $this->assertEquals($expected, $actual);
     }
 
-    public function testGetOAuthAccessToken()
+    public function testHandleCallback()
     {
-        $client = new Client();
-        $adapter = new WithingsApiAdapter($client);
-        $accessToken = $adapter->getOauthAccessToken();
     }
 
 }

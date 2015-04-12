@@ -38,6 +38,9 @@ function redrawChart(svgData, xChartFuncs) {
     drawData.yScale = d3.scale.linear()
 	.range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
 
+    drawData.legend = $("#legend"); //drawData.svg.append("g.legend");
+    createLegendGroups(drawData.legend, xChartFuncs[0].name);
+
     drawData.xAxis.scale(drawData.xScale);
     drawData.yAxis.scale(drawData.yScale);
     xChartFuncs[0].chart(drawData);
@@ -48,13 +51,15 @@ function redrawChart(svgData, xChartFuncs) {
 	.attr("class", "xAxis")
     .call(drawData.xAxis);
 
-    console.log(svgData);
-    console.log(drawData);
     drawData.svg.select("g.yAxis").remove();
     drawData.svg.append("g")
 	.attr("transform", "translate(" + svgData.chartPadding + ", 0)")
 	.attr("class", "yAxis")
     .call(drawData.yAxis);
+}
+
+function createLegendGroups(legend, chartName) {
+    legend.append("<div class='" + chartName + "'></div>");
 }
 
 function getTimestampData() {
@@ -110,5 +115,3 @@ dataMods.forEach(function (dataMod) {
 	});
     }
 });
-
-

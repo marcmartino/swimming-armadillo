@@ -23,20 +23,6 @@ class UserDataController extends Controller
 
         foreach ($userData->getUserData($measurementTypeSlug) as $measurementEvent) {
 
-//            $weight = 0;
-//            $fatmass = 0;
-//            $leanmass = 0;
-//
-//            foreach ($measurementEvent['measurements'] as $measurement) {
-//                if ($measurement['type'] == 2) {
-//                    $weight = $measurement['units'] * 0.00220462;
-//                } else if ($measurement['type'] == 4) {
-//                    $leanmass = $measurement['units'] * 0.00220462;
-//                } else if ($measurement['type'] == 6) {
-//                    $fatmass = $measurement['units'] * 0.00220462;
-//                }
-//            }
-
             $dateTime = new \DateTime($measurementEvent['event_time']);
 
             $formattedData[] = [

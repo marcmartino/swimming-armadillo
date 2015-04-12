@@ -11,7 +11,7 @@ class AbstractApiAdapter {
     protected $container;
 
     /**
-     * @param ContainerInterface $container
+     * @param Container $container
      */
     public function __construct(
         ContainerInterface $container

@@ -45,3 +45,15 @@ services:
     entity.measurement_event:
         class: AppBundle\Entity\MeasurementEvent
         arguments: ["@database_connection"]
+
+    abtest:
+        class: AppBundle\ABTest\ABTestService
+        arguments: ["@insight"]
+
+    insight:
+        class: AppBundle\Insight\InsightService
+        arguments: ["@insight.insight_factory"]
+
+    insight.insight_factory:
+        class: AppBundle\Insight\InsightFactory
+        arguments: ["@database_connection"]

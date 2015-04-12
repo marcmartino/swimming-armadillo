@@ -3,6 +3,9 @@ namespace AppBundle\ApiAdapter;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
+ * Responsible for creating provider objects based on provided slug
+ * Place new provider classes in the ./Provider directory with uppercase first letter and ApiAdapter.php appended
+ *
  * Class ProviderApiAdapterFactory
  * @package AppBundle\ApiAdapter
  */

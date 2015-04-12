@@ -1,0 +1,27 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    <div class="center row">
+        <div class="large-12 columns">
+
+            <h1>{{ abtest.name }}</h1>
+
+            <p>{{ abtest.description }}</p>
+            <p>{{ abtest.startDate|date('M d') }} - {{ abtest.endDate|date('M d') }}</p>
+
+            {% if "now"|date('Y-m-d') > abtest.endDate|date('Y-m-d') %}
+                <h2>Insights</h2>
+
+                <ul>
+                    {% for insight in insights %}
+                        <li>{{ insight.description }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="panel">
+                    <h5>In Progress</h5>
+                    <p>You'll see valuable insights here when your test is complete!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
