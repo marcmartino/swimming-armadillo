@@ -29,7 +29,7 @@ class FatratioInsight extends AbstractInsight implements InsightInterface{
         $lastWeight = $this->getLastMeasurementOfType($endDate, 13);
 
         $insight = (new Insight)
-            ->setDescription('Lost ' . ((int) $firstWeight['units'] - (int) $lastWeight['units']) . ' % bodyfat.');
+            ->setDescription('Lost ' . ((int) $firstWeight['units'] - (int) $lastWeight['units']) . '% bodyfat.');
 
         return $insight;
     }
