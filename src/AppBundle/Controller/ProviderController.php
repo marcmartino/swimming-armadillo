@@ -19,10 +19,11 @@ class ProviderController extends Controller
      */
     public function providersAction()
     {
-        /** @var Provider $provider */
-        $provider = $this->get('entity_provider');
+        $providers = $this->getDoctrine()->getRepository('AppBundle:ServiceProvider')
+            ->findAll();
+
         return $this->render("provider/providers.html.twig", [
-            'providers' => $provider->getProviders($this->getUser()->getId())
+            'providers' => $providers
         ]);
     }
 

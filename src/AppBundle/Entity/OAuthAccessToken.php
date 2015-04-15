@@ -1,82 +1,188 @@
 <?php
+
 namespace AppBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * Class OAuthAccessToken
- * @package AppBundle\Entity
+ * OAuthAccessToken
+ *
+ * @ORM\Table()
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\OAuthAccessTokenRepository")
  */
-class OAuthAccessToken extends AbstractEntity
+class OAuthAccessToken
 {
     /**
-     * Check to see if a user already has an access token stored for given service provider
+     * @var integer
      *
-     * @param $userId
-     * @param $providerId
-     * @return bool
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    public function doesUserHaveProviderAccessToken($userId, $providerId)
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="token", type="string", length=100)
+     */
+    private $token;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="secret", type="string", length=100)
+     */
+    private $secret;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    private $user;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foreign_user_id", type="string", length=255)
+     */
+    private $foreignUserId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ServiceProvider")
+     * @ORM\JoinColumn(name="service_provider_id", referencedColumnName="id")
+     */
+    private $serviceProvider;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
     {
-        foreach ($this->getUserOAuthAccessTokens($userId) as $accessToken) {
-            if ($accessToken['service_provider_id'] === $providerId) {
-                return true;
-            }
-        }
-        return false;
+        return $this->id;
     }
 
     /**
-     * @param $userId
-     * @return array
+     * Set token
+     *
+     * @param string $token
+     *
+     * @return OAuthAccessToken
      */
-    public function getUserOAuthAccessTokens($userId)
+    public function setToken($token)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
-        ");
-        $stmt->execute([':userId' => $userId]);
-        return $stmt->fetchAll();
+        $this->token = $token;
+
+        return $this;
     }
 
     /**
-     * @param $userId
-     * @param $providerId
-     * @param $foreignUserId
-     * @param $accessToken
-     * @param $accessTokenSecret
+     * Get token
+     *
+     * @return string
      */
-    public function store(
-        $userId,
-        $providerId,
-        $foreignUserId,
-        $accessToken,
-        $accessTokenSecret
-    ) {
-        $stmt = $this->conn->prepare("
-            INSERT INTO oauth_access_tokens (user_id, service_provider_id, foreign_user_id, token, secret)
-            VALUES (:userId, :providerId, :foreignUserId, :accessToken, :accessTokenSecret)
-        ");
-        $stmt->execute([
-            ':userId' => $userId,
-            ':providerId' => $providerId,
-            ':foreignUserId' => $foreignUserId,
-            ':accessToken' => $accessToken,
-            ':accessTokenSecret' => $accessTokenSecret,
-        ]);
+    public function getToken()
+    {
+        return $this->token;
     }
 
     /**
-     * @param $userId
-     * @param $serviceProviderId
-     * @return array
+     * Set secret
+     *
+     * @param string $secret
+     *
+     * @return OAuthAccessToken
      */
-    public function getOAuthAccessTokenForUserAndServiceProvider($userId, $serviceProviderId)
+    public function setSecret($secret)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM oauth_access_tokens
-            WHERE user_id = :userId AND service_provider_id = :serviceProviderId
-            ");
-        $stmt->execute([':userId' => $userId, ':serviceProviderId' => $serviceProviderId]);
+        $this->secret = $secret;
 
-        return $stmt->fetchAll();
+        return $this;
     }
-} 
+
+    /**
+     * Get secret
+     *
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
+    }
+
+    /**
+     * Set userId
+     *
+     * @param integer $userId
+     *
+     * @return OAuthAccessToken
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
+    /**
+     * Get userId
+     *
+     * @return integer
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+    /**
+     * Set foreignUserId
+     *
+     * @param string $foreignUserId
+     *
+     * @return OAuthAccessToken
+     */
+    public function setForeignUserId($foreignUserId)
+    {
+        $this->foreignUserId = $foreignUserId;
+
+        return $this;
+    }
+
+    /**
+     * Get foreignUserId
+     *
+     * @return string
+     */
+    public function getForeignUserId()
+    {
+        return $this->foreignUserId;
+    }
+
+    /**
+     * Set serviceProviderId
+     *
+     * @param integer $serviceProviderId
+     *
+     * @return OAuthAccessToken
+     */
+    public function setServiceProviderId($serviceProviderId)
+    {
+        $this->serviceProviderId = $serviceProviderId;
+
+        return $this;
+    }
+
+    /**
+     * Get serviceProviderId
+     *
+     * @return integer
+     */
+    public function getServiceProviderId()
+    {
+        return $this->serviceProviderId;
+    }
+}
+
