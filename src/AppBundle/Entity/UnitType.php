@@ -1,25 +1,97 @@
 <?php
+
 namespace AppBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 
-use AppBundle\Exception\UnitTypeNotFoundException;
-
-class UnitType extends AbstractEntity {
+/**
+ * UnitType
+ *
+ * @ORM\Table()
+ * @ORM\Entity
+ */
+class UnitType
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
     /**
-     * @param $slug
-     * @return array
+     * @var string
+     *
+     * @ORM\Column(name="slug", type="string", length=255)
      */
-    public function getUnitType($slug)
+    private $slug;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM unit_types WHERE slug = :slug
-        ");
-        $stmt->execute([':slug' => $slug]);
-        if ($stmt->rowCount() == 0) {
-            throw new UnitTypeNotFoundException("Measurement type '$slug' not found");
-        }
-        return $stmt->fetch();
+        return $this->id;
     }
 
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     *
+     * @return UnitType
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return UnitType
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }
+
