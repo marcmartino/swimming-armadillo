@@ -44,7 +44,7 @@ class OAuthAccessToken
     /**
      * @var string
      *
-     * @ORM\Column(name="foreign_user_id", type="string", length=255)
+     * @ORM\Column(name="foreign_user_id", type="string", length=255, nullable=true)
      */
     private $foreignUserId;
 
@@ -184,5 +184,38 @@ class OAuthAccessToken
     {
         return $this->serviceProviderId;
     }
+
+    public function getUserOAuthAccessTokens($userId)
+    {
+        $stmt = $this->conn->prepare("
+            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
+        ");
+        $stmt->execute([':userId' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * @param $userId
+     * @param $providerId
+     * @param $foreignUserId
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function store(
+        $userId,
+        $providerId,
+        $foreignUserId,
+        $accessToken,
+        $accessTokenSecret
+    ) {
+        $this->setUserId($userId)
+            ->setServiceProviderId($providerId)
+            ->setForeignUserId($foreignUserId)
+            ->setToken($accessToken)
+            ->setSecret($accessTokenSecret);
+
+        return $this;
+    }
+
 }
 
