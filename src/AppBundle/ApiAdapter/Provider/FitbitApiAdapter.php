@@ -118,16 +118,18 @@ class FitbitApiAdapter implements ApiAdapterInterface
                 ->findOneBy(['slug' => Providers::FITBIT]);
 
 
+            $user = $securityContext->getToken()->getUser()->getId();
+
             $oauthToken = $this->em->getRepository('AppBundle:OAuthAccessToken')
                 ->findOneBy([
-                    'user' => $securityContext->getToken()->getUser(),
-                    'serviceProvider' => $provider
+                    'userId' => $user,
+                    'serviceProviderId' => $provider->getId()
                 ]);
 
-            print_r($oauthToken); exit;
+            print_r($oauthToken);
 
 
-            if (!empty($oauthToken)) {
+            if (empty($oauthToken)) {
                 throw new \Exception("User has not authenticated service provider: " . Providers::FITBIT);
             }
 
@@ -147,12 +149,18 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
             // If something was logged
             if ($calories != 0) {
-                $measurementEventId = $measurementEventService->store($date, $providerService->getProvider(Providers::FITBIT)[0]['id']);
+                $measurementEventId = $measurementEventService->store(
+                    $date,
+                    $this->em->getRepository('AppBundle:ServiceProvider')
+                        ->findOneBy(['slug' => Providers::FITBIT])->getId()
+                );
 
                 foreach ([$calories, $carbs, $fat, $fiber, $protein, $sodium] as $measurement) {
                     $measurement = $measurementService->store(
                         $measurementEventId,
                         $measurementTypeService->getMeasurementType($measurement[1])['id'],
+                        $this->em->getRepository('AppBundle:MeasurementType')
+                        ->findOneBy(['slug' => $measurement[1]])->getId(),
                         $unitTypeService->getUnitType($measurement[2])['id'],
                         $measurement[0]
                     );
@@ -169,10 +177,15 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
 
         foreach ($json['fat'] as $fatMeasurement) {
-            $measurementEventId = $measurementEventService->store(
+            $measurementEvent = $measurementEventService->store(
                 new \DateTime($fatMeasurement['date']),
-                $providerService->getProvider(Providers::FITBIT)[0]['id']
+                $this->em->getRepository('AppBundle:ServiceProvider')
+                    ->findOneBy(['slug' => Providers::FITBIT])
+                    ->getId()
             );
+
+            $this->em->persist($measurementEvent);
+            $this->em->flush();
 
             $measurementService->store(
                 $measurementEventId,
@@ -224,8 +237,11 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
         $accessTokenObj = new OAuthAccessToken();
 
+        $userId = $securityContext->getToken()->getUser()->getId();
+        $user = $securityContext->getToken()->getUser();
+
         $accessTokenObj->store(
-            $securityContext->getToken()->getUser()->getId(),
+            $userId,
             $provider->getId(),
             null,
             $accessToken->getAccessToken(),

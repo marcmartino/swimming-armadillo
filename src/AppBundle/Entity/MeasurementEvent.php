@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -92,6 +93,22 @@ class MeasurementEvent
     public function getProviderId()
     {
         return $this->providerId;
+    }
+
+    /**
+     * @param DateTime $eventTime
+     * @param $providerId
+     * @return int - the id of the newly created measurement_event
+     */
+    public function store(
+        DateTime $eventTime,
+        $providerId
+    ) {
+        $measurementEvent = (new MeasurementEvent)
+            ->setEventTime($eventTime)
+            ->setProviderId($providerId);
+
+        return $measurementEvent;
     }
 }
 

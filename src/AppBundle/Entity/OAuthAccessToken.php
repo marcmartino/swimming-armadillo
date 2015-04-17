@@ -36,10 +36,10 @@ class OAuthAccessToken
     private $secret;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @var integer
+     * @ORM\Column(name="user_id", type="integer")
      */
-    private $user;
+    private $userId;
 
     /**
      * @var string
@@ -49,10 +49,10 @@ class OAuthAccessToken
     private $foreignUserId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ServiceProvider")
-     * @ORM\JoinColumn(name="service_provider_id", referencedColumnName="id")
+     * @var integer
+     * @ORM\Column(name="service_provider_id", type="integer")
      */
-    private $serviceProvider;
+    private $serviceProviderId;
 
 
     /**
