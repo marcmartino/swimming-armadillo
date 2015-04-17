@@ -51,7 +51,7 @@ class ProviderController extends Controller
         $apiAdapter->handleCallback();
 
         // Store the data associated with this provider
-//        $apiAdapter->consumeData();
+        $apiAdapter->consumeData();
 
         return $this->redirect($this->generateUrl('providers'));
     }

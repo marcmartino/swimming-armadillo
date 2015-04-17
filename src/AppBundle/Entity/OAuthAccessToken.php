@@ -187,11 +187,12 @@ class OAuthAccessToken
 
     public function getUserOAuthAccessTokens($userId)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
-        ");
-        $stmt->execute([':userId' => $userId]);
-        return $stmt->fetchAll();
+//        $stmt = $this->conn->prepare("
+//            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
+//        ");
+//        $stmt->execute([':userId' => $userId]);
+//        return $stmt->fetchAll();
+        return [];
     }
 
     /**

@@ -16,7 +16,7 @@ services:
 
     api_adapter_factory:
         class: AppBundle\ApiAdapter\ProviderApiAdapterFactory
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@doctrine.orm.entity_manager"]
 
     user_data:
         class: AppBundle\UserData\UserData

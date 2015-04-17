@@ -113,17 +113,21 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
             /** @var SecurityContext $securityContext */
             $securityContext = $this->container->get('security.context');
-            /** @var Provider $provider */
-            $provider = $this->container->get('entity_provider');
 
-            /** @var OAuthAccessToken $accessTokenService */
-            $accessTokenService = $this->container->get('entity.oauth_access_token');
-            $userTokens = $accessTokenService->getOAuthAccessTokenForUserAndServiceProvider(
-                $securityContext->getToken()->getUser()->getId(),
-                $provider->getProvider(Providers::FITBIT)[0]['id']
-            );
+            $provider = $provider = $this->em->getRepository('AppBundle:ServiceProvider')
+                ->findOneBy(['slug' => Providers::FITBIT]);
 
-            if (count($userTokens) < 1) {
+
+            $oauthToken = $this->em->getRepository('AppBundle:OAuthAccessToken')
+                ->findOneBy([
+                    'user' => $securityContext->getToken()->getUser(),
+                    'serviceProvider' => $provider
+                ]);
+
+            print_r($oauthToken); exit;
+
+
+            if (!empty($oauthToken)) {
                 throw new \Exception("User has not authenticated service provider: " . Providers::FITBIT);
             }
 
