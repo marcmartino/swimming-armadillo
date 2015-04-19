@@ -155,13 +155,14 @@ class FitbitApiAdapter implements ApiAdapterInterface
                         ->findOneBy(['slug' => Providers::FITBIT])->getId()
                 );
 
-                foreach ([$calories, $carbs, $fat, $fiber, $protein, $sodium] as $measurement) {
+                foreach ([$calories] as $measurement) {
+//                    foreach ([$calories, $carbs, $fat, $fiber, $protein, $sodium] as $measurement) {
                     $measurement = $measurementService->store(
                         $measurementEventId,
-                        $measurementTypeService->getMeasurementType($measurement[1])['id'],
                         $this->em->getRepository('AppBundle:MeasurementType')
-                        ->findOneBy(['slug' => $measurement[1]])->getId(),
-                        $unitTypeService->getUnitType($measurement[2])['id'],
+                            ->findOneBy(['slug' => $measurement[1]])->getId(),
+                        $this->em->getRepository('AppBundle:UnitType')
+                            ->findOneBy(['slug' => $measurement[2]])->getId(),
                         $measurement[0]
                     );
                     $this->em->persist($measurement);
