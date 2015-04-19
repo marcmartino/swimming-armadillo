@@ -12,7 +12,7 @@ class SimpleSlope implements CorrelatorInterface {
         return $slope1 / $slope2;
     }
 
-    protected function calculateSlopOfDataSet($dataset)
+    public function calculateSlopOfDataSet($dataset)
     {
         $rise = $dataset[1]['units'] - $dataset[0]['units'];
         $run = $dataset[1]['timestamp'] - $dataset[0]['timestamp'];
