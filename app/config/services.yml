@@ -57,3 +57,6 @@ services:
     insight.insight_factory:
         class: AppBundle\Insight\InsightFactory
         arguments: ["@database_connection"]
+
+    correlator.simple_slope:
+        class: AppBundle\Correlator\SimpleSlope

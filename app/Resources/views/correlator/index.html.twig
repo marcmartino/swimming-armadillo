@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+<div class="center row">
+    <div class="large-12 columns">
+        <div class="panel callout radius">
+            <p>See correlation between weight and bodyfat.</p>
+        </div>
+        <div>
+            <p>Start: {{ start|date('Y-m-d H:i:s') }}</p>
+            <p>End: {{ end|date('Y-m-d H:i:s') }}</p>
+            <p>Weight Dataset: {{ dump(weight_data) }}</p>
+            <p>Bodyfat Dataset: {{ dump(bodyfat_data) }}</p>
+            <p>Correlation: {{ correlation }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
