@@ -11,7 +11,8 @@ console.log("module fatmass running");
 
 //export default {poo:"poo"};
 var remoteData;
-var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";	   
+var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";
+var bfMin = undefined;	   
 	
 var drawDataTemp;
 var drawFunc = (drawData) => {
@@ -73,17 +74,46 @@ var drawFunc = (drawData) => {
         .attr("stroke-width", 4)
         .attr("fill", "none");
 };
+var isOutlier = (function (dataSet, accessor, customPred) {
+    var outlierStats = {
+	mean: d3.mean(dataSet, accessor),
+	median: d3.median(dataSet, accessor),
+	sd: d3.deviation(dataSet, accessor),
+	max: parseInt(d3.max(dataSet, accessor), 10),
+	min: parseInt(d3.min(dataSet, accessor), 10),
+    };
+    outlierStats.devMax = outlierStats.mean + outlierStats.sd * 2;
+    outlierStats.devMin = outlierStats.mean - outlierStats.sd * 2;
+
+    console.log(outlierStats);
+    // console.log({sd, mean, min, max, median});
+    // console.log(d3.extent(dataSet, accessor));
+    var predFunc = (!!customPred ? customPred : (function (dataPoint) {
+	console.log("customPred was not supplied");
+	return (!(dataPoint < this.devMax && dataPoint > this.devMin));
+    }));
+    return predFunc.bind(outlierStats);
+});
 function groupByDate(prev, curr, index, arr) {
-    var itemDate = Date.parseString(curr.Date, 'yyyy-MM-dd h:mm a');
-    itemDate = itemDate.setDate(parseInt(itemDate.getDate() / 2, 10) *2);
-    itemDate = (new Date(itemDate)).setHours(12,0,0,0);
-    var prevItem = prev[itemDate];
-    
-    if (prevItem) {
-	prev[itemDate].Units = ((prevItem.Units * prevItem.count) + parseInt(curr.Units,10)) / (prevItem.count + 1);
-	prev[itemDate].count++;
+    var currUnits = parseInt(curr.Units, 10);
+//    if (currUnits >= parseInt(bfMin, 10) + 50) {
+    if (!isOutlier(currUnits)) {
+	//console.log([curr.Units, bfMin]);
+
+	console.log(currUnits + " is not an outlier");
+	var itemDate = Date.parseString(curr.Date, 'yyyy-MM-dd h:mm a');
+	itemDate = itemDate.setDate(parseInt(itemDate.getDate() / 2, 10) * 2);
+	itemDate = (new Date(itemDate)).setHours(12,0,0,0);
+	var prevItem = prev[itemDate];
+	
+	if (prevItem) {
+	    prev[itemDate].Units = ((prevItem.Units * prevItem.count) +currUnits) / (prevItem.count + 1);
+	    prev[itemDate].count++;
+	} else {
+	    prev[itemDate] = {Units: parseInt(curr.Units, 10), count: 1};
+	}
     } else {
-	prev[itemDate] = {Units: parseInt(curr.Units, 10), count: 1};
+	console.warn(currUnits + "is an outlier");
     }
     return prev;
 }
@@ -97,12 +127,11 @@ function getXMinMax (data) {
     };
     return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
 }
-function getYMinMax (data) {
-    var fatAccessor  = (el) => {
-	return el['Units'];
-    };
+var fatAccessor  = (el) => {
+   return el['Units'];
+};
+function getYMinMax (data) {   
     return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
-
 };
   export default  {
     unit: "bpm",
@@ -117,13 +146,21 @@ function getYMinMax (data) {
 		   // console.log(data);
 		    remoteData = typeof data == 'object' ? data : JSON.parse(data);
 //console.log(getYMinMax(remoteData));
+		    
 		    resolve({
 			chart: drawFunc,
 			xScale: getXMinMax(remoteData),
 			yScale: getYMinMax(remoteData),
 			name: "withingsBf"
 		    });
-		    
+		    isOutlier = isOutlier(remoteData, fatAccessor, (function(dataPoint) {
+			
+			
+			var range = this.max - this.min,
+			    limit = range * (50/100);
+			console.log({limit, dataPoint, maxLimit: this.max - limit, minLimit: this.min + limit});
+			return (dataPoint < this.max - limit || dataPoint < this.min + limit);
+		    }));
 		    
 		    /*if (drawDataTemp) {
 			drawFunc(drawDataTemp);
