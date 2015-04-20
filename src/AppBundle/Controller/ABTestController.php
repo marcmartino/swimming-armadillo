@@ -44,22 +44,24 @@ class ABTestController extends Controller {
             $em = $this->getDoctrine()->getManager();
             $em->persist($abTest);
             $em->flush();
+
+            return $this->forward('AppBundle:ABTest:view', ['id' => $abTest->getId()]);
         }
 
         return $this->render('abtest/create.html.twig', ['form' => $form->createView()]);
     }
 
     /**
-     * @Route("/abtest/{slug}", name="abtestview")
+     * @Route("/abtest/{id}", name="abtestview")
      */
-    public function viewAction($slug)
+    public function viewAction($id)
     {
         /** @var ABTestService $abTestService */
         $abTestService = $this->get('abtest');
         $abTestService->setUser($this->getUser());
         $abTest = $this->getDoctrine()
             ->getRepository('AppBundle:ABTest')
-            ->find($slug);
+            ->find($id);
         $insights = $abTestService->getInsights($abTest);
         return $this->render('abtest/view.html.twig', ['abtest' => $abTest, 'insights' => $insights]);
     }
