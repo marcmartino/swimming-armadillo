@@ -1,5 +1,9 @@
 {
   "jspm": {
     "name": "Swimming Armadillo"
+  },
+  "devDependencies": {
+    "babel": "^5.1.11",
+    "traceur": "0.0.88"
   }
 }

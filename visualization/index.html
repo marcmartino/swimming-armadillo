@@ -26,6 +26,7 @@ svg {
 	<div id="legend"></div>
 </div>
 
+<!-- <script src="lib/chartModuleGen.js"></script> -->
 <script src="jspm_packages/system.js"></script>
 
 <script src="vendor/jquery.js"></script>
@@ -33,4 +34,7 @@ svg {
 <script src="vendor/date.js"></script>
 <script src="vendor/lodash.js"></script>
 
-<script>System.import('lib/chartMaster');</script>
+<script>
+  System.paths['traceur'] = 'node_modules/traceur/bin/traceur.js';
+  System.import('lib/chartMaster');
+</script>
