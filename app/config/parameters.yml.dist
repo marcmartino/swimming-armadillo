@@ -33,3 +33,6 @@ parameters:
     fitbit_consumer_key: garblegarblegarble
     fitbit_consumer_secret: garblegarblegarble
     fitbit_callback_uri: 'http://hdlbit.com/fitbit/callback'
+
+    # Mandrill (Email Notifications) Configuration
+    mandrill.api_key: garblegarble

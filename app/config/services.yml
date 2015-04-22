@@ -60,3 +60,11 @@ services:
 
     correlator.simple_slope:
         class: AppBundle\Correlator\SimpleSlope
+
+
+    # Event Listeners
+    kernel.listener.your_listener_name:
+        class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted
+        arguments: ["@service_container", "@router"]
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.completed, method: processEvent }
