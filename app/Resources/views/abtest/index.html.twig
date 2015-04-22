@@ -20,7 +20,7 @@
                 <tbody>
                     {% for abtest in abtests %}
                     <tr>
-                        <td><a href="{{ path('abtestview', {'slug': abtest.id}) }}">{{ abtest.name }}</a></td>
+                        <td><a href="{{ path('abtestview', {'id': abtest.id}) }}">{{ abtest.name }}</a></td>
                         <td>{{ abtest.description }}</td>
                         <td>{{ abtest.startDate|date('M d, Y') }}</td>
                         <td>{{ abtest.endDate|date('M d, Y') }}</td>
