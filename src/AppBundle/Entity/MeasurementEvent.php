@@ -104,11 +104,10 @@ class MeasurementEvent
         DateTime $eventTime,
         $providerId
     ) {
-        $measurementEvent = (new MeasurementEvent)
-            ->setEventTime($eventTime)
+        $this->setEventTime($eventTime)
             ->setProviderId($providerId);
 
-        return $measurementEvent;
+        return $this;
     }
 }
 

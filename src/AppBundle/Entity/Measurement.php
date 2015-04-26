@@ -169,12 +169,12 @@ class Measurement
         $unitsTypeId,
         $units
     ) {
-        $measuremnt = (new Measurement)
-            ->setMeasurementTypeId($measurementEventId)
+        $measurement = (new Measurement)
+            ->setMeasurementEventId($measurementEventId)
             ->setMeasurementTypeId($measurementTypeId)
             ->setUnitsTypeId($unitsTypeId)
             ->setUnits($units);
-        return $measuremnt;
+        return $measurement;
     }
 }
 
