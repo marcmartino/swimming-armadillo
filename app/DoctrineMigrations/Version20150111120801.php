@@ -2,49 +2,59 @@
 
 namespace Application\Migrations;
 
-use AppBundle\UnitType\UnitType;
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use AppBundle\Entity\UnitType;
 use Doctrine\DBAL\Schema\Schema;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\DBAL\Migrations\AbstractMigration;
+use AppBundle\UnitType\UnitType as UnitTypePeer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Add default unit types
  */
 class Version20150111120801 extends AbstractMigration implements ContainerAwareInterface
 {
-    private $container;
-    private $pdo;
+    protected $em;
+    protected $container;
 
     public $types = [
-        UnitType::PERCENT => 'Percent',
-        UnitType::GRAMS => 'Grams',
-        UnitTYpe::METERS => 'Meters',
-        UnitType::MILLIMETERS_MERCURY => 'Millimeters Mercury',
-        UnitType::SECONDS => 'Seconds'
+        UnitTypePeer::PERCENT => 'Percent',
+        UnitTypePeer::GRAMS => 'Grams',
+        UnitTypePeer::METERS => 'Meters',
+        UnitTypePeer::MILLIMETERS_MERCURY => 'Millimeters Mercury',
+        UnitTypePeer::SECONDS => 'Seconds',
+        UnitTypePeer::BEATS_PER_MINUTE => 'Beats Per Minute',
+        UnitTypePeer::CALORIES => 'Calories',
+        UnitTypePeer::LITERS => 'Liters'
     ];
 
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-        $this->pdo = $this->container->get("doctrine.dbal.default_connection");
+        $this->em = $this->container->get("doctrine.orm.entity_manager");
     }
 
     public function up(Schema $schema)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO unit_types (slug, name) VALUES (:slug, :name)");
-
         foreach ($this->types as $slug => $name) {
-            $stmt->execute([':slug' => $slug, ':name' => $name]);
+            $unitType = (new UnitType)
+                ->setName($name)
+                ->setSlug($slug);
+            $this->em->persist($unitType);
+            $this->em->flush();
         }
     }
 
     public function down(Schema $schema)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM unit_types WHERE slug = :slug");
-
         foreach ($this->types as $slug => $name) {
-            $stmt->execute([':slug' => $slug]);
+            $unitType = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy([
+                    'name' => $name,
+                    'slug' => $slug
+                ]);
+            $this->em->remove($unitType);
+            $this->em->flush();
         }
     }
 }
