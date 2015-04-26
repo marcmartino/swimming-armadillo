@@ -27,6 +27,7 @@ svg {
 </div>
 
 <!-- <script src="lib/chartModuleGen.js"></script> -->
+<!-- <script src="lib/chartGen.js"></script> -->
 <script src="jspm_packages/system.js"></script>
 
 <script src="vendor/jquery.js"></script>
@@ -36,5 +37,9 @@ svg {
 
 <script>
   System.paths['traceur'] = 'node_modules/traceur/bin/traceur.js';
+  var drawGen;
+  System.import('lib/chartGen').then(function (imp) {
+  drawGen = imp.default;
+  });
   System.import('lib/chartMaster');
 </script>

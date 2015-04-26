@@ -54,7 +54,7 @@ function getYMinMax (data) {
     return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
 
 };
-  export default  {
+f  export default  {
     unit: "bpm",
     prom: new Promise(function(resolve, reject) {
 

@@ -1,16 +1,10 @@
 "format es6";
 console.log("mod gen running");
 
-export default {
-    func: function (modSettings) {
-	console.log('mod gen function');
-    },
-};
-/*
-var genFunc = function () {
-    var remoteData;
-    var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";	   
+var drawGen = function (settings) {
     
+    var url = settings.dataUri,
+    remoteData;
     var drawDataTemp;
     var drawFunc = (drawData) => {
 	var yFreq = [];
@@ -101,13 +95,14 @@ var genFunc = function () {
 	};
 	return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
     }
-    var fatAccessor  = (el) => {
+    var fatAccessor  = settings.dataAccessor || ((el) => {
 	return el['Units'];
-    };
+    });
     function getYMinMax (data) {   
 	return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
     };
-    export default  {
+    //export default  {
+    return {
 	unit: "bpm",
 	prom: new Promise(function(resolve, reject) {
 	    
@@ -148,5 +143,8 @@ var genFunc = function () {
 	    };
 	}())
     }
-}
-*/
+};
+
+//};
+
+export default { func: drawGen };
