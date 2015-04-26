@@ -3,6 +3,7 @@ namespace AppBundle\Controller;
 
 
 use AppBundle\Correlator\SimpleSlope;
+use AppBundle\Entity\Measurement;
 use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\UserData\UserData;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -25,7 +26,9 @@ class CorrelatorController extends Controller {
         /** @var UserData $userData */
         $userData = $this->get('user_data');
 
-        $weightUserData = $userData->getUserData(MeasurementType::WEIGHT, $start, $end);
+        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => MeasurementType::WEIGHT]);
+        $weightUserData = $userData->getUserData($measurementType->getId(), $start, $end);
 
         $weightData = [
             [
@@ -38,7 +41,9 @@ class CorrelatorController extends Controller {
             ]
         ];
 
-        $bodyfatUserData = $userData->getUserData(MeasurementType::FAT_RATIO, $start, $end);
+        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => MeasurementType::FAT_RATIO]);
+        $bodyfatUserData = $userData->getUserData($measurementType->getId(), $start, $end);
 
         $bodyFatData = [
             [
