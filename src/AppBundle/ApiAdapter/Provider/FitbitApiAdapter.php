@@ -1,25 +1,22 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
-use AppBundle\ApiAdapter\ApiAdapterInterface;
-use AppBundle\Entity\Measurement;
-use AppBundle\Entity\MeasurementEvent;
-use AppBundle\Entity\MeasurementType as MeasurementTypeService;
-use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\Entity\Provider;
-use AppBundle\Entity\ServiceProvider;
-use AppBundle\Entity\UnitType as UnitTypeService;
-use AppBundle\MeasurementType\MeasurementType;
-use AppBundle\Provider\Providers;
-use AppBundle\UnitType\UnitType;
 use DateTime;
-use Doctrine\ORM\EntityManager;
-use OAuth\Common\Consumer\Credentials;
-use OAuth\Common\Storage\Session;
-use OAuth\OAuth1\Service\FitBit;
 use OAuth\ServiceFactory;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\ORM\EntityManager;
+use AppBundle\UnitType\UnitType;
+use OAuth\OAuth1\Service\FitBit;
+use AppBundle\Provider\Providers;
+use AppBundle\Entity\Measurement;
+use OAuth\Common\Storage\Session;
+use AppBundle\Entity\ServiceProvider;
+use OAuth\Common\Consumer\Credentials;
+use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Entity\OAuthAccessToken;
+use AppBundle\ApiAdapter\ApiAdapterInterface;
+use AppBundle\MeasurementType\MeasurementType;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class FitbitApiAdapter
@@ -27,21 +24,13 @@ use Symfony\Component\Security\Core\SecurityContext;
  */
 class FitbitApiAdapter implements ApiAdapterInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
-    /**
-     * @var FitBit
-     */
+    /** @var FitBit */
     protected $service;
-    /**
-     * @var Session
-     */
+    /** @var Session */
     protected $storage;
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     private $em;
 
     public function __construct(
@@ -52,20 +41,20 @@ class FitbitApiAdapter implements ApiAdapterInterface
         $this->container = $container;
         $this->storage = $this->container->get('token_storage_session');
 
-        $this->consumerKey = $this->container->getParameter('fitbit_consumer_key');
-        $this->consumerSecret = $this->container->getParameter('fitbit_consumer_secret');
-        $this->callbackUri = $this->container->getParameter('fitbit_callback_uri');
-
         $this->service = $this->createService();
         $this->em = $em;
     }
 
+    /**
+     * @return \OAuth\Common\Service\ServiceInterface
+     * @throws \OAuth\Common\Exception\Exception
+     */
     protected function createService()
     {
         $credentials = new Credentials(
-            $this->consumerKey,
-            $this->consumerSecret,
-            $this->callbackUri
+            $this->container->getParameter('fitbit_consumer_key'),
+            $this->container->getParameter('fitbit_consumer_secret'),
+            $this->container->getParameter('fitbit_callback_uri')
         );
 
         $serviceFactory = new ServiceFactory();
@@ -96,10 +85,8 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
     public function consumeData()
     {
-        /** @var Measurement $measurementService */
-        $measurementService = $this->container->get('entity.measurement');
-
-        $date = (new DateTime)->modify('-1 month');
+        // Consume data for the last day (should be changed)
+        $date = (new DateTime)->modify('-1 day');
         while ($date <= (new DateTime)) {
 
             $uri = '/user/-/foods/log/date/' . $date->format('Y-m-d') . '.json';
@@ -123,7 +110,6 @@ class FitbitApiAdapter implements ApiAdapterInterface
             $json = json_decode($response, true);
             $summary = $json['summary'];
 
-
             $calories = [$summary['calories'], MeasurementType::DAILY_CALORIES, UnitType::CALORIES];
             $carbs = [$summary['carbs'], MeasurementType::DAILY_CARBS, UnitType::GRAMS];
             $fat = [$summary['fat'], MeasurementType::DAILY_FAT, UnitType::GRAMS];
@@ -140,16 +126,18 @@ class FitbitApiAdapter implements ApiAdapterInterface
                 $this->em->persist($measurementEvent);
                 $this->em->flush();
 
-                foreach ([$calories] as $measurement) {
+                foreach ([$calories] as $measurementArray) {
 //                    foreach ([$calories, $carbs, $fat, $fiber, $protein, $sodium] as $measurement) {
-                    $measurement = $measurementService->store(
-                        $measurementEvent->getId(),
-                        $this->em->getRepository('AppBundle:MeasurementType')
-                            ->findOneBy(['slug' => $measurement[1]])->getId(),
-                        $this->em->getRepository('AppBundle:UnitType')
-                            ->findOneBy(['slug' => $measurement[2]])->getId(),
-                        $measurement[0]
-                    );
+
+                    $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                        ->findOneBy(['slug' => $measurementArray[1]])->getId();
+                    $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                        ->findOneBy(['slug' => $measurementArray[2]])->getId();
+                    $measurement = (new Measurement)
+                        ->setMeasurementEventId($measurementEvent->getId())
+                        ->setMeasurementTypeId($measurementTypeId)
+                        ->setUnitsTypeId($unitTypeId)
+                        ->setUnits($measurementArray[0]);
 
                     $this->em->persist($measurement);
                     $this->em->flush();
@@ -174,14 +162,16 @@ class FitbitApiAdapter implements ApiAdapterInterface
             $this->em->persist($measurementEvent);
             $this->em->flush();
 
-            $measurement = $measurementService->store(
-                $measurementEvent->getId(),
-                $this->em->getRepository('AppBundle:MeasurementType')
-                    ->findOneBy(['slug' => MeasurementType::FAT_RATIO])->getId(),
-                $this->em->getRepository('AppBundle:UnitType')
-                    ->findOneBy(['slug' => UnitType::PERCENT])->getId(),
-                $fatMeasurement['fat']
-            );
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::FAT_RATIO])->getId();
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::PERCENT])->getId();
+            $measurement = (new Measurement)
+                ->setMeasurementEventId($measurementEvent->getId())
+                ->setMeasurementTypeId($measurementTypeId)
+                ->setUnitsTypeId($unitTypeId)
+                ->setUnits($fatMeasurement['fat']);
+
             $this->em->persist($measurement);
         }
 
@@ -196,14 +186,18 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
             $this->em->persist($measurementEvent);
 
-            $measurementService->store(
-                $measurementEvent->getId(),
-                $this->em->getRepository('AppBundle:MeasurementType')
-                    ->findOneBy(['slug' => MeasurementType::WEIGHT])->getId(),
-                $this->em->getRepository('AppBundle:UnitType')
-                    ->findOneBy(['slug' => UnitType::GRAMS])->getId(),
-                $weightMeasurement['weight'] * 1000 // kilograms to grams
-            );
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::WEIGHT])->getId();
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::GRAMS])->getId();
+            $measurement = (new Measurement)
+                ->setMeasurementEventId($measurementEvent->getId())
+                ->setMeasurementTypeId($measurementTypeId)
+                ->setUnitsTypeId($unitTypeId)
+                ->setUnits(($weightMeasurement['weight'] * 1000));
+
+            $this->em->persist($measurement);
+            $this->em->flush();
         }
     }
 
