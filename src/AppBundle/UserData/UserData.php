@@ -31,17 +31,32 @@ class UserData
 
     /**
      * @param $measurementTypeId
+     * @param \DateTime $startDatetime
+     * @param \DateTime $endDatetime
      * @return array
+     * @throws \AppBundle\Exception\MeasurementTypeNotFoundException
      */
-    public function getUserData($measurementTypeId)
+    public function getUserData($measurementTypeId, $startDatetime = null, $endDatetime = null)
     {
-        $stmt = $this->conn->prepare("
-            SELECT me.event_time, m.units
+        $query = "SELECT me.event_time, m.units
             FROM measurementevent me INNER JOIN measurement m
             ON me.id = m.measurement_event_id
-            WHERE m.measurement_type_id = :measurementType
-        ");
-        $stmt->execute([':measurementType' => $measurementTypeId]);
+            WHERE m.measurement_type_id = :measurementType";
+
+        $parameters = [
+            ':measurementType' => $measurementTypeId,
+        ];
+        if (!empty($startDatetime)) {
+            $query .= " AND me.event_time > :startDatetime";
+            $parameters[':startDatetime'] = $startDatetime->format('Y-m-d H:i:s');
+        }
+        if (!empty($endDatetime)) {
+            $query .= " AND me.event_time < :endDatetime";
+            $parameters[':endDatetime'] = $endDatetime->format('Y-m-d H:i:s');
+        }
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($parameters);
 
         return $stmt->fetchAll();
     }
