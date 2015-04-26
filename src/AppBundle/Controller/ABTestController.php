@@ -31,11 +31,15 @@ class ABTestController extends Controller {
         $abTest = new ABTest();
 
         $form = $this->createFormBuilder($abTest)
-            ->add('name', 'text')
-            ->add('description', 'text')
+            ->add('name', 'text', [ 'attr' => [
+                'placeholder' => '10 Day Diet & Cleanse'
+            ]])
+            ->add('description', 'text', [ 'attr' => [
+                'placeholder' => 'Try out Purium\'s awesome 10 Day Transformational Cleanse.'
+            ]])
             ->add('startDate', 'date')
             ->add('endDate', 'date')
-            ->add('save', 'submit', array('label' => 'Create Test'))
+            ->add('save', 'submit')
             ->getForm();
 
         $form->handleRequest($request);
