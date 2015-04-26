@@ -30,18 +30,18 @@ class UserData
     }
 
     /**
-     * @param $measurementTypeSlug
+     * @param $measurementTypeId
      * @return array
      */
-    public function getUserData($measurementTypeSlug)
+    public function getUserData($measurementTypeId)
     {
         $stmt = $this->conn->prepare("
             SELECT me.event_time, m.units
-            FROM measurement_event me INNER JOIN measurement m
+            FROM measurementevent me INNER JOIN measurement m
             ON me.id = m.measurement_event_id
             WHERE m.measurement_type_id = :measurementType
         ");
-        $stmt->execute([':measurementType' => $this->measurementType->getMeasurementType($measurementTypeSlug)['id']]);
+        $stmt->execute([':measurementType' => $measurementTypeId]);
 
         return $stmt->fetchAll();
     }

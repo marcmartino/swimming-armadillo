@@ -21,7 +21,9 @@ class UserDataController extends Controller
         /** @var UserData $userData */
         $userData = $this->get('user_data');
 
-        foreach ($userData->getUserData($measurementTypeSlug) as $measurementEvent) {
+        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => $measurementTypeSlug]);
+        foreach ($userData->getUserData($measurementType->getId()) as $measurementEvent) {
 
             $dateTime = new \DateTime($measurementEvent['event_time']);
 
