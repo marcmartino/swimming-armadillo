@@ -1,11 +1,20 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: Nate
+ * Date: 4/26/15
+ * Time: 6:07 PM
+ */
+
 namespace AppBundle\Tests\ApiParser;
 
-use AppBundle\ApiParser\FitbitWeight;
+
+use AppBundle\ApiParser\FitbitBodyFat;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use DateTime;
 
-class FitbitWeightTest extends PHPUnit_Framework_TestCase {
+class FitbitBodyFatTest extends \PHPUnit_Framework_TestCase{
     public function testParse()
     {
         $entityManager = $this
@@ -13,10 +22,10 @@ class FitbitWeightTest extends PHPUnit_Framework_TestCase {
             ->disableOriginalConstructor()
             ->getMock();
 
-        $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitWeight.json');
-        $parser = new FitbitWeight($entityManager);
+        $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitBodyFat.json');
+        $parser = new FitbitBodyFat($entityManager);
         $results = $parser->parse($responseBody);
-
+        
         $this->assertCount(2, $results['measurements']);
         $this->assertCount(2, $results['measurement_events']);
 
@@ -27,6 +36,6 @@ class FitbitWeightTest extends PHPUnit_Framework_TestCase {
 
         /** @var Measurement $measurement */
         $measurement = $results['measurements'][1];
-        $this->assertEquals(72500, $measurement->getUnits());
+        $this->assertEquals(13.5, $measurement->getUnits());
     }
 }
