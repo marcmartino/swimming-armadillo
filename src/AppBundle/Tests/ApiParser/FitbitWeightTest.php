@@ -5,6 +5,13 @@ use AppBundle\ApiParser\FitbitWeight;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 
+use DateTime;
+use PHPUnit_Framework_TestCase;
+
+/**
+ * Class FitbitWeightTest
+ * @package AppBundle\Tests\ApiParser
+ */
 class FitbitWeightTest extends PHPUnit_Framework_TestCase {
     public function testParse()
     {

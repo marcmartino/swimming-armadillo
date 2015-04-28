@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Nate
- * Date: 4/26/15
- * Time: 6:07 PM
- */
-
 namespace AppBundle\Tests\ApiParser;
-
 
 use AppBundle\ApiParser\FitbitBodyFat;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use DateTime;
 
+/**
+ * Class FitbitBodyFatTest
+ * @package AppBundle\Tests\ApiParser
+ */
 class FitbitBodyFatTest extends \PHPUnit_Framework_TestCase{
     public function testParse()
     {

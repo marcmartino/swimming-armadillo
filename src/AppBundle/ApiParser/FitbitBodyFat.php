@@ -1,23 +1,14 @@
 <?php
 namespace AppBundle\ApiParser;
 
-use Doctrine\ORM\EntityManager;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 
-class FitbitBodyFat implements ApiParserInterface {
-
-    /** @var EntityManager */
-    protected $em;
-
-    /**
-     * @param EntityManager $em
-     */
-    public function __construct(
-        EntityManager $em
-    ) {
-        $this->em = $em;
-    }
+/**
+ * Class FitbitBodyFat
+ * @package AppBundle\ApiParser
+ */
+class FitbitBodyFat extends AbstractEntityApiParser implements ApiParserInterface {
 
     /**
      * Create objects/arrays from an api response body
