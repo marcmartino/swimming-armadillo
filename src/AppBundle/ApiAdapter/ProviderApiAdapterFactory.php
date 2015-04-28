@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\ApiAdapter;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -15,13 +16,18 @@ class ProviderApiAdapterFactory
      * @var Container
      */
     private $container;
+    /**
+     * @var EntityManager
+     */
+    private $em;
 
     /**
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, EntityManager $em)
     {
         $this->container = $container;
+        $this->em = $em;
     }
 
     /**
@@ -31,6 +37,6 @@ class ProviderApiAdapterFactory
     public function getApiAdapter($providerSlug)
     {
         $fullyQualifiedName = "AppBundle\\ApiAdapter\\Provider\\" . ucfirst($providerSlug) . "ApiAdapter";
-        return new $fullyQualifiedName($this->container);
+        return new $fullyQualifiedName($this->container, $this->em);
     }
 }

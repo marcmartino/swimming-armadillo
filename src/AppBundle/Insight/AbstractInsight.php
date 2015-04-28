@@ -28,7 +28,7 @@ abstract class AbstractInsight {
      */
     public function gitFirstMeasurementOfType(DateTime $date, $measurementTypeId)
     {
-        $stmt = $this->conn->prepare("SELECT units FROM measurement m INNER JOIN measurement_event me ON
+        $stmt = $this->conn->prepare("SELECT units FROM measurement m INNER JOIN measurementevent me ON
         m.measurement_event_id = me.id WHERE me.event_time > :startDate AND m.measurement_type_id = :measurementTypeId ORDER BY me.event_time ASC
         LIMIT 1");
 
@@ -49,7 +49,7 @@ abstract class AbstractInsight {
      */
     public function getLastMeasurementOfType(DateTime $date, $measurementTypeId)
     {
-        $stmt = $this->conn->prepare("SELECT units FROM measurement m INNER JOIN measurement_event me ON
+        $stmt = $this->conn->prepare("SELECT units FROM measurement m INNER JOIN measurementevent me ON
         m.measurement_event_id = me.id WHERE me.event_time < :endDate AND m.measurement_type_id = :measurementTypeId ORDER BY me.event_time DESC
         LIMIT 1");
 

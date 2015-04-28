@@ -2,15 +2,15 @@
 
 namespace Application\Migrations;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Schema\Schema;
 use AppBundle\Entity\ServiceProvider;
 use Doctrine\DBAL\Migrations\AbstractMigration;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Add default service providers
  */
 class Version20150415095013 extends AbstractMigration implements ContainerAwareInterface
 {

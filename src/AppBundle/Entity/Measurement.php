@@ -155,5 +155,26 @@ class Measurement
     {
         return $this->units;
     }
+
+    /**
+     * @param $measurementEventId
+     * @param $measurementTypeId
+     * @param $unitsTypeId
+     * @param $units
+     * @return Measurement
+     */
+    public function store(
+        $measurementEventId,
+        $measurementTypeId,
+        $unitsTypeId,
+        $units
+    ) {
+        $measurement = (new Measurement)
+            ->setMeasurementEventId($measurementEventId)
+            ->setMeasurementTypeId($measurementTypeId)
+            ->setUnitsTypeId($unitsTypeId)
+            ->setUnits($units);
+        return $measurement;
+    }
 }
 

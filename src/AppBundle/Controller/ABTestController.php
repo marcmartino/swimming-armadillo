@@ -31,11 +31,15 @@ class ABTestController extends Controller {
         $abTest = new ABTest();
 
         $form = $this->createFormBuilder($abTest)
-            ->add('name', 'text')
-            ->add('description', 'text')
+            ->add('name', 'text', [ 'attr' => [
+                'placeholder' => '10 Day Diet & Cleanse'
+            ]])
+            ->add('description', 'text', [ 'attr' => [
+                'placeholder' => 'Try out Purium\'s awesome 10 Day Transformational Cleanse.'
+            ]])
             ->add('startDate', 'date')
             ->add('endDate', 'date')
-            ->add('save', 'submit', array('label' => 'Create Test'))
+            ->add('save', 'submit')
             ->getForm();
 
         $form->handleRequest($request);
@@ -44,22 +48,24 @@ class ABTestController extends Controller {
             $em = $this->getDoctrine()->getManager();
             $em->persist($abTest);
             $em->flush();
+
+            return $this->forward('AppBundle:ABTest:view', ['id' => $abTest->getId()]);
         }
 
         return $this->render('abtest/create.html.twig', ['form' => $form->createView()]);
     }
 
     /**
-     * @Route("/abtest/{slug}", name="abtestview")
+     * @Route("/abtest/{id}", name="abtestview")
      */
-    public function viewAction($slug)
+    public function viewAction($id)
     {
         /** @var ABTestService $abTestService */
         $abTestService = $this->get('abtest');
         $abTestService->setUser($this->getUser());
         $abTest = $this->getDoctrine()
             ->getRepository('AppBundle:ABTest')
-            ->find($slug);
+            ->find($id);
         $insights = $abTestService->getInsights($abTest);
         return $this->render('abtest/view.html.twig', ['abtest' => $abTest, 'insights' => $insights]);
     }

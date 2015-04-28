@@ -14,6 +14,11 @@
             {% stylesheets '@AppBundle/Resources/public/vendor/foundation/css/*.css' filter='cssrewrite' %}
                 <link rel="stylesheet" href="{{ asset_url }}" />
             {% endstylesheets %}
+            <style>
+                body {
+                    margin-bottom: 30px;
+                }
+            </style>
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>

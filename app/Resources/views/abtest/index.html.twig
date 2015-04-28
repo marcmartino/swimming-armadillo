@@ -1,4 +1,13 @@
 {% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        img {
+            float: right;
+            margin: 10px 0px 10px 10px;
+        }
+    </style>
+{% endblock %}
 {% block body %}
     <div class="center row">
         <div class="large-12 columns">
@@ -7,8 +16,29 @@
                 <p>Use A/B testing to find out what lifestyle changes work for you, and which ones you should avoid.</p>
             </div>
 
-            <a href="{{ path('abtestcreate') }}" class="button">Create a new test</a>
-            <table>
+            <h3>What is an A/B test?</h3>
+
+            <p>
+                {% image '@AppBundle/Resources/public/images/abtest/abtest_apple.png' %}
+                <img src="{{ asset_url }}" alt="abtest" style="width:277px; height: 258px;"/>
+                {% endimage %}
+                A/B tests are commonly used in the tech world to test a website's ability to help users.
+                We use A/B tests to test small, measurable changes in our lives and see what, if any, outcomes there are.
+                <br>
+                <br>
+                For example: I once tried out a liquid diet by Purium called the 10 day transformational cleanse.<br>
+                This diet lasted 10 days, and I wanted to see what changes the diet made to my overall health,
+                especially with my body fat content.
+                <br>
+                <br>
+                My body fat dropped by an astounding 25% (%20 down to %15) over those 10 days and I had a tremendous
+                boost in energy. To date, I have kept off those extra pounds of body fat and maintained my higher
+                level of energy. Thanks to the power of Hdlbit and my handy Fitbit Aria scale, I can measure the exact
+                changes I experienced and can now for certain see that the diet did in fact work.
+
+            </p>
+
+            <table style="width:100%">
                 <thead>
                     <tr>
                         <th width="200">Name</th>
@@ -18,16 +48,24 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if abtests|length > 0 %}
                     {% for abtest in abtests %}
                     <tr>
-                        <td><a href="{{ path('abtestview', {'slug': abtest.id}) }}">{{ abtest.name }}</a></td>
+                        <td><a href="{{ path('abtestview', {'id': abtest.id}) }}">{{ abtest.name }}</a></td>
                         <td>{{ abtest.description }}</td>
                         <td>{{ abtest.startDate|date('M d, Y') }}</td>
                         <td>{{ abtest.endDate|date('M d, Y') }}</td>
                     </tr>
                     {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4">You don't have any A/B tests yet. <a href="{{ path('abtestcreate') }}">Create one here</a></td>
+                    </tr>
+                    {% endif %}
                 </tbody>
             </table>
+
+            <a href="{{ path('abtestcreate') }}" class="button">Create a new test</a>
         </div>
     </div>
 {% endblock %}

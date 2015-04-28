@@ -36,23 +36,23 @@ class OAuthAccessToken
     private $secret;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @var integer
+     * @ORM\Column(name="user_id", type="integer")
      */
-    private $user;
+    private $userId;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="foreign_user_id", type="string", length=255)
+     * @ORM\Column(name="foreign_user_id", type="string", length=255, nullable=true)
      */
     private $foreignUserId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ServiceProvider")
-     * @ORM\JoinColumn(name="service_provider_id", referencedColumnName="id")
+     * @var integer
+     * @ORM\Column(name="service_provider_id", type="integer")
      */
-    private $serviceProvider;
+    private $serviceProviderId;
 
 
     /**
@@ -184,5 +184,39 @@ class OAuthAccessToken
     {
         return $this->serviceProviderId;
     }
+
+    public function getUserOAuthAccessTokens($userId)
+    {
+//        $stmt = $this->conn->prepare("
+//            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
+//        ");
+//        $stmt->execute([':userId' => $userId]);
+//        return $stmt->fetchAll();
+        return [];
+    }
+
+    /**
+     * @param $userId
+     * @param $providerId
+     * @param $foreignUserId
+     * @param $accessToken
+     * @param $accessTokenSecret
+     */
+    public function store(
+        $userId,
+        $providerId,
+        $foreignUserId,
+        $accessToken,
+        $accessTokenSecret
+    ) {
+        $this->setUserId($userId)
+            ->setServiceProviderId($providerId)
+            ->setForeignUserId($foreignUserId)
+            ->setToken($accessToken)
+            ->setSecret($accessTokenSecret);
+
+        return $this;
+    }
+
 }
 
