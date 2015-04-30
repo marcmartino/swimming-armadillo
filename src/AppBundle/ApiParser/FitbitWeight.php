@@ -3,6 +3,8 @@ namespace AppBundle\ApiParser;
 
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\UnitType\UnitType;
 
 /**
  * Class FitbitWeight
@@ -33,9 +35,15 @@ class FitbitWeight extends AbstractEntityApiParser implements ApiParserInterface
 
             $results['measurement_events'][] = $measurementEvent;
 
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::GRAMS])->getId();
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::WEIGHT])->getId();
             $measurement = (new Measurement)
                 ->setMeasurementEventId($measurementEvent->getId())
-                ->setUnits(($weightMeasurement['weight'] * 1000));
+                ->setUnits(($weightMeasurement['weight'] * 1000))
+                ->setUnitsTypeId($unitTypeId)
+                ->setMeasurementTypeId($measurementTypeId);
 
             $this->em->persist($measurement);
 

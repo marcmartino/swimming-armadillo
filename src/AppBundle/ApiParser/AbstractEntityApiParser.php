@@ -3,6 +3,8 @@ namespace AppBundle\ApiParser;
 use Doctrine\ORM\EntityManager;
 
 /**
+ * Subclasses should create Doctrine Entities with information they have from api responses
+ *
  * Class AbstractEntityApiParser
  * @package AppBundle\ApiParser
  */

@@ -3,6 +3,8 @@ namespace AppBundle\ApiParser;
 
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\UnitType\UnitType;
 
 /**
  * Class FitbitBodyFat
@@ -31,9 +33,15 @@ class FitbitBodyFat extends AbstractEntityApiParser implements ApiParserInterfac
                 ->setEventTime(new \DateTime($fatMeasurement['date'] . ' ' . $fatMeasurement['time']));
             $this->em->persist($measurementEvent);
 
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::PERCENT])->getId();
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::FAT_RATIO])->getId();
             $measurement = (new Measurement)
                 ->setMeasurementEventId($measurementEvent->getId())
-                ->setUnits($fatMeasurement['fat']);
+                ->setUnits($fatMeasurement['fat'])
+                ->setUnitsTypeId($unitTypeId)
+                ->setMeasurementTypeId($measurementTypeId);
             $this->em->persist($measurement);
 
             $results['measurement_events'][] = $measurementEvent;

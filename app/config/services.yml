@@ -62,6 +62,20 @@ services:
         class: AppBundle\Correlator\SimpleSlope
 
 
+    # Api Parsers
+    api_parser.fitbit_food:
+      class: AppBundle\ApiParser\FitbitFood
+      arguments: ["@doctrine.orm.entity_manager"]
+
+    api_parser.fitbit_bodyfat:
+      class: AppBundle\ApiParser\FitbitBodyFat
+      arguments: ["@doctrine.orm.entity_manager"]
+
+    api_parser.fitbit_weight:
+      class: AppBundle\ApiParser\FitbitWeight
+      arguments: ["@doctrine.orm.entity_manager"]
+
+
     # Event Listeners
     kernel.listener.your_listener_name:
         class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted

@@ -47,7 +47,7 @@ class FitbitFood extends AbstractEntityApiParser implements ApiParserInterface
         $sodiumMeasurement = $this->getSummaryMeasurement(UnitType::GRAMS, MeasurementType::DAILY_SODIUM,
             $json['summary']['sodium']);
 
-        $waterMeasurement = $this->getSummaryMeasurement(UnitType::GRAMS, MeasurementType::DAILY_SODIUM,
+        $waterMeasurement = $this->getSummaryMeasurement(UnitType::GRAMS, MeasurementType::DAILY_WATER,
             $json['summary']['water']);
 
         $results['measurement_events'][] = $measurementEvent;
@@ -56,7 +56,8 @@ class FitbitFood extends AbstractEntityApiParser implements ApiParserInterface
 
         /** @var Measurement $measurement */
         foreach ($results['measurements'] as $measurement) {
-            $measurement->setMeasurementEventId($measurementEvent);
+            $measurement->setMeasurementEventId($measurementEvent->getId());
+            $this->em->persist($measurement);
         }
 
         return $results;
