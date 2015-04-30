@@ -12,6 +12,12 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ABTest
 {
+    public function __construct()
+    {
+        $this->startDate = (new \DateTime);
+        $this->endDate = (new \DateTime)->modify('+1 day');
+    }
+
     /**
      * @var integer
      *
