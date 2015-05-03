@@ -7,6 +7,9 @@ var generatedMod = drawGen.func({
     domClass: "fatmasssPlot",
     dataUri: location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmasssweight",
     curveFitting: true,
+    
+    curveColor: "black",
+    pointColor: "blue",
 });
 console.log(generatedMod);
 export default generatedMod;

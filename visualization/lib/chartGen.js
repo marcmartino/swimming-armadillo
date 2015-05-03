@@ -12,7 +12,7 @@ var drawGen = function (settings) {
 	var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
 	
 	drawData.svg.append("g")
-	    .attr("class", settings.domClass)
+	    .attr("class", settings.domClass + " dotPlot")
 	    .selectAll("rect")
 	    .data(remoteData)
    	    .enter()
@@ -28,9 +28,9 @@ var drawGen = function (settings) {
    		return thisYScale(d['Units']  || 0);
    	    })
    	    .attr('r', 3) 
-   	    .attr('fill', 'brown');
+   	    .attr('fill', settings.pointColor || 'brown');
 	
-	$("#legend ." + settings.name).text("body fat")
+	$("#legend ." + settings.name).text(settings.name)
 	    .off("click")
 	    .on("click", (e) => {
 		$("g." + settings.domClass).toggle();
@@ -48,7 +48,7 @@ var drawGen = function (settings) {
 	    drawData.svg.select("g." + settings.domClass)
 		.append("path")
 		.attr("d", lineFunction(pluckedGroups))
-		.attr("stroke", "gray")
+		.attr("stroke", settings.curveColor || "gray")
 		.attr("stroke-width", 4)
 		.attr("fill", "none");
 	}

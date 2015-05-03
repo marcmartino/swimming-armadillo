@@ -11,6 +11,7 @@ var generatedMod = drawGen.func({
     domClass: "weightPlot",
     dataUri: url,
     curveFitting: true,
+    pointColor: "green",
 });
 console.log(generatedMod);
 export default generatedMod;
