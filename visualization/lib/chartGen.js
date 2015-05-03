@@ -86,8 +86,8 @@ var drawGen = function (settings) {
 		prev[itemDate] = {Units: parseInt(curr.Units, 10), count: 1};
 	    }
 	} else {
-	    console.warn(currUnits + "is an outlier " );
-//	    console.log(chartOutlierPred);
+	    // console.warn(currUnits + "is an outlier " );
+	    // console.log(chartOutlierPred);
 	}
 	return prev;
     }

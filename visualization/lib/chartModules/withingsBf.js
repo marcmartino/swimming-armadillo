@@ -1,6 +1,5 @@
 "format es6";
 console.log("module fatmass running");
-console.log("attempting to use the gen module");
 
 var generatedMod = drawGen.func({
     name: "withingsBf",
@@ -11,5 +10,4 @@ var generatedMod = drawGen.func({
     curveColor: "black",
     pointColor: "blue",
 });
-console.log(generatedMod);
 export default generatedMod;
