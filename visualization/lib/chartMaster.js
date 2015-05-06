@@ -2,12 +2,6 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
 var fetchModName = getParameterByName('measure');
 
 var svgData = {
@@ -56,6 +50,11 @@ function redrawChart(svgData, xChartFuncs) {
 	.attr("transform", "translate(" + svgData.chartPadding + ", 0)")
 	.attr("class", "yAxis")
     .call(drawData.yAxis);
+    
+    //console.log(window.parent);
+    if (window.parent) {
+	window.parent.postMessage("rendered", '*');
+    }
 }
 
 function createLegendGroups(legend, chartName) {
@@ -83,6 +82,7 @@ function resize() {
     redrawChart(svgData);
 }
 
+
 function convertGetParams(imports) {
     var measures = getParameterByName("measure");
 
@@ -95,10 +95,6 @@ function convertGetParams(imports) {
 
 d3.select(window).on('resize', resize);
 
-//var withingsBf, weight;
-
-chartSettings.startTime = getParameterByName("start");
-chartSettings.endTime =   getParameterByName("end");
 
 import withingsBf from './chartModules/withingsBf';
 import weight from './chartModules/weight';
