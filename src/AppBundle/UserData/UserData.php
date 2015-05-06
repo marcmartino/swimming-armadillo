@@ -55,6 +55,8 @@ class UserData
             $parameters[':endDatetime'] = $endDatetime->format('Y-m-d H:i:s');
         }
 
+        $query .= " ORDER BY me.event_time";
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute($parameters);
 
