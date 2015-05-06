@@ -1,3 +1,11 @@
-console.warn("poopcicles");
-console.log("moar poops");
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 var chartSettings = {};
+
+chartSettings.startTime = getParameterByName("start");
+chartSettings.endTime =   getParameterByName("end");

@@ -111,7 +111,7 @@ var drawGen = function (settings) {
     return {
 	unit: "bpm",
 	prom: new Promise(function(resolve, reject) {
-	    
+	    console.warn(chartSettings);
 	    $.ajax({
 		type: "GET",
 		url: url,
