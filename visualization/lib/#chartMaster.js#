@@ -2,12 +2,6 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
 var fetchModName = getParameterByName('measure');
 
 var svgData = {
@@ -83,6 +77,7 @@ function resize() {
     redrawChart(svgData);
 }
 
+
 function convertGetParams(imports) {
     var measures = getParameterByName("measure");
 
@@ -95,8 +90,6 @@ function convertGetParams(imports) {
 
 d3.select(window).on('resize', resize);
 
-chartSettings.startTime = getParameterByName("start");
-chartSettings.endTime =   getParameterByName("end");
 
 import withingsBf from './chartModules/withingsBf';
 import weight from './chartModules/weight';
