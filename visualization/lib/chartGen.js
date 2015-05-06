@@ -11,6 +11,7 @@ var drawGen = function (settings) {
 	var yFreq = [];
 	var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
 	
+	debugObj("drawing " + settings.name + " data points");
 	drawData.svg.append("g")
 	    .attr("class", settings.domClass + " dotPlot")
 	    .selectAll("rect")
@@ -30,6 +31,7 @@ var drawGen = function (settings) {
    	    .attr('r', 3) 
    	    .attr('fill', settings.pointColor || 'brown');
 	
+	debugObj("generating legend for " + settings.name);
 	$("#legend ." + settings.name).text(settings.name)
 	    .off("click")
 	    .on("click", (e) => {
@@ -38,6 +40,7 @@ var drawGen = function (settings) {
 
 
 	if (settings.curveFitting) {
+	    debugObj("fitting the curve for " + settings.name);
 	    var lineFunction = d3.svg.line()
 		.x((d) => {return drawData.xScale(new Date(d.Date));})
 		.y((d) => {return drawData.yScale(d.Units);})
@@ -111,7 +114,7 @@ var drawGen = function (settings) {
     return {
 	unit: "bpm",
 	prom: new Promise(function(resolve, reject) {
-	    console.warn(chartSettings);
+	    debugObj("fetching data for " + settings.name);
 	    $.ajax({
 		type: "GET",
 		url: url,
@@ -120,6 +123,7 @@ var drawGen = function (settings) {
 		    end: chartSettings.endTime
 		},
 		success: (data) => {
+		    debugObj("data for " + settings.name + " loaded");
 		    remoteData = typeof data == 'object' ? data : JSON.parse(data);
 		    
 		    resolve({
@@ -135,6 +139,7 @@ var drawGen = function (settings) {
 		    
 		},
 		error: (d) => {
+		    debugObj("data for " + settings.name + " failed to load");
 		    console.log("ajax errored");
 		    console.log(d);
 		    reject(Error(d));
