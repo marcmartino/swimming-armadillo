@@ -97,6 +97,9 @@ d3.select(window).on('resize', resize);
 
 //var withingsBf, weight;
 
+chartSettings.startTime = getParameterByName("start");
+chartSettings.endTime =   getParameterByName("end");
+
 import withingsBf from './chartModules/withingsBf';
 import weight from './chartModules/weight';
 

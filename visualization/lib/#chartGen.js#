@@ -111,14 +111,14 @@ var drawGen = function (settings) {
     return {
 	unit: "bpm",
 	prom: new Promise(function(resolve, reject) {
-	    
+
 	    $.ajax({
 		type: "GET",
-		url: url,
 		data: {
-		    start: chartSettings.startTime,
-		    end: chartSettings.endTime
+		    start: drawData.startTime,
+		    end: drawData.endTime,
 		},
+		url: url,
 		success: (data) => {
 		    remoteData = typeof data == 'object' ? data : JSON.parse(data);
 		    
