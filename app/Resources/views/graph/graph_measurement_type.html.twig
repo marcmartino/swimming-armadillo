@@ -27,5 +27,13 @@
                 iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
             }, 1200);
         }
+
+	window.addEventListener("message", receiveMessage, false);
+	function receiveMessage(event) {
+	console.log(event);
+	if (event.data === "rendered") {
+	iframeLoaded();
+	}
+	}
     </script>
 {% endblock %}
