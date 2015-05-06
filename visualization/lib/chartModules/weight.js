@@ -1,9 +1,22 @@
 "format es6";
 console.log("module weight running");
 
-var remoteData;
+//var remoteData;
 var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/weight.json" : "/userdata/weight";	   
-	
+
+console.log("attempting to use the gen module");
+
+var generatedMod = drawGen.func({
+    name: "weight",
+    domClass: "weightPlot",
+    dataUri: url,
+    curveFitting: true,
+    pointColor: "green",
+});
+console.log(generatedMod);
+export default generatedMod;
+
+/*	
 var drawDataTemp;
 var drawFunc = (drawData) => {
     console.log("weight draw func executing");
@@ -93,3 +106,4 @@ function getYMinMax (data) {
 	};
     }())
   }
+*/

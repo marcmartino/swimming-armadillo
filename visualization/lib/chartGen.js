@@ -1,23 +1,18 @@
 "format es6";
 console.log("mod gen running");
 
-export default {
-    func: function (modSettings) {
-	console.log('mod gen function');
-    },
-};
-/*
-var genFunc = function () {
-    var remoteData;
-    var url = location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmassweight";	   
+var drawGen = function (settings) {
     
+    var url = settings.dataUri,
+    remoteData,
+    chartOutlierPred;
     var drawDataTemp;
     var drawFunc = (drawData) => {
 	var yFreq = [];
 	var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
 	
 	drawData.svg.append("g")
-	    .attr("class", "fatmassPlot")
+	    .attr("class", settings.domClass + " dotPlot")
 	    .selectAll("rect")
 	    .data(remoteData)
    	    .enter()
@@ -33,27 +28,30 @@ var genFunc = function () {
    		return thisYScale(d['Units']  || 0);
    	    })
    	    .attr('r', 3) 
-   	    .attr('fill', 'brown');
+   	    .attr('fill', settings.pointColor || 'brown');
 	
-	$("#legend .withingsBf").text("body fat")
+	$("#legend ." + settings.name).text(settings.name)
 	    .off("click")
 	    .on("click", (e) => {
-		$("g.fatmassPlot").toggle();
+		$("g." + settings.domClass).toggle();
 	    });
+
+
+	if (settings.curveFitting) {
+	    var lineFunction = d3.svg.line()
+		.x((d) => {return drawData.xScale(new Date(d.Date));})
+		.y((d) => {return drawData.yScale(d.Units);})
+		.interpolate('basis');
 	
-	var lineFunction = d3.svg.line()
-	    .x((d) => {return drawData.xScale(new Date(d.Date));})
-	    .y((d) => {return drawData.yScale(d.Units);})
-	    .interpolate('basis');
-	
-	var grouped = remoteData.reduce(groupByDate,{});
-	var pluckedGroups = _.reduce(grouped, arrayToObj, []); 
-	drawData.svg.select("g.fatmassPlot")
-	    .append("path")
-	    .attr("d", lineFunction(pluckedGroups))
-            .attr("stroke", "gray")
-            .attr("stroke-width", 4)
-            .attr("fill", "none");
+	    var grouped = remoteData.reduce(groupByDate,{});
+	    var pluckedGroups = _.reduce(grouped, arrayToObj, []); 
+	    drawData.svg.select("g." + settings.domClass)
+		.append("path")
+		.attr("d", lineFunction(pluckedGroups))
+		.attr("stroke", settings.curveColor || "gray")
+		.attr("stroke-width", 4)
+		.attr("fill", "none");
+	}
     };
     var isOutlier = (function (dataSet, accessor, customPred) {
 	var outlierStats = {
@@ -67,6 +65,7 @@ var genFunc = function () {
 	outlierStats.devMin = outlierStats.mean - outlierStats.sd * 2;
 	
 	var predFunc = (!!customPred ? customPred : (function (dataPoint) {
+	    // console.log(dataPoint, this.devMax, this.devMin);
 	    return (!(dataPoint < this.devMax && dataPoint > this.devMin));
 	}));
 	return predFunc.bind(outlierStats);
@@ -74,7 +73,7 @@ var genFunc = function () {
     function groupByDate(prev, curr, index, arr) {
 	var currUnits = parseInt(curr.Units, 10);
 	
-	if (!isOutlier(currUnits)) {
+	if (!chartOutlierPred || !chartOutlierPred(currUnits)) {
 	    var itemDate = Date.parseString(curr.Date, 'yyyy-MM-dd h:mm a');
 	    itemDate = itemDate.setDate(parseInt(itemDate.getDate() / 2, 10) * 2);
 	    itemDate = (new Date(itemDate)).setHours(12,0,0,0);
@@ -87,7 +86,8 @@ var genFunc = function () {
 		prev[itemDate] = {Units: parseInt(curr.Units, 10), count: 1};
 	    }
 	} else {
-	    console.warn(currUnits + "is an outlier");
+	    console.warn(currUnits + "is an outlier " );
+//	    console.log(chartOutlierPred);
 	}
 	return prev;
     }
@@ -101,13 +101,14 @@ var genFunc = function () {
 	};
 	return [d3.min(data, dateAccessor), d3.max(data, dateAccessor)];
     }
-    var fatAccessor  = (el) => {
+    var fatAccessor  = settings.dataAccessor || ((el) => {
 	return el['Units'];
-    };
+    });
     function getYMinMax (data) {   
 	return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
     };
-    export default  {
+    //export default  {
+    return {
 	unit: "bpm",
 	prom: new Promise(function(resolve, reject) {
 	    
@@ -121,14 +122,12 @@ var genFunc = function () {
 			chart: drawFunc,
 			xScale: getXMinMax(remoteData),
 			yScale: getYMinMax(remoteData),
-			name: "withingsBf"
+			name: settings.name,
 		    });
-		    isOutlier = isOutlier(remoteData, fatAccessor, (function(dataPoint) {
-			
-			var range = this.max - this.min,
-			limit = range * (50/100);
-			return (dataPoint < this.max - limit || dataPoint < this.min + limit);
-		    }));
+
+		    if (settings.curveFitting) {
+			chartOutlierPred = isOutlier(remoteData, fatAccessor);
+		    }
 		    
 		},
 		error: (d) => {
@@ -148,5 +147,13 @@ var genFunc = function () {
 	    };
 	}())
     }
+};
+function alternateOutlierFunction(dataPoint) {
+			
+    var range = this.max - this.min,
+    limit = range * (50/100);
+    return (dataPoint < this.max - limit || dataPoint < this.min + limit);
 }
-*/
+//};
+
+export default { func: drawGen };

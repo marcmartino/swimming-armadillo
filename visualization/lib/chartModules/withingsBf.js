@@ -1,8 +1,15 @@
 "format es6";
 console.log("module fatmass running");
+console.log("attempting to use the gen module");
 
-console.log("trying to import");
-System.import("lib/chartModuleGen").then(function (m) {
-    console.log("loaaded");
-    console.log(m);
+var generatedMod = drawGen.func({
+    name: "withingsBf",
+    domClass: "fatmasssPlot",
+    dataUri: location.origin.indexOf('localhost') >= 0 ? "dataCache/data.json" : "/userdata/fatmasssweight",
+    curveFitting: true,
+    
+    curveColor: "black",
+    pointColor: "blue",
 });
+console.log(generatedMod);
+export default generatedMod;
