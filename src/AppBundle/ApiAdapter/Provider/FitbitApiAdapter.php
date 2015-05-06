@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
+use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\ApiParser\FitbitBodyFat;
 use AppBundle\ApiParser\FitbitFood;
 use AppBundle\ApiParser\FitbitWeight;
@@ -23,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Class FitbitApiAdapter
  * @package AppBundle\ApiAdapter\Provider
  */
-class FitbitApiAdapter implements ApiAdapterInterface
+class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
 {
     /** @var ContainerInterface */
     protected $container;
@@ -73,25 +74,6 @@ class FitbitApiAdapter implements ApiAdapterInterface
 
         /** @var $fitbitService FitBit */
         return $fitbitService = $serviceFactory->createService('FitBit', $credentials, $this->storage);
-    }
-
-    /**
-     * @return FitBit|void
-     */
-    public function getService()
-    {
-        return $this->service;
-    }
-
-    /**
-     * Return URI for oauth authorization
-     *
-     * @return string
-     */
-    public function getAuthorizationUri()
-    {
-        $token = $this->getService()->requestRequestToken();
-        return $this->getService()->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()));
     }
 
     public function consumeData()
@@ -200,28 +182,5 @@ class FitbitApiAdapter implements ApiAdapterInterface
     {
         return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
             ->findOneBy(['slug' => Providers::FITBIT]);
-    }
-
-    /**
-     * @return null|OauthAccessToken
-     * @throws \Exception
-     */
-    public function getUserOauthToken()
-    {
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-        $user = $securityContext->getToken()->getUser()->getId();
-
-        $oauthToken = $this->em->getRepository('AppBundle:OAuthAccessToken')
-            ->findOneBy([
-                'userId' => $user,
-                'serviceProviderId' => $this->getServiceProvider()->getId()
-            ]);
-
-        if (empty($oauthToken)) {
-            throw new \Exception("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
-        }
-
-        return $oauthToken;
     }
 }

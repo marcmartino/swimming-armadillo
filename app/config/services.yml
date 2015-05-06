@@ -75,6 +75,10 @@ services:
       class: AppBundle\ApiParser\FitbitWeight
       arguments: ["@doctrine.orm.entity_manager"]
 
+    api_parser.withings_body_measurement:
+      class: AppBundle\ApiParser\Withings\BodyMeasurement
+      arguments: ["@doctrine.orm.entity_manager"]
+
 
     # Event Listeners
     kernel.listener.your_listener_name:
