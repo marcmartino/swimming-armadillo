@@ -20,6 +20,22 @@ text-align: center;
 .dotPlot circle {
 opacity: 0.4;
 }
+#legend > div.disabled:before {
+background-color: white;
+border-color: black;
+}
+#legend > div:before {
+content: '';
+background-color: black;
+border: 1px solid white;
+border-radius: 10px;
+height: 10px;
+width: 10px;
+display:inline-block;
+margin-right: .25em;
+}
+#legend > div {
+}
 .axis path,
 .axis line {
     fill: none;

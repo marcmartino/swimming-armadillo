@@ -34,8 +34,10 @@ var drawGen = function (settings) {
 	
 	debugObj("generating legend for " + settings.name);
 	$("#legend ." + settings.name).text(settings.name)
+	    .attr("data-color", settings.pointColor)
 	    .off("click")
 	    .on("click", (e) => {
+		$(e.currentTarget).toggleClass("disabled");
 		$("g." + settings.domClass).toggle();
 	    });
 
