@@ -2,6 +2,7 @@
 namespace AppBundle\ApiAdapter;
 
 use AppBundle\Entity\OAuthAccessToken;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\SecurityContext;
 
@@ -15,14 +16,20 @@ abstract class AbstractApiAdapter {
      * @var \OAuth\OAuth1\Service\AbstractService
      */
     protected $service;
+    /**
+     * @var EntityManager
+     */
+    protected $em;
 
     /**
      * @param Container $container
      */
     public function __construct(
-        Container $container
+        Container $container,
+        EntityManager $em
     ) {
         $this->container = $container;
+        $this->em = $em;
     }
 
     /**

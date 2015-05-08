@@ -26,8 +26,8 @@ parameters:
 
     # Automatic Configuration
     automatic_authorization_uri: https://www.automatic.com/oauth/authorize
-    automatic_client_id: garblegarblegarble
-    automatic_client_secret: garblegarblegarble
+    automatic_consumer_key: garblegarblegarble
+    automatic_consumer_secret: garblegarblegarble
 
     # Fitbit Configuration
     fitbit_consumer_key: garblegarblegarble
