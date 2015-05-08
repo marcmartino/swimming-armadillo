@@ -1,14 +1,14 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
+use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
-use AppBundle\Entity\Measurement;
+use AppBundle\ApiParser\Withings\BodyMeasurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\Entity\Provider;
+use AppBundle\Entity\ServiceProvider;
 use AppBundle\Provider\Providers;
-use DateTime;
-use OAuth\OAuth1\Token\StdOAuth1Token;
+use Doctrine\ORM\EntityManager;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
@@ -21,48 +21,27 @@ use Symfony\Component\Security\Core\SecurityContext;
  * Class WithingsApiAdapter
  * @package AppBundle\ApiAdapter
  */
-class WithingsApiAdapter implements ApiAdapterInterface
+class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
 {
-    /**
-     * @var string
-     */
-    private $callbackUri;
-    /**
-     * @var string
-     */
-    private $consumerSecret;
-    /**
-     * @var string
-     */
-    private $consumerKey;
-    /**
-     * @var TokenStorageInterface
-     */
+    /** @var TokenStorageInterface */
     private $storage;
-
-    /**
-     * @var ServiceInterface
-     */
-    private $withingsService;
-    /**
-     * @var Container
-     */
-    private $container;
+    /** @var BodyMeasurement */
+    protected $bodyMeasurement;
 
     /**
      * @param Container $container
      */
     public function __construct(
-        Container $container
+        Container $container,
+        EntityManager $em
     ) {
-        $this->container = $container;
-
-        $this->consumerKey = $this->container->getParameter('withings_consumer_key');
-        $this->consumerSecret = $this->container->getParameter('withings_consumer_secret');
-        $this->callbackUri = $this->container->getParameter('withings_callback_uri');
+        parent::__construct($container, $em);
         $this->storage = $this->container->get('token_storage_session');;
 
-        $this->withingsService = $this->createWithingsService();
+        $this->service = $this->createWithingsService();
+        $this->em = $em;
+
+        $this->bodyMeasurement = $this->container->get('api_parser.withings_body_measurement');
     }
 
     /**
@@ -71,9 +50,9 @@ class WithingsApiAdapter implements ApiAdapterInterface
     public function createWithingsService()
     {
         $credentials = new Credentials(
-            $this->consumerKey,
-            $this->consumerSecret,
-            $this->callbackUri
+            $this->container->getParameter('withings_consumer_key'),
+            $this->container->getParameter('withings_consumer_secret'),
+            $this->container->getParameter('withings_callback_uri')
         );
 
         $serviceFactory = new ServiceFactory();
@@ -84,115 +63,27 @@ class WithingsApiAdapter implements ApiAdapterInterface
     }
 
     /**
-     * Return URI for oauth authorization
-     *
-     * @return string
-     */
-    public function getAuthorizationUri()
-    {
-        $token = $this->getService()->requestRequestToken();
-
-        $authorizationUrl = $this->getService()->getAuthorizationUri(
-            array('oauth_token' => $token->getRequestToken())
-        );
-
-        return $authorizationUrl;
-    }
-
-    /**
      * @return mixed|void
      * @throws \Exception
      */
     public function consumeData()
     {
-        $uri = 'measure?action=getmeas&userid=';
+        // Ensure the user has authenticated with fitbit
+        $userOauthToken = $this->getUserOauthToken();
 
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-        /** @var Provider $provider */
-        $provider = $this->container->get('entity_provider');
-
-        /** @var OAuthAccessToken $accessTokenService */
-        $accessTokenService = $this->container->get('entity.oauth_access_token');
-        $userTokens = $accessTokenService->getOAuthAccessTokenForUserAndServiceProvider(
-            $securityContext->getToken()->getUser()->getId(),
-            $provider->getProvider(Providers::WITHINGS)[0]['id']
-        );
-
-        if (count($userTokens) < 1) {
-            throw new \Exception("User has not authenticated service provider: " . Providers::WITHINGS);
-        }
-
-        $uri .= $userTokens[0]['foreign_user_id'];
-
-        /** @var MeasurementEvent $measurementEventService */
-        $measurementEventService = $this->container->get('entity.measurement_event');
-        /** @var Measurement $measurementService */
-        $measurementService = $this->container->get('entity.measurement');
+        $uri = 'measure?action=getmeas&userid=' . $userOauthToken->getForeignUserId();
 
         $response = $this->getService()->request($uri);
 
-        $json = json_decode($response, true);
+        $results = $this->bodyMeasurement->parse($response);
 
-        if ($json['status'] !== 0) {
-            throw new \Exception("Request was unsuccessful.");
+        /** @var MeasurementEvent $measurementEvent */
+        foreach ($results['measurement_events'] as $measurementEvent) {
+            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $this->em->persist($measurementEvent);
         }
 
-        foreach ($json['body']['measuregrps'] as $measureGroup) {
-            $datetime = new DateTime(date("Y-m-d H:i:s", $measureGroup['date']));
-            $measurements = $measureGroup['measures'];
-            $eventId = $measurementEventService->store($datetime, 1);
-
-            foreach ($measurements as $measurement) {
-
-                $measurementTypeId = false;
-                $unitsTypeId = false;
-                $units = $measurement['value'];
-
-                switch ($measurement['type']) {
-                    case 1:  // weight
-                        $measurementTypeId = 2;
-                        $unitsTypeId = 3;
-                        $units = $measurement['value'];
-                        break;
-                    case 4:  // height
-                        $measurementTypeId = 3;
-                        $unitsTypeId = 4;
-                        break;
-                    case 5:  // fat free mass
-                        $measurementTypeId = 4;
-                        $unitsTypeId = 3;
-                        $units = $measurement['value'];
-                        break;
-                    case 6:  // fat ratio
-                        $measurementTypeId = 5;
-                        $unitsTypeId = 2;
-                        $units = $measurement['value'] * pow(10, $measurement['unit']);
-                        break;
-                    case 8:  // fat mass weight
-                        $measurementTypeId = 6;
-                        $unitsTypeId = 3;
-                        break;
-                    case 11: // heart pulse
-                        $measurementTypeId = 1;
-                        $unitsTypeId = 1;
-                        break;
-                    default:
-                        throw new \Exception("Measurement type (" . $measurement['type'] . ") not handled");
-
-                }
-
-                $measurementService->store($eventId, $measurementTypeId, $unitsTypeId, $units);
-            }
-        }
-    }
-
-    /**
-     * @return \OAuth\OAuth1\Service\AbstractService
-     */
-    public function getService()
-    {
-        return $this->withingsService;
+        $this->em->flush();
     }
 
     /**
@@ -208,22 +99,29 @@ class WithingsApiAdapter implements ApiAdapterInterface
             $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
         );
 
-        /** @var Provider $provider */
-        $provider = $this->container->get('entity_provider');
-
-        /** @var OAuthAccessToken $accessTokenService */
-        $accessTokenService = $this->container->get('entity.oauth_access_token');
-
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('security.context');
 
         // Store the newly created access token
-        $accessTokenService->store(
-            $securityContext->getToken()->getUser()->getId(),
-            $provider->getProvider(Providers::WITHINGS)[0]['id'],
-            $_GET['userid'],
-            $accessToken->getAccessToken(),
-            $accessToken->getAccessTokenSecret()
-        );
+        $accessTokenObj = (new OAuthAccessToken)
+            ->setUserId($securityContext->getToken()->getUser()->getId())
+            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setForeignUserId($_GET['userid'])
+            ->setToken($accessToken->getAccessToken())
+            ->setSecret($accessToken->getAccessTokenSecret());
+
+        $this->em->persist($accessTokenObj);
+        $this->em->flush();
+    }
+
+    /**
+     * Return a service provider entity for fitbit
+     *
+     * @return null|ServiceProvider
+     */
+    public function getServiceProvider()
+    {
+        return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
+            ->findOneBy(['slug' => Providers::WITHINGS]);
     }
 }

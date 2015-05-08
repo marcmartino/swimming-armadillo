@@ -30,21 +30,21 @@ class UserData
     }
 
     /**
-     * @param $measurementTypeSlug
+     * @param $measurementTypeId
      * @param \DateTime $startDatetime
      * @param \DateTime $endDatetime
      * @return array
      * @throws \AppBundle\Exception\MeasurementTypeNotFoundException
      */
-    public function getUserData($measurementTypeSlug, $startDatetime = null, $endDatetime = null)
+    public function getUserData($measurementTypeId, $startDatetime = null, $endDatetime = null)
     {
         $query = "SELECT me.event_time, m.units
-            FROM measurement_event me INNER JOIN measurement m
+            FROM measurementevent me INNER JOIN measurement m
             ON me.id = m.measurement_event_id
             WHERE m.measurement_type_id = :measurementType";
 
         $parameters = [
-            ':measurementType' => $this->measurementType->getMeasurementType($measurementTypeSlug)['id'],
+            ':measurementType' => $measurementTypeId,
         ];
         if (!empty($startDatetime)) {
             $query .= " AND me.event_time > :startDatetime";
@@ -54,6 +54,8 @@ class UserData
             $query .= " AND me.event_time < :endDatetime";
             $parameters[':endDatetime'] = $endDatetime->format('Y-m-d H:i:s');
         }
+
+        $query .= " ORDER BY me.event_time";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute($parameters);

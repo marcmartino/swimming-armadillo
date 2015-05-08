@@ -2,10 +2,10 @@
 namespace AppBundle\EventListener;
 
 use Mandrill;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
 use Mandrill_Error;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class FOSUserBundleRegistrationCompleted

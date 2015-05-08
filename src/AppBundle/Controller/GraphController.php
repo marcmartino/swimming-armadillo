@@ -16,11 +16,10 @@ class GraphController extends Controller
      */
     public function graphAction()
     {
-        /** @var MeasurementType $measurementTypeService */
-        $measurementTypeService = $this->get('entity_measurement_type');
-
         return $this->render('graph/graph.html.twig', [
-            'measurement_types' => $measurementTypeService->getAll()
+            'measurement_types' => $this->getDoctrine()->getManager()
+                ->getRepository('AppBundle:MeasurementType')
+            ->findAll()
         ]);
     }
 
@@ -29,14 +28,13 @@ class GraphController extends Controller
      */
     public function graphMeasurementType()
     {
-        /** @var MeasurementType $measurementTypeService */
-        $measurementTypeService = $this->get('entity_measurement_type');
-
         $measurementTypeSlugs = explode('-', $_GET['measure']);
 
         $measurementTypes = [];
         foreach ($measurementTypeSlugs as $slug) {
-            $measurementTypes[] = $measurementTypeService->getMeasurementType($slug);
+            $measurementTypes[] = $this->getDoctrine()->getManager()
+                ->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => $slug]);
         }
 
         return $this->render('graph/graph_measurement_type.html.twig', [

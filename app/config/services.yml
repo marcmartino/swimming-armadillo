@@ -16,7 +16,7 @@ services:
 
     api_adapter_factory:
         class: AppBundle\ApiAdapter\ProviderApiAdapterFactory
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@doctrine.orm.entity_manager"]
 
     user_data:
         class: AppBundle\UserData\UserData
@@ -60,6 +60,24 @@ services:
 
     correlator.simple_slope:
         class: AppBundle\Correlator\SimpleSlope
+
+
+    # Api Parsers
+    api_parser.fitbit_food:
+      class: AppBundle\ApiParser\FitbitFood
+      arguments: ["@doctrine.orm.entity_manager"]
+
+    api_parser.fitbit_bodyfat:
+      class: AppBundle\ApiParser\FitbitBodyFat
+      arguments: ["@doctrine.orm.entity_manager"]
+
+    api_parser.fitbit_weight:
+      class: AppBundle\ApiParser\FitbitWeight
+      arguments: ["@doctrine.orm.entity_manager"]
+
+    api_parser.withings_body_measurement:
+      class: AppBundle\ApiParser\Withings\BodyMeasurement
+      arguments: ["@doctrine.orm.entity_manager"]
 
 
     # Event Listeners

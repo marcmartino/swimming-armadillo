@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
+use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\MeasurementType as MeasurementTypeService;
@@ -22,7 +23,7 @@ use Symfony\Component\Security\Core\SecurityContext;
  * Class AutomaticApiAdapter
  * @package AppBundle\ApiAdapter\Provider
  */
-class AutomaticApiAdapter implements ApiAdapterInterface
+class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
 {
     /**
      * @var ContainerInterface
@@ -190,5 +191,15 @@ class AutomaticApiAdapter implements ApiAdapterInterface
         }
 
         return $tripEvents;
+    }
+
+    /**
+     * Return a ServiceProvider object for this ApiAdapter
+     * @return mixed
+     */
+    public function getServiceProvider()
+    {
+        return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
+            ->findOneBy(['slug' => Providers::AUTOMATIC]);
     }
 }

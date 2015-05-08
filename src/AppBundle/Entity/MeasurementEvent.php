@@ -1,14 +1,100 @@
 <?php
+
 namespace AppBundle\Entity;
 
 use DateTime;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class MeasurementEvent
- * @package AppBundle\Entity
+ * MeasurementEvent
+ *
+ * @ORM\Table()
+ * @ORM\Entity
  */
-class MeasurementEvent extends AbstractEntity
+class MeasurementEvent
 {
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="event_time", type="datetimetz")
+     */
+    private $eventTime;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="provider_id", type="integer")
+     */
+    private $providerId;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set eventTime
+     *
+     * @param \DateTime $eventTime
+     *
+     * @return MeasurementEvent
+     */
+    public function setEventTime($eventTime)
+    {
+        $this->eventTime = $eventTime;
+
+        return $this;
+    }
+
+    /**
+     * Get eventTime
+     *
+     * @return \DateTime
+     */
+    public function getEventTime()
+    {
+        return $this->eventTime;
+    }
+
+    /**
+     * Set providerId
+     *
+     * @param integer $providerId
+     *
+     * @return MeasurementEvent
+     */
+    public function setProviderId($providerId)
+    {
+        $this->providerId = $providerId;
+
+        return $this;
+    }
+
+    /**
+     * Get providerId
+     *
+     * @return integer
+     */
+    public function getProviderId()
+    {
+        return $this->providerId;
+    }
+
     /**
      * @param DateTime $eventTime
      * @param $providerId
@@ -18,13 +104,10 @@ class MeasurementEvent extends AbstractEntity
         DateTime $eventTime,
         $providerId
     ) {
-        $eventQuery = 'INSERT INTO measurement_event (event_time, provider_id) VALUES (:event_time, :provider_id)';
-        $eventStmt = $this->conn->prepare($eventQuery);
-        $eventStmt->execute([
-            ':event_time' => $eventTime->format('Y-m-d H:i:s'),
-            ':provider_id' => $providerId
-        ]);
+        $this->setEventTime($eventTime)
+            ->setProviderId($providerId);
 
-        return $this->conn->lastInsertId('measurement_event_id_seq');
+        return $this;
     }
 }
+
