@@ -18,6 +18,15 @@ function redrawChart(svgData, xChartFuncs) {
 	    .attr("height", svgData.h)
     };
 
+    drawData.chartClipId = "chart-area";
+    drawData.svg.append('clipPath')
+	.attr("id", drawData.chartClipId)
+	.append("rect")
+	.attr("x", svgData.chartPadding)
+	.attr("y", svgData.chartPadding)
+	.attr("width", svgData.w - svgData.chartPadding * 2)
+	.attr("height", svgData.h - svgData.chartPadding * 2);
+
     drawData.xAxis = d3.svg.axis()
 	.orient("bottom")
         .ticks(parseInt(svgData.w / 75, 10));
@@ -25,6 +34,7 @@ function redrawChart(svgData, xChartFuncs) {
     	.orient("left")
     	.ticks(5)
     	.tickFormat(d3.format("%"));
+    
     drawData.xScale = d3.time.scale()
 	.domain(xChartFuncs[0].xScale)
 	.range([0 + svgData.chartPadding, svgData.w - svgData.chartPadding]);
