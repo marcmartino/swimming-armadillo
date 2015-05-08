@@ -36,7 +36,8 @@ class Version20150111111551 extends AbstractMigration implements ContainerAwareI
         MeasurementTypePeer::SYSTOLIC_BLOOD_PREASSURE => 'Systolic Blood Pressure',
         MeasurementTypePeer::SPO2 => 'SPO2',
         MeasurementTypePeer::DRIVE_DISTANCE => 'Drive Distance',
-        MeasurementTypePeer::DRIVE_TIME => 'Drive Time'
+        MeasurementTypePeer::DRIVE_TIME => 'Drive Time',
+        MeasurementTypePeer::HEART_RATE => 'Heart Rate'
     ];
 
     public function setContainer(ContainerInterface $container = null)

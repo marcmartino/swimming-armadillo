@@ -92,11 +92,10 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
                 ->setProviderId($this->getServiceProvider()->getId());
             $this->em->persist($measurementEventObj);
 
-            $measurementObj = new Measurement();
-
             $measurement = $measurementEvent['measurements'];
             // Store drive distance
             $distance = $measurement['distance'];
+            $measurementObj = new Measurement();
             $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
                 ->findOneBy(['slug' => UnitType::METERS])->getId();
             $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
@@ -109,6 +108,7 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
             // Store drive time
             $driveTime = $measurement['drive_time'];
+            $measurementObj = new Measurement();
             $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
                 ->findOneBy(['slug' => UnitType::SECONDS])->getId();
             $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
