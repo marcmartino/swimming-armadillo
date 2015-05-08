@@ -49,6 +49,8 @@ class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterf
 
             $measurementEvent->setEventTime($datetime);
 
+            $this->em->persist($measurementEvent);
+
             $measures = $measureGroup['measures'];
 
             foreach ($measures as $measurement) {
@@ -92,9 +94,12 @@ class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterf
                     ->findOneBy(['slug' => $measurementTypeSlug])->getId();
 
                 $measurement = (new Measurement)
+                    ->setMeasurementEventId($measurementEvent->getId())
                     ->setUnitsTypeId($unitTypeId)
                     ->setMeasurementTypeId($measurementTypeId)
                     ->setUnits($units);
+
+                $this->em->persist($measurement);
 
                 $results['measurements'][] = $measurement;
             }

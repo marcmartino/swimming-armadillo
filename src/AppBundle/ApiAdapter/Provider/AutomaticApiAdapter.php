@@ -86,32 +86,40 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
         $trips = $this->consumeTrips($response);
 
         foreach ($trips['events'] as $measurementEvent) {
-            $measurementEventId = $measurementEventService->store(
-                new \DateTime($measurementEvent['event_time']),
-                $provider->getProvider(Providers::AUTOMATIC)[0]['id']
-            );
+            $measurementEventObj = new MeasurementEvent();
+            $eventTime = new \DateTime($measurementEvent['event_time']);
+            $measurementEventObj->setEventTime($eventTime)
+                ->setProviderId($this->getServiceProvider()->getId());
+            $this->em->persist($measurementEventObj);
+
             $measurement = $measurementEvent['measurements'];
             // Store drive distance
             $distance = $measurement['distance'];
-            $measurementTypeId = $measurementTypeService->getMeasurementType(MeasurementType::DRIVE_DISTANCE)['id'];
-            $measurementService->store(
-                $measurementEventId,
-                $measurementTypeId,
-                $this->unitTypeService->getUnitType(UnitType::METERS)['id'],
-                $distance
-            );
+            $measurementObj = new Measurement();
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::METERS])->getId();
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::DRIVE_DISTANCE])->getId();
+            $measurementObj->setMeasurementEventId($measurementEventObj->getId())
+                ->setMeasurementTypeId($measurementTypeId)
+                ->setUnitsTypeId($unitTypeId)
+                ->setUnits($distance);
+            $this->em->persist($measurementObj);
+
             // Store drive time
             $driveTime = $measurement['drive_time'];
-            $measurementTypeId = $measurementTypeService->getMeasurementType(MeasurementType::DRIVE_TIME)['id'];
-            $measurementService->store(
-                $measurementEventId,
-                $measurementTypeId,
-                $this->unitTypeService->getUnitType(UnitType::SECONDS)['id'],
-                $driveTime
-            );
+            $measurementObj = new Measurement();
+            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
+                ->findOneBy(['slug' => UnitType::SECONDS])->getId();
+            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
+                ->findOneBy(['slug' => MeasurementType::DRIVE_TIME])->getId();
+            $measurementObj->setMeasurementEventId($measurementEventObj->getId())
+                ->setMeasurementTypeId($measurementTypeId)
+                ->setUnitsTypeId($unitTypeId)
+                ->setUnits($driveTime);
+            $this->em->persist($measurementObj);
         }
-
-
+        $this->em->flush();
     }
 
     public function handleCallback()
