@@ -65,6 +65,7 @@ function redrawChart(svgData, xChartFuncs) {
     if (window.parent) {
 	window.parent.postMessage("rendered", '*');
     }
+    $("#notice").hide();
 }
 
 function createLegendGroups(legend, chartName) {
