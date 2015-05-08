@@ -30,12 +30,8 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 {
     /** @var TokenStorageInterface */
     private $storage;
-    /** @var ServiceInterface */
-    private $service;
-    /** @var Container */
-    private $container;
     /** @var BodyMeasurement */
-    private $bodyMeasurement;
+    protected $bodyMeasurement;
 
     /**
      * @param Container $container
@@ -44,7 +40,7 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
         Container $container,
         EntityManager $em
     ) {
-        $this->container = $container;
+        parent::__construct($container, $em);
         $this->storage = $this->container->get('token_storage_session');;
 
         $this->service = $this->createWithingsService();

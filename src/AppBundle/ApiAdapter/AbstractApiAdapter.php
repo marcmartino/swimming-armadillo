@@ -10,7 +10,7 @@ abstract class AbstractApiAdapter {
     /**
      * @var Container
      */
-    private $container;
+    protected $container;
     /**
      * @var \OAuth\OAuth1\Service\AbstractService
      */
