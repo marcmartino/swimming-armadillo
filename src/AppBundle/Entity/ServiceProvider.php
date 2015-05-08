@@ -5,12 +5,12 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UnitType
+ * ServiceProvider
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class UnitType
+class ServiceProvider
 {
     /**
      * @var integer
@@ -24,7 +24,7 @@ class UnitType
     /**
      * @var string
      *
-     * @ORM\Column(name="slug", type="string", length=255)
+     * @ORM\Column(name="slug", type="string", length=255, unique=true)
      */
     private $slug;
 
@@ -39,7 +39,7 @@ class UnitType
     /**
      * Get id
      *
-     * @return integer
+     * @return integer 
      */
     public function getId()
     {
@@ -50,8 +50,7 @@ class UnitType
      * Set slug
      *
      * @param string $slug
-     *
-     * @return UnitType
+     * @return ServiceProvider
      */
     public function setSlug($slug)
     {
@@ -63,7 +62,7 @@ class UnitType
     /**
      * Get slug
      *
-     * @return string
+     * @return string 
      */
     public function getSlug()
     {
@@ -74,8 +73,7 @@ class UnitType
      * Set name
      *
      * @param string $name
-     *
-     * @return UnitType
+     * @return ServiceProvider
      */
     public function setName($name)
     {
@@ -87,11 +85,10 @@ class UnitType
     /**
      * Get name
      *
-     * @return string
+     * @return string 
      */
     public function getName()
     {
         return $this->name;
     }
 }
-

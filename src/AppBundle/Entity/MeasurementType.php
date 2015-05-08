@@ -1,52 +1,97 @@
 <?php
+
 namespace AppBundle\Entity;
 
-use AppBundle\Exception\MeasurementTypeNotFoundException;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class MeasurementType
- * @package AppBundle\Entity
+ * MeasurementType
+ *
+ * @ORM\Table()
+ * @ORM\Entity
  */
-class MeasurementType extends AbstractEntity
+class MeasurementType
 {
     /**
-     * @return array
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    public function get($userId)
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="slug", type="string", length=255)
+     */
+    private $slug;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM service_providers sp
-            LEFT JOIN oauth_access_tokens oat
-            ON  sp.id = oat.service_provider_id AND oat.user_id = :userId
-        ");
-        $stmt->execute([
-            ':userId' => $userId
-        ]);
-        return $stmt->fetchAll();
+        return $this->id;
     }
 
     /**
-     * @param $slug
-     * @return mixed
-     * @throws MeasurementTypeNotFoundException
+     * Set slug
+     *
+     * @param string $slug
+     *
+     * @return MeasurementType
      */
-    public function getMeasurementType($slug)
+    public function setSlug($slug)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM measurement_types WHERE slug = :slug
-        ");
-        $stmt->execute([':slug' => $slug]);
-        if ($stmt->rowCount() == 0) {
-            throw new MeasurementTypeNotFoundException("Measurement type '$slug' not found");
-        }
-        return $stmt->fetch();
+        $this->slug = $slug;
+
+        return $this;
     }
 
     /**
-     * @return array
+     * Get slug
+     *
+     * @return string
      */
-    public function getAll()
+    public function getSlug()
     {
-        return $this->conn->query("SELECT * FROM measurement_types")->fetchAll();
+        return $this->slug;
     }
-} 
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return MeasurementType
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+}
+

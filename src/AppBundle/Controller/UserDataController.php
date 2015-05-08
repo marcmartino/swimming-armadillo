@@ -22,6 +22,9 @@ class UserDataController extends Controller
         /** @var UserData $userData */
         $userData = $this->get('user_data');
 
+        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => $measurementTypeSlug]);
+
         $startDate = $request->query->get('start', null);
         $endDate = $request->query->get('end', null);
 
@@ -32,7 +35,7 @@ class UserDataController extends Controller
             $endDate = new \DateTime($endDate);
         }
 
-        foreach ($userData->getUserData($measurementTypeSlug, $startDate, $endDate) as $measurementEvent) {
+        foreach ($userData->getUserData($measurementType->getId(0), $startDate, $endDate) as $measurementEvent) {
 
             $dateTime = new \DateTime($measurementEvent['event_time']);
 
