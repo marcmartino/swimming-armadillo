@@ -13,6 +13,7 @@ var drawGen = function (settings) {
 	
 	debugObj("drawing " + settings.name + " data points");
 	drawData.svg.append("g")
+	    .attr("clip-path", "url(#" + drawData.chartClipId + ")")
 	    .attr("class", settings.domClass + " dotPlot")
 	    .selectAll("rect")
 	    .data(remoteData)
