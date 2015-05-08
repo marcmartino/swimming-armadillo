@@ -1,19 +1,14 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
-use AppBundle\ApiAdapter\AbstractApiAdapter;
 use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
 use AppBundle\ApiParser\Withings\BodyMeasurement;
-use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\Entity\Provider;
 use AppBundle\Entity\ServiceProvider;
 use AppBundle\Provider\Providers;
-use DateTime;
 use Doctrine\ORM\EntityManager;
-use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
@@ -82,7 +77,7 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 
         $results = $this->bodyMeasurement->parse($response);
 
-        /** @var $results $measurementEvent */
+        /** @var MeasurementEvent $measurementEvent */
         foreach ($results['measurement_events'] as $measurementEvent) {
             $measurementEvent->setProviderId($this->getServiceProvider()->getId());
             $this->em->persist($measurementEvent);
@@ -104,23 +99,19 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
             $this->storage->retrieveAccessToken('WithingsOAuth')->getRequestTokenSecret()
         );
 
-        /** @var Provider $provider */
-        $provider = $this->container->get('entity_provider');
-
-        /** @var OAuthAccessToken $accessTokenService */
-        $accessTokenService = $this->container->get('entity.oauth_access_token');
-
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('security.context');
 
         // Store the newly created access token
-        $accessTokenService->store(
-            $securityContext->getToken()->getUser()->getId(),
-            $provider->getProvider(Providers::WITHINGS)[0]['id'],
-            $_GET['userid'],
-            $accessToken->getAccessToken(),
-            $accessToken->getAccessTokenSecret()
-        );
+        $accessTokenObj = (new OAuthAccessToken)
+            ->setUserId($securityContext->getToken()->getUser()->getId())
+            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setForeignUserId($_GET['userid'])
+            ->setToken($accessToken->getAccessToken())
+            ->setSecret($accessToken->getAccessTokenSecret());
+
+        $this->em->persist($accessTokenObj);
+        $this->em->flush();
     }
 
     /**
