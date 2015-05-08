@@ -70,6 +70,10 @@ class AutomaticOAuth2 extends AbstractService
 
         return $token;
     }
+    /**
+     * https://accounts.automatic.com/oauth/authorize/?client_id=553f2bc0a03cd495b70e&response_type=code&scope=scope%3Apublic+scope%3Auser%3Aprofile+scope%3Alocation+scope%3Avehicle%3Aprofile+scope%3Avehicle%3Aevents+scope%3Atrip+scope%3Abehavior
+     * https://accounts.automatic.com/oauth/authorize/?client_id=553f2bc0a03cd495b70e&response_type=code&scope=scope:vehicle:profile%20scope:behavior%20scope:location%20scope:vehicle:events%20scope:trip%20scope:public%20scope:user:profile
+     */
 
     /**
      * Returns the authorization API endpoint.
@@ -78,7 +82,7 @@ class AutomaticOAuth2 extends AbstractService
      */
     public function getAuthorizationEndpoint()
     {
-        return new Uri('https://accounts.automatic.com/oauth/authorize');
+        return new Uri('https://accounts.automatic.com/oauth/authorize/');
     }
 
     /**
@@ -88,6 +92,37 @@ class AutomaticOAuth2 extends AbstractService
      */
     public function getAccessTokenEndpoint()
     {
-        return new Uri('https://accounts.automatic.com/oauth/access_token');
+        return new Uri('https://accounts.automatic.com/oauth/access_token/');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthorizationUri(array $additionalParameters = array())
+    {
+        $parameters = array_merge(
+            $additionalParameters,
+            array(
+                'client_id'     => $this->credentials->getConsumerId(),
+                'response_type' => 'code',
+            )
+        );
+
+        $parameters['scope'] = implode(' ', $this->scopes);
+
+        if ($this->needsStateParameterInAuthUrl()) {
+            if (!isset($parameters['state'])) {
+                $parameters['state'] = $this->generateAuthorizationState();
+            }
+            $this->storeAuthorizationState($parameters['state']);
+        }
+
+        // Build the url
+        $url = clone $this->getAuthorizationEndpoint();
+        foreach ($parameters as $key => $val) {
+            $url->addToQuery($key, $val);
+        }
+
+        return $url;
     }
 }

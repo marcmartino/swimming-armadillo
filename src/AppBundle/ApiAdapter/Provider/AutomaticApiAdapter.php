@@ -11,6 +11,7 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use AppBundle\UnitType\UnitType;
+use Doctrine\ORM\EntityManager;
 use OAuth\OAuth2\Token\StdOAuth2Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\AutomaticOAuth2;
@@ -41,8 +42,9 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
     /**
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, EntityManager $em)
     {
+        parent::__construct($container, $em);
         $this->container = $container;
         $this->storage = $this->container->get('token_storage_session');
 
@@ -116,23 +118,17 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
     {
         $accessToken = $this->getService()->requestAccessToken($_GET['code']);
 
-        /** @var Provider $provider */
-        $provider = $this->container->get('entity_provider');
-
-        /** @var OAuthAccessToken $accessTokenService */
-        $accessTokenService = $this->container->get('entity.oauth_access_token');
-
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('security.context');
 
         // Store the newly created access token
-        $accessTokenService->store(
-            $securityContext->getToken()->getUser()->getId(),
-            $provider->getProvider(Providers::AUTOMATIC)[0]['id'],
-            null,
-            $accessToken->getAccessToken(),
-            null
-        );
+        $accessTokenObj = (new OAuthAccessToken)
+            ->setUserId($securityContext->getToken()->getUser()->getId())
+            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setToken($accessToken->getAccessToken());
+
+        $this->em->persist($accessTokenObj);
+        $this->em->flush();
     }
 
     /**
