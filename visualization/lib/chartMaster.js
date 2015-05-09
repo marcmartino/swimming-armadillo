@@ -69,7 +69,7 @@ function redrawChart(svgData, xChartFuncs) {
 }
 
 function createLegendGroups(legend, chartName) {
-    legend.append("<div class='" + chartName + "'></div>");
+    legend.append("<div class='" + chartName + "'><span class='legendDot'></span><span class='legendName'></span></div>");
 }
 
 function getTimestampData() {

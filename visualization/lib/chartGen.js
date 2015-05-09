@@ -33,13 +33,14 @@ var drawGen = function (settings) {
    	    .attr('fill', settings.pointColor || 'brown');
 	
 	debugObj("generating legend for " + settings.name);
-	$("#legend ." + settings.name).text(settings.name)
-	    .attr("data-color", settings.pointColor)
-	    .off("click")
+	$("#legend ." + settings.name + " .legendName").text(settings.name)
+	    .parent().off("click")
 	    .on("click", (e) => {
 		$(e.currentTarget).toggleClass("disabled");
 		$("g." + settings.domClass).toggle();
-	    });
+	    })
+	    .find(".legendDot")
+	    .css("backgroundColor", settings.pointColor);
 
 
 	if (settings.curveFitting) {
