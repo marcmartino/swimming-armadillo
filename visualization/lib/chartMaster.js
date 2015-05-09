@@ -97,7 +97,7 @@ function resize() {
 function convertGetParams(imports) {
     var measures = getParameterByName("measure");
 
-    return measures.split(",").map(function (measureName) {
+    return measures.split("-").map(function (measureName) {
 	console.log(measureName);
 	console.log(imports[measureName]);
 	return imports[measureName];
@@ -109,8 +109,11 @@ d3.select(window).on('resize', resize);
 
 import withingsBf from './chartModules/withingsBf';
 import weight from './chartModules/weight';
+import drivedistance from './chartModules/drivedistance';
+import drivetime from './chartModules/drivetime';
+//import heartrate from './chartModules/heartrate';
 
-var dataMods = convertGetParams({weight: weight, withingsBf: withingsBf});
+var dataMods = convertGetParams({weight: weight, withingsBf: withingsBf, drivetime: drivetime, drivedistance: drivedistance});
 
 dataMods.forEach(function (dataMod) {
     if (dataMod) {
