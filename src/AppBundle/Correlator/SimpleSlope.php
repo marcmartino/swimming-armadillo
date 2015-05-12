@@ -19,7 +19,7 @@ class SimpleSlope implements CorrelatorInterface {
     public function calculateSlopOfDataSet($dataset)
     {
         $rise = $dataset[1]['units'] - $dataset[0]['units'];
-        $run = $dataset[1]['timestamp'] - $dataset[0]['timestamp'];
+        $run = $dataset[1]['timestamp']->getTimestamp() - $dataset[0]['timestamp']->getTimestamp();
 
         if ($run == 0) {
             return 0;

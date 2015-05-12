@@ -1,0 +1,10 @@
+<div class="large-12 columns" id="measurementTypeList" style="margin-bottom: 10px">
+    {% for measurement_type in measurement_types %}
+        <a class="button expand secondary" data-slug="{{ measurement_type.slug }}">
+            {{ measurement_type.name }}
+        </a>
+    {% endfor %}
+    <input type="date" id="startDate" />
+    <input type="date" id="endDate" />
+    <button class="expand" id="getGraphs">Go</button>
+</div>

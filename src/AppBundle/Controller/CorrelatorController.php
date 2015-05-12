@@ -6,64 +6,101 @@ use AppBundle\Correlator\SimpleSlope;
 use AppBundle\Entity\Measurement;
 use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\UserData\UserData;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use DateTime;
 
 class CorrelatorController extends Controller {
+
     /**
-     * @Route("/correlator", name="correlatorindex")
+     * @Route("/correlator", name="correlator")
      */
-    public function indexAction(Request $request)
+    public function correlatorAction()
     {
+        return $this->render('correlator/correlator.html.twig', [
+            'measurement_types' => $this->getDoctrine()->getManager()
+                ->getRepository('AppBundle:MeasurementType')
+                ->findAll()
+        ]);
+    }
+
+    /**
+     * @Route("/correlatorcalc", name="correlatorcalc")
+     */
+    public function calcAction(Request $request)
+    {
+        $measurementTypeSlugs = explode('-', $_GET['measure']);
+        $start = $request->query->get('start', null);
+        $end = $request->query->get('end', null);
+
+        if (!empty($start)) {
+            $start = new DateTime($start);
+        }
+        if (!empty($end)) {
+            $end = new DateTime($end);
+        }
+
         /** @var SimpleSlope $correlator */
-        $correlator = $this->get('correlator.simple_slope');
-
-        $start = new DateTime('2015-02-15');
-        $end = new DateTime('2015-04-01');
-
+        $correlator = $this->get('correlator.pearson');
         /** @var UserData $userData */
         $userData = $this->get('user_data');
 
-        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
-            ->findOneBy(['slug' => MeasurementType::WEIGHT]);
-        $weightUserData = $userData->getUserData($measurementType->getId(), $start, $end);
+        if (count($measurementTypeSlugs) !== 2) {
+            throw new InvalidArgumentException("Two and only two measurement types can be compared for correlations.");
+        }
 
-        $weightData = [
-            [
-                'timestamp' => (new DateTime($weightUserData[0]['event_time']))->getTimestamp(),
-                'units' => $weightUserData[0]['units']
-            ],
-            [
-                'timestamp' => (new DateTime(end($weightUserData)['event_time']))->getTimestamp(),
-                'units' => end($weightUserData)['units']
-            ]
+        $measurementType1 = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => $measurementTypeSlugs[0]]);
+        $weightUserData = $userData->getUserData($measurementType1->getId(), $start, $end);
+        array_walk($weightUserData, function (&$item) {
+            $item['timestamp'] = new DateTime($item['event_time']);
+        });
+
+        $measurementType2 = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
+            ->findOneBy(['slug' => $measurementTypeSlugs[1]]);
+        $bodyfatUserData = $userData->getUserData($measurementType2->getId(), $start, $end);
+        array_walk($bodyfatUserData, function (&$item) {
+            $item['timestamp'] = new DateTime($item['event_time']);
+        });
+
+        $correlation = $correlator->getCorrelation($weightUserData, $bodyfatUserData);
+        if ($correlation > 1 || $correlation < -1) {
+            throw new Exception("Correlation did not work, invalid correlation ($correlation)");
+        }
+
+        $correlationMap = [
+            [1 , 'Perfectly Correlated'],
+            [.8,  'Highly Correlated'],
+            [.5,  'Correlated'],
+            [.3,  'Slightly Correlated'],
+            [.1,  'Barely Correlated'],
+            [0, 'Not Correlated'],
+            [-.1, 'Barely Negatively Correlated'],
+            [-.3, 'Slightly Negatively Correlated'],
+            [-.5, 'Negatively Correlated'],
+            [-.8, 'Highly Negatively Correlated'],
+            [-1, 'Perfectly Negatively Correlated']
         ];
-
-        $measurementType = $this->getDoctrine()->getEntityManager()->getRepository('AppBundle:MeasurementType')
-            ->findOneBy(['slug' => MeasurementType::FAT_RATIO]);
-        $bodyfatUserData = $userData->getUserData($measurementType->getId(), $start, $end);
-
-        $bodyFatData = [
-            [
-                'timestamp' => (new DateTime($bodyfatUserData[0]['event_time']))->getTimestamp(),
-                'units' => $bodyfatUserData[0]['units']
-            ],
-            [
-                'timestamp' => (new DateTime(end($bodyfatUserData)['event_time']))->getTimestamp(),
-                'units' => end($bodyfatUserData)['units']
-            ]
-        ];
+        $correlationEnglish = 'Error';
+        foreach ($correlationMap as $map) {
+            if ($correlation >= $map[0]) {
+                $correlationEnglish = $map[1];
+                break;
+            }
+        }
 
         return $this->render('correlator/index.html.twig', [
             'start' => $start,
             'end' => $end,
-            'weight_data' => $weightData,
-            'weight_slope' => $correlator->calculateSlopOfDataSet($weightData),
-            'bodyfat_data' => $bodyFatData,
-            'bodyfat_slope' => $correlator->calculateSlopOfDataSet($bodyFatData),
-            'correlation' => $correlator->getCorrelation($weightData, $bodyFatData)
+            'weight_data' => $weightUserData,
+            'bodyfat_data' => $bodyfatUserData,
+            'correlation' => $correlation,
+            'correlationEnglish' => $correlationEnglish,
+            'measurementType1' => $measurementType1,
+            'measurementType2' => $measurementType2
         ]);
     }
 }

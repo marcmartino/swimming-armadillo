@@ -28,9 +28,14 @@
         {% block javascripts%}
             {% javascripts
             '@AppBundle/Resources/public/vendor/foundation/js/foundation.js'
+            '@AppBundle/Resources/public/vendor/foundation/js/foundation/foundation.topbar.js'
             %}
             <script src="{{ asset_url }}"></script>
             {% endjavascripts %}
         {% endblock %}
+    {% include 'layout/footer.html.twig' %}
+    <script>
+        $(document).foundation();
+    </script>
     </body>
 </html>
