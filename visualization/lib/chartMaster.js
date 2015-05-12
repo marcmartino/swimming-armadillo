@@ -111,9 +111,16 @@ import withingsBf from './chartModules/withingsBf';
 import weight from './chartModules/weight';
 import drivedistance from './chartModules/drivedistance';
 import drivetime from './chartModules/drivetime';
+import fatratio from './chartModules/fatratio';
 //import heartrate from './chartModules/heartrate';
 
-var dataMods = convertGetParams({weight: weight, withingsBf: withingsBf, drivetime: drivetime, drivedistance: drivedistance});
+var dataMods = convertGetParams({
+    weight: weight,
+    withingsBf: withingsBf,
+    drivetime: drivetime,
+    drivedistance: drivedistance,
+    fatratio: fatratio
+});
 
 dataMods.forEach(function (dataMod) {
     if (dataMod) {

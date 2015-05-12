@@ -24,6 +24,14 @@ class GraphController extends Controller
     }
 
     /**
+     * @Route("/graph/visualization", name="graph_viz")
+     */
+    public function graphIframeAction()
+    {
+        return $this->render("graph/graph_iframe.html.twig");
+    }
+
+    /**
      * @Route("/graph/measure", name="graph_measurement_type")
      */
     public function graphMeasurementType()
@@ -39,7 +47,9 @@ class GraphController extends Controller
 
         return $this->render('graph/graph_measurement_type.html.twig', [
             'measurementTypeSlug' => $_GET['measure'],
-            'measurement_types' => $measurementTypes
+            'measurement_types' => $measurementTypes,
+            'start' => !empty($_GET['start']) ? $_GET['start'] : '',
+            'end' => !empty($_GET['end']) ? $_GET['end'] : '',
         ]);
     }
 } 

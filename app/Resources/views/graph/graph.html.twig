@@ -21,19 +21,29 @@
             {% endfor %}
             <button class="expand" id="getGraphs">Go</button>
         </div>
+        <input type="date" id="startDate" />
+        <input type="date" id="endDate" />
     </div>
     <script>
         $("#measurementTypeList").on("click", "a", function() {
             $(this).toggleClass('success');
         });
         $("#getGraphs").on("click", function() {
-            var queryString = '?measure=';
+            var queryString = '?measure=',
+                    startDate = $("#startDate").val(),
+                    endDate = $("#endDate").val();
             $.each($("#measurementTypeList a.success"), function(index) {
                 queryString = queryString + $(this).data("slug");
                 if (index !== $("#measurementTypeList a.success").length - 1) {
-                    queryString = queryString + '-';
+                    queryString += '-';
                 }
             });
+            if (startDate) {
+                queryString += "&start=" + startDate;
+            }
+            if (endDate) {
+                queryString += "&end=" + endDate;
+            }
             if (queryString !== '?measure=') {
                 location.replace("{{ path('graph_measurement_type') }}" + queryString);
             }

@@ -25,7 +25,7 @@ parameters:
     withings_callback_uri: http://hdlbit.com/withings/callback
 
     # Automatic Configuration
-    automatic_authorization_uri: https://www.automatic.com/oauth/authorize
+    automatic_callback_uri: http://hdlbit.com/automatic/callback
     automatic_consumer_key: garblegarblegarble
     automatic_consumer_secret: garblegarblegarble
 

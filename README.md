@@ -9,8 +9,8 @@ swimming-armadillo
 ## Updating
 
 1. 'composer update'
-2. 'php app/console doctrine:migrations:migrate'
-3. 'php app/console doctrine:schema:update --force'
+2. 'php app/console doctrine:schema:update --force'
+3. 'php app/console doctrine:migrations:migrate'
 4. 'php app/console server:run'
 5. http://localhost:8000/withings/authorize
 
