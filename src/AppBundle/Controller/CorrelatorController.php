@@ -37,10 +37,10 @@ class CorrelatorController extends Controller {
         $end = $request->query->get('end', null);
 
         if (!empty($start)) {
-            $start = new \DateTime($start);
+            $start = new DateTime($start);
         }
-        if (!empty($endDate)) {
-            $end = new \DateTime($end);
+        if (!empty($end)) {
+            $end = new DateTime($end);
         }
 
         /** @var SimpleSlope $correlator */
