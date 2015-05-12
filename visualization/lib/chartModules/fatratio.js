@@ -7,6 +7,9 @@ var generatedMod = drawGen.func({
     dataUri: url,
     curveFitting: true,
     pointColor: "pink",
-    invertedY: true
+    invertedY: true,
+    filterFunc: function (datum) {
+	return (parseInt(datum['Units'], 10) > 3);
+    },
 });
 export default generatedMod;
