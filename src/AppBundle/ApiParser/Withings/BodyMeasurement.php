@@ -75,6 +75,7 @@ class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterf
                         $unitsTypeSlug = UnitType::PERCENT;
                         $units = $measurement['value'] * pow(10, $measurement['unit']);
                         break;
+                    // TODO inspect this, seems incorrect
                     case 8:  // fat mass weight
                         $measurementTypeSlug = MeasurementType::FAT_FREE_MASS;
                         $unitsTypeSlug = UnitType::GRAMS;
