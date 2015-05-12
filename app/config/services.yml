@@ -61,6 +61,9 @@ services:
     correlator.simple_slope:
         class: AppBundle\Correlator\SimpleSlope
 
+    correlator.pearson:
+        class: AppBundle\Correlator\Pearson
+
 
     # Api Parsers
     api_parser.fitbit_food:
