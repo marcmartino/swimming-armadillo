@@ -15,7 +15,17 @@
         {% include 'form/measurement_type_form.html.twig' %}
     </div>
     <script>
+        var selectedCount = 0;
         $("#measurementTypeList").on("click", "a", function() {
+            if (!$(this).hasClass('success') && selectedCount > 1) {
+                alert('You can only select two measurement types to correlate!');
+                return;
+            }
+            if ($(this).hasClass('success')) {
+                selectedCount = selectedCount - 1;
+            } else {
+                selectedCount += 1;
+            }
             $(this).toggleClass('success');
         });
         $("#getGraphs").on("click", function() {
