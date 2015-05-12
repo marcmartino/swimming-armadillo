@@ -11,6 +11,11 @@ var generatedMod = drawGen.func({
     dataUri: url,
     curveFitting: true,
     pointColor: "green",
-    invertedY: true
+    invertedY: true,
+    yFormat: function (d) {
+	console.log("y format running");
+	console.log(d);
+	return d/1000 + "kg";
+    }
 });
 export default generatedMod;

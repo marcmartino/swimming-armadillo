@@ -135,6 +135,7 @@ var drawGen = function (settings) {
 			xScale: getXMinMax(remoteData),
 			yScale: getYMinMax(remoteData),
 			name: settings.name,
+			yFormat: settings.yFormat
 		    });
 
 		    if (settings.curveFitting) {
