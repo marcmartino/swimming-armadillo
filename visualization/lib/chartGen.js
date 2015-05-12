@@ -9,7 +9,7 @@ var drawGen = function (settings) {
     var drawDataTemp;
     var drawFunc = (drawData) => {
 	var yFreq = [];
-	var thisYScale = drawData.yScale.domain(getYMinMax(remoteData));
+	var thisYScale = drawData.yScale.domain(settings.invertedY ? getYMinMax(remoteData).reverse() : getYMinMax(remoteData));
 	
 	debugObj("drawing " + settings.name + " data points");
 	drawData.svg.append("g")
@@ -25,7 +25,7 @@ var drawGen = function (settings) {
 	    .attr("cy", function (d, i) {
 		var fatVal = d['Units'] || 0;
 		var intFat = parseInt(fatVal, 10);
-		
+
 		yFreq[intFat] = yFreq[intFat] ? yFreq[intFat] + 1 : 1;
    		return thisYScale(d['Units']  || 0);
    	    })

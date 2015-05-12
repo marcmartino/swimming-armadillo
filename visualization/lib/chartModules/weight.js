@@ -11,5 +11,6 @@ var generatedMod = drawGen.func({
     dataUri: url,
     curveFitting: true,
     pointColor: "green",
+    invertedY: true
 });
 export default generatedMod;
