@@ -5,7 +5,7 @@
         <div class="large-12 columns">
 
             <div class="panel callout radius">
-                <p>Select the data you would like to visualize by clicking on the items below.</p>
+                <p>Select two measurement types to find the correlation efficient.</p>
             </div>
 
             <p>In order to get the most out of HappyStats, authorize as many wearables as possible here:
@@ -35,7 +35,7 @@
                 queryString += "&end=" + endDate;
             }
             if (queryString !== '?measure=') {
-                location.replace("{{ path('graph_measurement_type') }}" + queryString);
+                location.replace("{{ path('correlatorcalc') }}" + queryString);
             }
         });
     </script>

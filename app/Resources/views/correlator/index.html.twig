@@ -3,14 +3,23 @@
 <div class="center row">
     <div class="large-12 columns">
         <div class="panel callout radius">
-            <p>See correlation between weight and bodyfat.</p>
+            <p>The correlation between {{ measurementType1.name }} and {{ measurementType2.name }} is
+                <b>{{ correlationEnglish }}</b>.</p>
+        </div>
+        <div class="panel radius">
+            <p>We use a modified version of
+                <a href="http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient">
+                    Pearson's Correlation Coefficient
+                </a>
+                to determine the correlation between the two sets of data.
+            </p>
         </div>
         <div>
             <p>Start: {{ start|date('Y-m-d H:i:s') }}</p>
             <p>End: {{ end|date('Y-m-d H:i:s') }}</p>
             <p>Correlation: {{ correlation }}</p>
-            <p>Weight Dataset: {{ dump(weight_data) }}</p>
-            <p>Bodyfat Dataset: {{ dump(bodyfat_data) }}</p>
+            <p>{{ measurementType1.name }} Dataset: {{ dump(weight_data) }}</p>
+            <p>{{ measurementType2.name }} Dataset: {{ dump(bodyfat_data) }}</p>
         </div>
     </div>
 </div>

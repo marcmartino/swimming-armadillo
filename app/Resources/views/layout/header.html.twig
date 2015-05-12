@@ -13,7 +13,7 @@
             <li{% if app.request.attributes.get('_route') == 'graph' %} class="active"{% endif %}><a href="{{ path('graph') }}">Graphs</a></li>
         </ul>
         <ul class="left">
-            <li{% if app.request.attributes.get('_route') == 'correlatorindex' %} class="active"{% endif %}><a href="{{ path('correlatorindex') }}">Correlator</a></li>
+            <li{% if app.request.attributes.get('_route') == 'correlator' %} class="active"{% endif %}><a href="{{ path('correlator') }}">Correlator</a></li>
         </ul>
     </section>
 </nav>
