@@ -3,16 +3,18 @@
         <li class="name">
             <h1><a href="{{ path('homepage') }}">HappyStats</a></h1>
         </li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
     </ul>
 
+
     <section class="top-bar-section">
-        <ul class="left">
+        <ul class="right">
             <li{% if app.request.attributes.get('_route') == 'abtestindex' %} class="active"{% endif %}><a href="{{ path('abtestindex') }}">A/B Tests</a></li>
         </ul>
-        <ul class="left">
+        <ul class="right">
             <li{% if app.request.attributes.get('_route') == 'graph' %} class="active"{% endif %}><a href="{{ path('graph') }}">Graphs</a></li>
         </ul>
-        <ul class="left">
+        <ul class="right">
             <li{% if app.request.attributes.get('_route') == 'correlator' %} class="active"{% endif %}><a href="{{ path('correlator') }}">Correlator</a></li>
         </ul>
     </section>
