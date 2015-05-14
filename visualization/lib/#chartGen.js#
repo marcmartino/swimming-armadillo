@@ -132,7 +132,6 @@ var drawGen = function (settings) {
 		    if (settings.filterFunc) {
 			remoteData = _.filter(remoteData, settings.filterFunc);
 		    }
-		    console.log(remoteData);
 		    resolve({
 			chart: drawFunc,
 			xScale: getXMinMax(remoteData),
