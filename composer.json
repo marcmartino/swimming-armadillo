@@ -27,7 +27,13 @@
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
-        "phpunit/phpunit": "4.3.*"
+        "phpunit/phpunit": "4.3.*",
+        "squizlabs/php_codesniffer": "dev-master",
+        "phpmd/phpmd": "dev-master",
+        "sebastian/phpcpd": "dev-master",
+        "pdepend/pdepend": "2.0.*",
+        "phploc/phploc": "dev-master",
+        "theseer/phpdox": "dev-master"
     },
     "scripts": {
         "post-root-package-install": [
