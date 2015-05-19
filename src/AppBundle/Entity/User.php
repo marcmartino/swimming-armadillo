@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 
@@ -19,9 +20,30 @@ class User extends BaseUser
      */
     protected $id;
 
+    /**
+     * @ORM\OneToMany(targetEntity="MeasurementEvent", mappedBy="user")
+     **/
+    private $measurementEvents;
+
     public function __construct()
     {
         parent::__construct();
-        // your own logic
+        $this->measurementEvents = new ArrayCollection();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMeasurementEvents()
+    {
+        return $this->measurementEvents;
+    }
+
+    /**
+     * @param mixed $measurementEvents
+     */
+    public function setMeasurementEvents($measurementEvents)
+    {
+        $this->measurementEvents = $measurementEvents;
     }
 }

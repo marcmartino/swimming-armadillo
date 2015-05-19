@@ -5,6 +5,7 @@ use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\ApiParser\FitbitBodyFat;
 use AppBundle\ApiParser\FitbitFood;
 use AppBundle\ApiParser\FitbitWeight;
+use AppBundle\Entity\User;
 use DateTime;
 use OAuth\ServiceFactory;
 use Doctrine\ORM\EntityManager;
@@ -43,9 +44,11 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
 
     public function __construct(
         ContainerInterface $container,
-        EntityManager $em
+        EntityManager $em,
+        User $user
     )
     {
+        parent::__construct($container, $em, $user);
         $this->container = $container;
         $this->storage = $this->container->get('token_storage_session');
 
@@ -115,6 +118,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
             foreach ($fitbitResults['measurement_events'] as $measurementEvent) {
                 $measurementEvent->setEventTime($dateFrom);
                 $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+                $measurementEvent->setUser($this->getUser());
                 $this->em->persist($measurementEvent);
             }
 
@@ -131,6 +135,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         /** @var MeasurementEvent $measurementEvent */
         foreach ($bodyfatResults['measurement_events'] as $measurementEvent) {
             $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }
     }
@@ -145,6 +150,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         /** @var MeasurementEvent $measurementEvent */
         foreach ($weightResults['measurement_events'] as $measurementEvent) {
             $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }
     }

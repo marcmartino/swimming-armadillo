@@ -6,6 +6,7 @@ use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\MeasurementType as MeasurementTypeService;
 use AppBundle\Entity\UnitType as UnitTypeService;
+use AppBundle\Entity\User;
 use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
@@ -41,10 +42,12 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
     /**
      * @param ContainerInterface $container
+     * @param EntityManager $em
+     * @param User $user
      */
-    public function __construct(ContainerInterface $container, EntityManager $em)
+    public function __construct(ContainerInterface $container, EntityManager $em, User $user)
     {
-        parent::__construct($container, $em);
+        parent::__construct($container, $em, $user);
         $this->container = $container;
         $this->storage = $this->container->get('token_storage_session');
 
