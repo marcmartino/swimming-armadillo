@@ -28,13 +28,11 @@ class ProviderApiAdapterFactory
     /**
      * @param Container $container
      * @param EntityManager $em
-     * @param User $user
      */
-    public function __construct(Container $container, EntityManager $em, User $user)
+    public function __construct(Container $container, EntityManager $em)
     {
         $this->container = $container;
         $this->em = $em;
-        $this->user = $user;
     }
 
     /**
@@ -45,5 +43,21 @@ class ProviderApiAdapterFactory
     {
         $fullyQualifiedName = "AppBundle\\ApiAdapter\\Provider\\" . ucfirst($providerSlug) . "ApiAdapter";
         return new $fullyQualifiedName($this->container, $this->em, $this->user);
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 }

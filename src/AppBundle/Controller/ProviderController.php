@@ -34,6 +34,7 @@ class ProviderController extends Controller
     {
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
+        $factory->setUser($this->getUser());
         $apiAdapter = $factory->getApiAdapter($providerSlug);
         return new RedirectResponse((string) $apiAdapter->getAuthorizationUri());
     }
@@ -45,6 +46,7 @@ class ProviderController extends Controller
     {
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
+        $factory->setUser($this->getUser());
         $apiAdapter = $factory->getApiAdapter($providerSlug);
 
         // Handle the callback (store oauth token, ..., ...)
@@ -63,6 +65,7 @@ class ProviderController extends Controller
     {
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
+        $factory->setUser($this->getUser());
         $apiAdapter = $factory->getApiAdapter($providerSlug);
         var_dump($apiAdapter->consumeData()); exit;
     }
