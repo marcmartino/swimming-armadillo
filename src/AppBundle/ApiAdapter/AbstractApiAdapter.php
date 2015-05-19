@@ -5,6 +5,7 @@ use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
 abstract class AbstractApiAdapter {
