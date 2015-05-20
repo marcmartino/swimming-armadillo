@@ -32,4 +32,14 @@ modules.fatratio = function () {
     });
 };
 
+modules.unknown = function (name) {
+    console.log("unspecifiedd module being run");
+    return drawGen({
+	name: name,
+	domClass: name + "Plot",
+	dataUri: "/userdata/" + name,
+	curveFitting: true
+    });
+};
+
 export default modules;

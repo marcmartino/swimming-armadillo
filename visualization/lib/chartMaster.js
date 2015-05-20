@@ -120,10 +120,9 @@ import modules from './modDefs';
 console.log(modules);
 
 getParameterByName("measure").split("-").forEach(function (dataMod) {
-
-    console.warn(modules[dataMod]);
-    if (typeof modules[dataMod] === "function") {
-	modules[dataMod]().prom.then(function (result) {
+    var modObj = (typeof modules[dataMod] === "function") ? modules[dataMod]() : modules.unknown(dataMod);
+    if (modObj) {
+	    modObj.prom.then(function (result) {
 	    
 	    console.log("promise success");
 	    console.log(result);
@@ -134,6 +133,9 @@ getParameterByName("measure").split("-").forEach(function (dataMod) {
 	    console.log("promise err");
 	    console.log(err);
 	});
+    }
+    else {
+	
     }
 });
 
