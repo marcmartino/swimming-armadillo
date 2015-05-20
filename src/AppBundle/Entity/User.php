@@ -22,6 +22,7 @@ class User extends BaseUser
 
     /**
      * @ORM\OneToMany(targetEntity="MeasurementEvent", mappedBy="user")
+     * @var MeasurementEvent[]
      **/
     private $measurementEvents;
 

@@ -38,6 +38,7 @@ class MeasurementEvent
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="measurementEvents")
+     * @var User
      */
     private $user;
 
