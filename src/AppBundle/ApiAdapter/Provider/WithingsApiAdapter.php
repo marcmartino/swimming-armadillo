@@ -82,7 +82,8 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($results['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setProviderId($this->getServiceProvider()->getId())
+                ->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }
 

@@ -92,7 +92,8 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
             $measurementEventObj = new MeasurementEvent();
             $eventTime = new \DateTime($measurementEvent['event_time']);
             $measurementEventObj->setEventTime($eventTime)
-                ->setProviderId($this->getServiceProvider()->getId());
+                ->setProviderId($this->getServiceProvider()->getId())
+                ->setUser($this->getUser());
             $this->em->persist($measurementEventObj);
 
             $measurement = $measurementEvent['measurements'];
