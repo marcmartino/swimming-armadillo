@@ -7,6 +7,7 @@ use AppBundle\ApiParser\Withings\BodyMeasurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\ServiceProvider;
+use AppBundle\Entity\User;
 use AppBundle\Provider\Providers;
 use Doctrine\ORM\EntityManager;
 use OAuth\ServiceFactory;
@@ -15,6 +16,7 @@ use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Service\ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
 /**
@@ -32,10 +34,11 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
      * @param Container $container
      */
     public function __construct(
-        Container $container,
-        EntityManager $em
+        ContainerInterface $container,
+        EntityManager $em,
+        User $user
     ) {
-        parent::__construct($container, $em);
+        parent::__construct($container, $em, $user);
         $this->storage = $this->container->get('token_storage_session');;
 
         $this->service = $this->createWithingsService();
@@ -79,7 +82,8 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($results['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setProviderId($this->getServiceProvider()->getId())
+                ->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }
 

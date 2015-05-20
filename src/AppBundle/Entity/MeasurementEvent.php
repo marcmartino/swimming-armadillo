@@ -36,6 +36,11 @@ class MeasurementEvent
      */
     private $providerId;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="measurementEvents")
+     * @var User
+     */
+    private $user;
 
     /**
      * Get id
@@ -108,6 +113,22 @@ class MeasurementEvent
             ->setProviderId($providerId);
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 }
 

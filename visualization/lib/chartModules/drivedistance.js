@@ -11,6 +11,10 @@ var generatedMod = drawGen.func({
     dataUri: url,
     curveFitting: true,
     pointColor: "blue",
-    curveColor: "blue"
+    curveColor: "blue",
+    invertedY: true,
+    yFormat: function (d) {
+        return (d * 0.000621371).toFixed(1) + "mi";
+    }
 });
 export default generatedMod;

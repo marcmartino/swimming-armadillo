@@ -2,8 +2,10 @@
 namespace AppBundle\ApiAdapter;
 
 use AppBundle\Entity\OAuthAccessToken;
+use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
 abstract class AbstractApiAdapter {
@@ -16,20 +18,25 @@ abstract class AbstractApiAdapter {
      * @var \OAuth\OAuth1\Service\AbstractService
      */
     protected $service;
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
+
+    /** @var User */
+    protected $user;
 
     /**
      * @param Container $container
+     * @param EntityManager $em
+     * @param User $user
      */
     public function __construct(
-        Container $container,
-        EntityManager $em
+        ContainerInterface $container,
+        EntityManager $em,
+        User $user
     ) {
         $this->container = $container;
         $this->em = $em;
+        $this->user = $user;
     }
 
     /**
@@ -67,6 +74,22 @@ abstract class AbstractApiAdapter {
         }
 
         return $oauthToken;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 
 }

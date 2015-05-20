@@ -7,7 +7,6 @@
             height: 300px;
             margin-left: auto;
             margin-right: auto;
-            margin-top: 5%;
             max-width: 500px;
         }
 
@@ -48,7 +47,6 @@
     <div class="center row">
         <div class="section-container tabs" data-section="tabs">
             <section>
-                <p class="title" data-section-title><a href="#">Sign In</a></p>
                 <div class="content" data-section-content>
                     <p>
                     <div class="row">
@@ -67,7 +65,7 @@
                                             <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
                                         </div>
                                     </div>
-                                    <input type="submit" id="_submit" name="_submit" class="button" value="{{ 'Submit'|trans }}">
+                                    <input type="submit" id="_submit" name="_submit" class="button" value="{{ 'Login'|trans }}">
                                 </form>
                             </div>
                         </div>
@@ -75,6 +73,8 @@
                 </div>
             </section>
         </div>
+        <div style="text-align:center">
+            <a href="{{ path('fos_user_registration_register') }}" class="button">{{ 'Sign Up Here'|trans }}</a>
+        </div>
     <div>
-    <a href="{{ path('fos_user_registration_register') }}">Register</a>
 {% endblock %}

@@ -8,7 +8,6 @@
             height: 300px;
             margin-left: auto;
             margin-right: auto;
-            margin-top: 5%;
             max-width: 500px;
         }
 
@@ -50,7 +49,6 @@
 <div class="center row">
     <div class="section-container tabs" data-section="tabs">
         <section>
-            <p class="title" data-section-title><a href="#">Sign In</a></p>
             <div class="content" data-section-content>
                 <p>
                 <div class="row">
@@ -69,7 +67,9 @@
             </div>
         </section>
     </div>
-    <div>
-    <a href="{{ path('homepage') }}">Login</a>
+    <div style="text-align:center">
+        <a href="{{ path('homepage') }}" class="button">{{ 'Existing Users: Login Here'|trans }}</a>
+    </div>
+<div>
 
 {% endblock body %}

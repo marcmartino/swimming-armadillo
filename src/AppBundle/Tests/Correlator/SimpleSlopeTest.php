@@ -9,22 +9,22 @@ class SimpleSlopeTest extends PHPUnit_Framework_TestCase {
 
         $dataSet1 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '1'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '3'
             ]
         ];
 
         $dataSet2 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '3'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '1'
             ]
         ];
@@ -37,22 +37,22 @@ class SimpleSlopeTest extends PHPUnit_Framework_TestCase {
 
         $dataSet1 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '1'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '5'
             ]
         ];
 
         $dataSet2 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '1'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '5'
             ]
         ];
@@ -66,22 +66,22 @@ class SimpleSlopeTest extends PHPUnit_Framework_TestCase {
 
         $dataSet1 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '1'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '9'
             ]
         ];
 
         $dataSet2 = [
             [
-                'timestamp' => '1429479465',
+                'timestamp' => (new \DateTime)->setTimestamp('1429479465'),
                 'units' => '1'
             ],
             [
-                'timestamp' => '1432071465',
+                'timestamp' => (new \DateTime)->setTimestamp('1432071465'),
                 'units' => '5'
             ]
         ];

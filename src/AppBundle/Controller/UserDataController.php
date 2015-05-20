@@ -35,7 +35,7 @@ class UserDataController extends Controller
             $endDate = new \DateTime($endDate);
         }
 
-        foreach ($userData->getUserData($measurementType->getId(0), $startDate, $endDate) as $measurementEvent) {
+        foreach ($userData->getUserData($measurementType->getId(0), $this->getUser()->getId(), $startDate, $endDate) as $measurementEvent) {
 
             $dateTime = new \DateTime($measurementEvent['event_time']);
 

@@ -44,7 +44,7 @@ class FOSUserBundleRegistrationCompleted
             $message = [
                 'subject' => 'Welcome to hdlbit!',
                 'text' => 'html',
-                'from_email' => 'hello@hdlbit.com',
+                'from_email' => 'hello@happystats.io',
                 'to' => [
                     [
                         'email' => $user->getEmail()
