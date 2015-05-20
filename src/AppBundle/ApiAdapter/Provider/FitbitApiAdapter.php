@@ -85,21 +85,12 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         $userOauthToken = $this->getUserOauthToken();
 
         // Consume data for the last day (should be changed)
-        $date = new \DateTime;
-        $date = new \DateTime($date->format('Y-m-d'));
-        $date->modify('-1 week');
+        $from = $this->getStartConsumeDateTime();
+        $to = new DateTime;
 
         // We have to fetch food results with one request per day
-        $this->consumeFood($date, (new DateTime));
-
-        // Fetch a months worth of body fat
-        $from = (new DateTime)->modify('-1 month');
-        $to = (new DateTime);
+        $this->consumeFood($from, $to);
         $this->consumeBodyFat($from, $to);
-
-        // Fetch a months worth of weight
-        $from = (new DateTime)->modify('-1 month');
-        $to = (new DateTime);
         $this->consumeWeight($from, $to);
 
         $this->em->flush();

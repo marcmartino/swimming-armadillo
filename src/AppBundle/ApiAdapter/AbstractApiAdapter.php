@@ -1,17 +1,17 @@
 <?php
 namespace AppBundle\ApiAdapter;
 
-use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use AppBundle\Entity\OAuthAccessToken;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractApiAdapter {
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     protected $container;
     /**
@@ -25,7 +25,7 @@ abstract class AbstractApiAdapter {
     protected $user;
 
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
      * @param EntityManager $em
      * @param User $user
      */
@@ -51,6 +51,48 @@ abstract class AbstractApiAdapter {
     public function getService()
     {
         return $this->service;
+    }
+
+    /**
+     * Get the date and time to start consuming a service provider's api
+     *
+     * @return DateTime
+     */
+    public function getStartConsumeDateTime()
+    {
+        if($dateTime = $this->getLastMeasurementEventDateTime()) {
+            return $dateTime;
+        }
+        return $this->getDefaultConsumeDateTime();
+    }
+
+    /**
+     * Get date and time of the most recent data we have for this service provider
+     *
+     * @return bool|\DateTime
+     */
+    public function getLastMeasurementEventDateTime()
+    {
+        $measurementEventRepo = $this->em->getRepository('MeasurementEvent');
+        /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
+        $lastMeasurementEvent = $measurementEventRepo->findOneBy(
+            ['user' => $this->getUser(), 'serviceProviderId' => $this->getServiceProvider()->getId()],
+            ['event_time' => 'DESC']
+        );
+        if (!empty($lastMeasurementEvent)) {
+            return false;
+        }
+        return $lastMeasurementEvent->getEventTime();
+    }
+
+    /**
+     * Returns default start time for consuming provider apis, override if necessary
+     *
+     * @return DateTime
+     */
+    public function getDefaultConsumeDateTime()
+    {
+        return (new DateTime)->modify('-1 week');
     }
 
     /**
