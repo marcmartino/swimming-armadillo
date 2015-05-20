@@ -14,7 +14,7 @@ var generatedMod = drawGen.func({
     curveColor: "blue",
     invertedY: true,
     yFormat: function (d) {
-        return d * 0.000621371 + "mi";
+        return (d * 0.000621371).toFixed(1) + "mi";
     }
 });
 export default generatedMod;
