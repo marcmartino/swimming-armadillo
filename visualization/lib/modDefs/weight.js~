@@ -1,0 +1,18 @@
+function () {
+    console.log("module weight running");
+
+    var generatedMod = drawGen.func({
+	name: "weight",
+	domClass: "weightPlot",
+	dataUri: "/userdata/weight",
+	curveFitting: true,
+	pointColor: "green",
+	invertedY: true,
+	yFormat: function (d) {
+	    //console.log("y format running");
+	    //console.log(d);
+	    return d/1000 + "kg";
+	}
+    });
+    return generatedMod;
+}

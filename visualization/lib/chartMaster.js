@@ -102,7 +102,7 @@ function resize() {
 }
 
 
-function convertGetParams(imports) {
+/*function convertGetParams(imports) {
     var measures = getParameterByName("measure");
 
     return measures.split("-").map(function (measureName) {
@@ -112,27 +112,18 @@ function convertGetParams(imports) {
     });
 }
 
-d3.select(window).on('resize', resize);
+d3.select(window).on('resize', resize);*/
 
 
-import withingsBf from './chartModules/withingsBf';
-import weight from './chartModules/weight';
-import drivedistance from './chartModules/drivedistance';
-import drivetime from './chartModules/drivetime';
-import fatratio from './chartModules/fatratio';
-//import heartrate from './chartModules/heartrate';
 
-var dataMods = convertGetParams({
-    weight: weight,
-    withingsBf: withingsBf,
-    drivetime: drivetime,
-    drivedistance: drivedistance,
-    fatratio: fatratio
-});
+import modules from './modDefs';
+console.log(modules);
 
-dataMods.forEach(function (dataMod) {
-    if (dataMod) {
-	dataMod.prom.then(function (result) {
+getParameterByName("measure").split("-").forEach(function (dataMod) {
+
+    console.warn(modules[dataMod]);
+    if (typeof modules[dataMod] === "function") {
+	modules[dataMod]().prom.then(function (result) {
 	    
 	    console.log("promise success");
 	    console.log(result);
@@ -145,3 +136,5 @@ dataMods.forEach(function (dataMod) {
 	});
     }
 });
+
+
