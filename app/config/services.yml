@@ -89,3 +89,12 @@ services:
         arguments: ["@service_container", "@router"]
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed, method: processEvent }
+
+
+    # Form
+    acme_user.registration.form.type:
+        class: AppBundle\Form\Type\RegistrationFormType
+        arguments:
+          - 'AppBundle\Entity\User'
+        tags:
+            - { name: form.type, alias: happystats_user_registration }
