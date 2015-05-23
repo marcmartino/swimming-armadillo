@@ -36,6 +36,12 @@ class User extends BaseUser
     protected $name;
 
     /**
+     * @ORM\ManyToOne(targetEntity="RegistrationCode")
+     * @ORM\JoinColumn(name="registrationcode_id", referencedColumnName="id")
+     **/
+    protected $registrationCode;
+
+    /**
      * @ORM\OneToMany(targetEntity="MeasurementEvent", mappedBy="user")
      * @var MeasurementEvent[]
      **/
@@ -89,5 +95,21 @@ class User extends BaseUser
         $email = is_null($email) ? '' : $email;
         parent::setEmail($email);
         $this->setUsername($email);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegistrationCode()
+    {
+        return $this->registrationCode;
+    }
+
+    /**
+     * @param mixed $registrationCode
+     */
+    public function setRegistrationCode($registrationCode)
+    {
+        $this->registrationCode = $registrationCode;
     }
 }

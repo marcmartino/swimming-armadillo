@@ -28,7 +28,6 @@ class RegistrationFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->remove('username');
         $builder
             ->add('name', null, [ 'attr' => ['placeholder' => 'Name']])
             ->add('email', 'email', [
@@ -38,14 +37,20 @@ class RegistrationFormType extends AbstractType
                     'placeholder' => 'Email'
                 ]
             ])
-            ->add('plainPassword', null, [
+            ->add('plainPassword', 'password', [
                 'label' => 'form.password',
                 'translation_domain' => 'FOSUserBundle',
                 'attr' => [
                     'placeholder' => 'Password'
                 ]
-            ]);
-        ;
+            ])
+            ->add('registrationCodeCode', 'text', [
+                    'mapped' => false,
+                    'attr' => [
+                        'placeholder' => 'Registration Code'
+                    ]
+                ]
+            );
     }
 
     /**

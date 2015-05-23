@@ -48,4 +48,12 @@ class RegistrationCode
     {
         $this->code = $code;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getCode();
+    }
 } 

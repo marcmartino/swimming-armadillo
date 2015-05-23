@@ -84,11 +84,17 @@ services:
 
 
     # Event Listeners
-    kernel.listener.your_listener_name:
+    event.listener.registration_completed:
         class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted
         arguments: ["@service_container", "@router"]
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed, method: processEvent }
+
+    event.listener.registration_initialized:
+        class: AppBundle\EventListener\FOSUserBundleRegistrationInitialized
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize, method: processEvent }
 
 
     # Form

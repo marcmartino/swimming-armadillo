@@ -1,23 +1,25 @@
 <?php
 namespace AppBundle\EventListener;
+
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Event\UserEvent;
-use FOS\UserBundle\FOSUserEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class FOSUserBundleRegistrationInitialized
  * @package AppBundle\EventListener
  */
-class FOSUserBundleRegistrationInitialized implements EventSubscriberInterface
-{
+class FOSUserBundleRegistrationInitialized {
+
+    /** @var EntityManagerInterface */
+    protected $em;
+
     /**
-     * @return array
+     * @param EntityManagerInterface $em
      */
-    public static function getSubscribedEvents()
-    {
-        return [
-            FOSUserEvents::REGISTRATION_INITIALIZE => 'processEvent'
-        ];
+    public function __construct(
+        EntityManagerInterface $em
+    ) {
+        $this->em = $em;
     }
 
     /**
@@ -25,8 +27,14 @@ class FOSUserBundleRegistrationInitialized implements EventSubscriberInterface
      */
     public function processEvent(UserEvent $event)
     {
-        /** @var AppBundle\Entity\User $user */
-        $user = $event->getRequest()->getUser();
-        echo $user->getName(); exit;
+        $request = $event->getRequest();
+        $formFields = $request->get('fos_user_registration_form');
+        $registrationCode = $this->em->getRepository('AppBundle:RegistrationCode')
+            ->findOneBy(['code' => $formFields['registrationCodeCode']]);
+        if (!empty($registrationCode)) {
+            $event->getUser()->setRegistrationCode($registrationCode);
+        } else {
+            // TODO Handle lock
+        }
     }
 }
