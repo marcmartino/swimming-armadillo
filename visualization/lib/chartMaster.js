@@ -30,15 +30,15 @@ function redrawChart(svgData, xChartFunc) {
 	
 	drawData.xAxis = d3.svg.axis()
 	    .orient("bottom");
-        //.ticks(parseInt(svgData.w / 75, 10));
+
 	drawData.yAxis = d3.svg.axis()
     	    .orient("left")
     	    .ticks(5);
-	console.log("looking to use yform");
-	console.log(xChartFunc);
+	// console.log("looking to use yform");
+	// console.log(xChartFunc);
 	
 	if ('yFormat' in xChartFunc) {
-	    console.warn("using yformat");
+	    //console.warn("using yformat");
     	    drawData.yAxis.tickFormat(xChartFunc.yFormat);
 	}
 	
@@ -49,7 +49,7 @@ function redrawChart(svgData, xChartFunc) {
 	drawData.yScale = d3.scale.linear()
 	    .range([0 + svgData.chartPadding, svgData.h - svgData.chartPadding]);
 	
-	drawData.legend = $("#legend"); //drawData.svg.append("g.legend");
+	drawData.legend = $("#legend");
 	createLegendGroups(drawData.legend, xChartFunc.name);
 	
 	drawData.xAxis.scale(drawData.xScale);
@@ -68,7 +68,6 @@ function redrawChart(svgData, xChartFunc) {
 	    .attr("class", "yAxis")
 	    .call(drawData.yAxis);
 	
-	//console.log(window.parent);
 	if (window.parent) {
 	    window.parent.postMessage("rendered", '*');
 	}
@@ -117,15 +116,14 @@ d3.select(window).on('resize', resize);*/
 
 
 import modules from './modDefs';
-console.log(modules);
+//console.log(modules);
 
 getParameterByName("measure").split("-").forEach(function (dataMod) {
     var modObj = (typeof modules[dataMod] === "function") ? modules[dataMod]() : modules.unknown(dataMod);
     if (modObj) {
-	    modObj.prom.then(function (result) {
-	    
+	modObj.prom.then(function (result) {
 	    console.log("promise success");
-	    console.log(result);
+	    //console.log(result);
 	    if (result) {
 		redrawChart(svgData, result);
 	    }

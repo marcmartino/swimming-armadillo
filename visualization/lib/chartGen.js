@@ -111,7 +111,14 @@ var drawGen = function (settings) {
     var fatAccessor  = settings.dataAccessor || ((el) => {
 	return el['Units'];
     });
-    function getYMinMax (data) {   
+    function getYMinMax (data) { 
+	console.log(_.reduce(data, (total, curr) => {
+	    if (total < curr.Units || total === undefined) {
+		return curr.Units;
+	    }
+	    return total;
+	}, undefined));
+	console.log([d3.min(data, fatAccessor), d3.max(data, fatAccessor)]);
 	return [d3.min(data, fatAccessor), d3.max(data, fatAccessor)];
     };
     //export default  {
