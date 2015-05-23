@@ -50,25 +50,37 @@
     <div class="section-container tabs" data-section="tabs">
         <section>
             <div class="content" data-section-content>
-                <p>
                 <div class="row">
                     <div class="large-12 columns">
+                        <h2 class="text-center">Welcome to HappyStats!</h2>
+                        <div class="panel callout radius">
+                            <p>Fill out the fields below to sign up. Ask around for a beta code or register without
+                            one to join the waiting list.</p>
+                        </div>
                         <div class="signup-panel">
-                            <p class="welcome">Welcome back!</p>
                             <form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
-                                {{ form_widget(form) }}
+
+                                <div>
+                                    {{ form_errors(form.name) }}
+                                    {{ form_widget(form.name) }}
+                                    {{ form_errors(form.email) }}
+                                    {{ form_widget(form.email) }}
+                                    {{ form_errors(form.plainPassword) }}
+                                    {{ form_widget(form.plainPassword, { 'attr': { 'placeholder': 'Password'}}) }}
+                                </div>
+                                {#{{ form_widget(form) }}#}
                                 <div>
                                     <input type="submit" class="button" value="{{ 'Submit'|trans }}" />
                                 </div>
                             </form>
                         </div>
                     </div>
-                </div></p>
+                </div>
             </div>
         </section>
     </div>
-    <div style="text-align:center">
-        <a href="{{ path('homepage') }}" class="button">{{ 'Existing Users: Login Here'|trans }}</a>
+    <div class="panel radius">
+        <a href="{{ path('homepage') }}">{{ 'Existing Users: Login Here'|trans }}</a>
     </div>
 <div>
 

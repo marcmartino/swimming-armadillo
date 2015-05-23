@@ -5,7 +5,8 @@ imports:
 
 framework:
     #esi:             ~
-    #translator:      { fallback: "%locale%" }
+    translator:
+      enabled: true
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -16,7 +17,7 @@ framework:
     templating:
         engines: ['twig']
         #assets_version: SomeVersionScheme
-    default_locale:  "%locale%"
+    default_locale:  en
     trusted_hosts:   ~
     trusted_proxies: ~
     session:
@@ -77,6 +78,14 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: AppBundle\Entity\User
+    registration:
+        form:
+            type: happystats_user_registration
+            validation_groups: [HappyStatsAcmeRegistration]
+    profile:
+        form:
+            type: happystats_user_registration
+            validation_groups: [HappyStatsRegistration]
 # Enable if we desire email confirmation
 #    registration:
 #        confirmation:
