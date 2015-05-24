@@ -73,13 +73,13 @@ abstract class AbstractApiAdapter {
      */
     public function getLastMeasurementEventDateTime()
     {
-        $measurementEventRepo = $this->em->getRepository('MeasurementEvent');
+        $measurementEventRepo = $this->em->getRepository('AppBundle:MeasurementEvent');
         /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
         $lastMeasurementEvent = $measurementEventRepo->findOneBy(
-            ['user' => $this->getUser(), 'serviceProviderId' => $this->getServiceProvider()->getId()],
-            ['event_time' => 'DESC']
+            ['user' => $this->getUser(), 'providerId' => $this->getServiceProvider()->getId()],
+            ['eventTime' => 'DESC']
         );
-        if (!empty($lastMeasurementEvent)) {
+        if (empty($lastMeasurementEvent)) {
             return false;
         }
         return $lastMeasurementEvent->getEventTime();
@@ -92,7 +92,7 @@ abstract class AbstractApiAdapter {
      */
     public function getDefaultConsumeDateTime()
     {
-        return (new DateTime)->modify('-1 week');
+        return (new DateTime)->modify('-1 month');
     }
 
     /**
