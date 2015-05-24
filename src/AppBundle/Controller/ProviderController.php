@@ -1,12 +1,12 @@
 <?php
 namespace AppBundle\Controller;
 
-
-use AppBundle\Entity\Provider;
 use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
+use OAuth\Common\Exception\Exception as OAuthException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ProviderController
@@ -67,6 +67,14 @@ class ProviderController extends Controller
         $factory = $this->get('api_adapter_factory');
         $factory->setUser($this->getUser());
         $apiAdapter = $factory->getApiAdapter($providerSlug);
-        var_dump($apiAdapter->consumeData()); exit;
+        try {
+            $apiAdapter->consumeData();
+        } catch (OAuthException $e) {
+            $logger = $this->get('logger');
+            $logger->error('Exception caught: (' . get_class($e) . ') ' . $e->getMessage() . ' - '
+                . $this->getUser()->getId());
+        }
+
+        return new Response();
     }
 }
