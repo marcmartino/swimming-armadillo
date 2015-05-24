@@ -74,15 +74,9 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
      */
     public function consumeData()
     {
-        /** @var MeasurementEvent $measurementEventService */
-        $measurementEventService = $this->container->get('entity.measurement_event');
-        /** @var Measurement $measurementService */
-        $measurementService = $this->container->get('entity.measurement');
-        /** @var MeasurementTypeService $measurementTypeService */
-        $measurementTypeService = $this->container->get('entity_measurement_type');
-
-        /** @var Provider $provider */
-        $provider = $this->container->get('entity_provider');
+        $oauthAccessToken = $this->getUserOauthToken();
+        $token = new StdOAuth2Token($oauthAccessToken->getToken());
+        $this->storage->storeAccessToken('AutomaticOAuth2', $token);
 
         $response = $this->getService()->request('/trips');
 

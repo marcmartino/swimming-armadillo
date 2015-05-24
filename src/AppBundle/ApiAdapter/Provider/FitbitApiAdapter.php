@@ -88,7 +88,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         $token = new StdOAuth1Token($userOauthToken->getToken());
         $token->setAccessTokenSecret($userOauthToken->getSecret());
         $this->storage->storeAccessToken('FitBit', $token);
-        
+
         // Consume data for the last day (should be changed)
         $from = $this->getStartConsumeDateTime();
         $to = new DateTime;

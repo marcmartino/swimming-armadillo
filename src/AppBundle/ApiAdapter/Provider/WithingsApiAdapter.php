@@ -10,6 +10,7 @@ use AppBundle\Entity\ServiceProvider;
 use AppBundle\Entity\User;
 use AppBundle\Provider\Providers;
 use Doctrine\ORM\EntityManager;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
 use OAuth\Common\Consumer\Credentials;
@@ -73,6 +74,11 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
     {
         // Ensure the user has authenticated with fitbit
         $userOauthToken = $this->getUserOauthToken();
+        // Ensure the user has authenticated with fitbit
+        $userOauthToken = $this->getUserOauthToken();
+        $token = new StdOAuth1Token($userOauthToken->getToken());
+        $token->setAccessTokenSecret($userOauthToken->getSecret());
+        $this->storage->storeAccessToken('WithingsOAuth', $token);
 
         $uri = 'measure?action=getmeas&userid=' . $userOauthToken->getForeignUserId();
 
