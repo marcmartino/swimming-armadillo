@@ -74,8 +74,6 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
     {
         // Ensure the user has authenticated with fitbit
         $userOauthToken = $this->getUserOauthToken();
-        // Ensure the user has authenticated with fitbit
-        $userOauthToken = $this->getUserOauthToken();
         $token = new StdOAuth1Token($userOauthToken->getToken());
         $token->setAccessTokenSecret($userOauthToken->getSecret());
         $this->storage->storeAccessToken('WithingsOAuth', $token);
