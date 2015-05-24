@@ -110,7 +110,7 @@ abstract class AbstractApiAdapter {
                 'userId' => $user,
                 'serviceProviderId' => $this->getServiceProvider()->getId()
             ]);
-
+        
         if (empty($oauthToken)) {
             throw new \Exception("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
         }

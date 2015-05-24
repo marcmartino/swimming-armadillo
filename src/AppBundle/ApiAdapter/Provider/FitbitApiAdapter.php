@@ -7,6 +7,8 @@ use AppBundle\ApiParser\FitbitFood;
 use AppBundle\ApiParser\FitbitWeight;
 use AppBundle\Entity\User;
 use DateTime;
+use OAuth\Common\Http\Client\CurlClient;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use Doctrine\ORM\EntityManager;
 use OAuth\OAuth1\Service\FitBit;
@@ -83,7 +85,10 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
     {
         // Ensure the user has authenticated with fitbit
         $userOauthToken = $this->getUserOauthToken();
-
+        $token = new StdOAuth1Token($userOauthToken->getToken());
+        $token->setAccessTokenSecret($userOauthToken->getSecret());
+        $this->storage->storeAccessToken('FitBit', $token);
+        
         // Consume data for the last day (should be changed)
         $from = $this->getStartConsumeDateTime();
         $to = new DateTime;
@@ -99,7 +104,6 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
     public function consumeFood(DateTime $dateFrom, DateTime $dateTo)
     {
         while ($dateFrom <= $dateTo) {
-
             $uri = '/user/-/foods/log/date/' . $dateFrom->format('Y-m-d') . '.json';
             $response = $this->getService()->request($uri);
 
