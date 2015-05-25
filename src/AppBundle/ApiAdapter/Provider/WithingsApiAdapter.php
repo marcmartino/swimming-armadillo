@@ -10,6 +10,7 @@ use AppBundle\Entity\ServiceProvider;
 use AppBundle\Entity\User;
 use AppBundle\Provider\Providers;
 use Doctrine\ORM\EntityManager;
+use OAuth\Common\Http\Client\CurlClient;
 use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\WithingsOAuth;
@@ -60,6 +61,8 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
         );
 
         $serviceFactory = new ServiceFactory();
+        $httpClient = new CurlClient();
+        $serviceFactory->setHttpClient($httpClient);
         $serviceFactory->registerService('WithingsOAuth', 'AppBundle\\OAuth\\WithingsOAuth');
 
         /** @var WithingsOAuth $withingsService */

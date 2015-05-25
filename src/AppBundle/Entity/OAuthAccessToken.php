@@ -56,6 +56,12 @@ class OAuthAccessToken
 
 
     /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="oauthAccessTokens")
+     * @var User
+     */
+    protected $user;
+
+    /**
      * Get id
      *
      * @return integer
@@ -114,30 +120,6 @@ class OAuthAccessToken
     }
 
     /**
-     * Set userId
-     *
-     * @param integer $userId
-     *
-     * @return OAuthAccessToken
-     */
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId
-     *
-     * @return integer
-     */
-    public function getUserId()
-    {
-        return $this->userId;
-    }
-
-    /**
      * Set foreignUserId
      *
      * @param string $foreignUserId
@@ -185,35 +167,21 @@ class OAuthAccessToken
         return $this->serviceProviderId;
     }
 
-    public function getUserOAuthAccessTokens($userId)
+    /**
+     * @return User
+     */
+    public function getUser()
     {
-//        $stmt = $this->conn->prepare("
-//            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
-//        ");
-//        $stmt->execute([':userId' => $userId]);
-//        return $stmt->fetchAll();
-        return [];
+        return $this->user;
     }
 
     /**
-     * @param $userId
-     * @param $providerId
-     * @param $foreignUserId
-     * @param $accessToken
-     * @param $accessTokenSecret
+     * @param User $user
+     * @return $this
      */
-    public function store(
-        $userId,
-        $providerId,
-        $foreignUserId,
-        $accessToken,
-        $accessTokenSecret
-    ) {
-        $this->setUserId($userId)
-            ->setServiceProviderId($providerId)
-            ->setForeignUserId($foreignUserId)
-            ->setToken($accessToken)
-            ->setSecret($accessTokenSecret);
+    public function setUser($user)
+    {
+        $this->user = $user;
 
         return $this;
     }

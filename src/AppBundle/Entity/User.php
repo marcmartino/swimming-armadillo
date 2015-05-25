@@ -47,6 +47,12 @@ class User extends BaseUser
      **/
     private $measurementEvents;
 
+    /**
+     * @ORM\OneToMany(targetEntity="OAuthAccessToken", mappedBy="user")
+     * @var OAuthAccessToken[]
+     **/
+    private $oauthAccessTokens;
+
     public function __construct()
     {
         parent::__construct();
@@ -111,5 +117,21 @@ class User extends BaseUser
     public function setRegistrationCode($registrationCode)
     {
         $this->registrationCode = $registrationCode;
+    }
+
+    /**
+     * @return OAuthAccessToken[]
+     */
+    public function getOauthAccessTokens()
+    {
+        return $this->oauthAccessTokens;
+    }
+
+    /**
+     * @param OAuthAccessToken[] $oauthAccessTokens
+     */
+    public function setOauthAccessTokens($oauthAccessTokens)
+    {
+        $this->oauthAccessTokens = $oauthAccessTokens;
     }
 }

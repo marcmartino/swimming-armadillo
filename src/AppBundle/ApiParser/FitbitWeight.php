@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\ApiParser;
 
+use AppBundle\ApiParser\Fitbit\AbstractFitbitApiParser;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\MeasurementType\MeasurementType;
@@ -10,7 +11,7 @@ use AppBundle\UnitType\UnitType;
  * Class FitbitWeight
  * @package AppBundle\ApiParser
  */
-class FitbitWeight extends AbstractEntityApiParser implements ApiParserInterface {
+class FitbitWeight extends AbstractFitbitApiParser implements ApiParserInterface {
 
     /**
      * Create objects/arrays from an api response body
@@ -20,6 +21,7 @@ class FitbitWeight extends AbstractEntityApiParser implements ApiParserInterface
      */
     public function parse($responseBody)
     {
+        $this->parseError($responseBody);
         $json = json_decode($responseBody, true);
 
         $results = [
