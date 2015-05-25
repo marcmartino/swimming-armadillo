@@ -117,7 +117,7 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUserId($securityContext->getToken()->getUser()->getId())
+            ->setUser($securityContext->getToken()->getUser())
             ->setServiceProviderId($this->getServiceProvider()->getId())
             ->setForeignUserId($_GET['userid'])
             ->setToken($accessToken->getAccessToken())

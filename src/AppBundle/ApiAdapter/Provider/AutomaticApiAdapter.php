@@ -130,7 +130,7 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUserId($securityContext->getToken()->getUser()->getId())
+            ->setUser($securityContext->getToken()->getUser())
             ->setServiceProviderId($this->getServiceProvider()->getId())
             ->setToken($accessToken->getAccessToken());
 
