@@ -1,7 +1,36 @@
 {% extends 'layout.html.twig' %}
 {% block body %}
-    Index!!
-{% for datum in data %}
-{{ dump(datum) }}
-{% endfor %}
+	<style type="text/css">
+	.daySummary {
+		
+		margin-bottom: 10px;
+	}
+	.daySummary > h1 {
+		margin: 0;
+	}
+	</style>
+
+	{% for dayString, dayData in data %}
+		<div class="daySummary row" >
+			<h1>{{ dayString|date("F jS") }}</h1>
+			{% for measurementInfo in dayData %}
+				<a class="dayMeasurement" 
+					href="/graph/measure?measure={{ measurementInfo.measurementObj.slug  }}" >
+					<div class="dayMeasurementLabel" >
+						{{ measurementInfo.measurementObj.name }}
+					</div>
+					<div class="dayMeasurements" >
+						{% for dayData in measurementInfo.data  %}
+							<div class="dayMeasure" >
+								<span class="units small-6 columns" >
+									{{ dayData.units }} {{ dayData.unit_type }}</span>
+								<span class="measureTime small-6 columns" >
+									{{ dayData.event_time|date("ga") }}</span>
+							</div>
+						{% endfor %}
+					</div>
+				</a>
+			{% endfor %}
+		</div>
+	{% endfor %}
 {% endblock %}
