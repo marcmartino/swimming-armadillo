@@ -11,6 +11,7 @@ modules.weight = function () {
 	dataUri: "/userdata/weight",
 	curveFitting: true,
 	pointColor: "green",
+    curveColor: "green",
 	invertedY: true,
 	yFormat: function (d) {
 	    return d/1000 + "kg";
@@ -25,6 +26,7 @@ modules.fatratio = function () {
 	dataUri: "/userdata/fatratio",
 	curveFitting: true,
 	pointColor: "pink",
+    curveColor: "pink",
 	invertedY: true,
 	filterFunc: function (datum) {
 	    return (parseInt(datum['Units'], 10) > 3);
