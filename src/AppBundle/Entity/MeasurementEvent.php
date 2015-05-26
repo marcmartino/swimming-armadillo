@@ -101,21 +101,6 @@ class MeasurementEvent
     }
 
     /**
-     * @param DateTime $eventTime
-     * @param $providerId
-     * @return int - the id of the newly created measurement_event
-     */
-    public function store(
-        DateTime $eventTime,
-        $providerId
-    ) {
-        $this->setEventTime($eventTime)
-            ->setProviderId($providerId);
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getUser()
