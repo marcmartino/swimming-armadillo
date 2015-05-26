@@ -8,7 +8,8 @@ modules.weight = function () {
 	domClass: "weightPlot",
 	dataUri: "/userdata/weight",
 	curveFitting: true,
-	pointColor: "green",
+    pointColor: "green",
+    curveColor: "green",
 	invertedY: true,
 	yFormat: function (d) {
 	    //console.log("y format running");
