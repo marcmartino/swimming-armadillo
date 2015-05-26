@@ -64,7 +64,7 @@ class LoginConsumeApis
         // TODO add unique key to user_id.service_provider_id in oauth_access_token table
         $serviceProviderSlugs = [];
         foreach ($accessTokens as $accessToken) {
-            $serviceProvider = $serviceProviderRepository->find($accessToken->getServiceProviderId());
+            $serviceProvider = $serviceProviderRepository->find($accessToken->getServiceProvider()->getId());
             if (!in_array($serviceProvider->getSlug(), $serviceProviderSlugs)) {
                 $apiAdapter = $this->providerApiAdapterFactory->getApiAdapter($serviceProvider->getSlug());
                 try {
