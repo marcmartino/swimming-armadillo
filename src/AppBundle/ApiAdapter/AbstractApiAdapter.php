@@ -103,12 +103,12 @@ abstract class AbstractApiAdapter {
     {
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('security.context');
-        $user = $securityContext->getToken()->getUser()->getId();
+        $user = $securityContext->getToken()->getUser();
 
         $oauthToken = $this->em->getRepository('AppBundle:OAuthAccessToken')
             ->findOneBy([
-                'userId' => $user,
-                'serviceProviderId' => $this->getServiceProvider()->getId()
+                'user' => $user,
+                'serviceProvider' => $this->getServiceProvider()
             ]);
         
         if (empty($oauthToken)) {

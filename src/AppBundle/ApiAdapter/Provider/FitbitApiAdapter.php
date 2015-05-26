@@ -168,7 +168,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
             ->setUser($securityContext->getToken()->getUser())
-            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken())
             ->setSecret($accessToken->getAccessTokenSecret());
 

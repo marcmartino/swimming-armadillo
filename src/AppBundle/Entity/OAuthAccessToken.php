@@ -36,23 +36,11 @@ class OAuthAccessToken
     private $secret;
 
     /**
-     * @var integer
-     * @ORM\Column(name="user_id", type="integer")
-     */
-    private $userId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="foreign_user_id", type="string", length=255, nullable=true)
      */
     private $foreignUserId;
-
-    /**
-     * @var integer
-     * @ORM\Column(name="service_provider_id", type="integer")
-     */
-    private $serviceProviderId;
 
 
     /**
@@ -60,6 +48,13 @@ class OAuthAccessToken
      * @var User
      */
     protected $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ServiceProvider")
+     * @ORM\JoinColumn(name="service_provider_id", referencedColumnName="id")
+     * @var ServiceProvider
+     */
+    protected $serviceProvider;
 
     /**
      * Get id
@@ -144,30 +139,6 @@ class OAuthAccessToken
     }
 
     /**
-     * Set serviceProviderId
-     *
-     * @param integer $serviceProviderId
-     *
-     * @return OAuthAccessToken
-     */
-    public function setServiceProviderId($serviceProviderId)
-    {
-        $this->serviceProviderId = $serviceProviderId;
-
-        return $this;
-    }
-
-    /**
-     * Get serviceProviderId
-     *
-     * @return integer
-     */
-    public function getServiceProviderId()
-    {
-        return $this->serviceProviderId;
-    }
-
-    /**
      * @return User
      */
     public function getUser()
@@ -182,6 +153,25 @@ class OAuthAccessToken
     public function setUser($user)
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServiceProvider()
+    {
+        return $this->serviceProvider;
+    }
+
+    /**
+     * @param ServiceProvider $serviceProvider
+     * @return $this
+     */
+    public function setServiceProvider(ServiceProvider $serviceProvider)
+    {
+        $this->serviceProvider = $serviceProvider;
 
         return $this;
     }
