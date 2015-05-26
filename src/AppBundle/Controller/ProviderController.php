@@ -2,6 +2,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
+use AppBundle\Exception\UserNotAuthenticatedWithServiceProvider;
 use OAuth\Common\Exception\Exception as OAuthException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -30,7 +31,7 @@ class ProviderController extends Controller
     /**
      * @Route("/{providerSlug}/authorize", name="providerauthorize")
      */
-    public function authorizeProvider($providerSlug)
+    public function authorizeAction($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
         $factory = $this->get('api_adapter_factory');
@@ -73,6 +74,8 @@ class ProviderController extends Controller
             $logger = $this->get('logger');
             $logger->error('Exception caught: (' . get_class($e) . ') ' . $e->getMessage() . ' - '
                 . $this->getUser()->getId());
+        } catch (UserNotAuthenticatedWithServiceProvider $e) {
+            $this->forward('AppBundle:Provider:authorize');
         }
 
         return new Response();

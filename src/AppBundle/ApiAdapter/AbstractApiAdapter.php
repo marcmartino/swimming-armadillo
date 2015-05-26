@@ -2,6 +2,7 @@
 namespace AppBundle\ApiAdapter;
 
 use AppBundle\Entity\User;
+use AppBundle\Exception\UserNotAuthenticatedWithServiceProvider;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use AppBundle\Entity\OAuthAccessToken;
@@ -96,8 +97,8 @@ abstract class AbstractApiAdapter {
     }
 
     /**
+     * @throws UserNotAuthenticatedWithServiceProvider
      * @return null|OauthAccessToken
-     * @throws \Exception
      */
     public function getUserOauthToken()
     {
@@ -112,7 +113,7 @@ abstract class AbstractApiAdapter {
             ]);
         
         if (empty($oauthToken)) {
-            throw new \Exception("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
+            throw new UserNotAuthenticatedWithServiceProvider("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
         }
 
         return $oauthToken;
