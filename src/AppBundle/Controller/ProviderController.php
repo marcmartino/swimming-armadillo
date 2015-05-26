@@ -75,7 +75,7 @@ class ProviderController extends Controller
             $logger->error('Exception caught: (' . get_class($e) . ') ' . $e->getMessage() . ' - '
                 . $this->getUser()->getId());
         } catch (UserNotAuthenticatedWithServiceProvider $e) {
-            $this->forward('AppBundle:Provider:authorize', ['slug' => $providerSlug]);
+            $this->forward('AppBundle:Provider:authorize', ['providerSlug' => $providerSlug]);
         }
 
         return new Response();
