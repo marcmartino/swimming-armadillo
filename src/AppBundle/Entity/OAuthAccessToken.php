@@ -36,24 +36,25 @@ class OAuthAccessToken
     private $secret;
 
     /**
-     * @var integer
-     * @ORM\Column(name="user_id", type="integer")
-     */
-    private $userId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="foreign_user_id", type="string", length=255, nullable=true)
      */
     private $foreignUserId;
 
-    /**
-     * @var integer
-     * @ORM\Column(name="service_provider_id", type="integer")
-     */
-    private $serviceProviderId;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="oauthAccessTokens")
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ServiceProvider")
+     * @ORM\JoinColumn(name="service_provider_id", referencedColumnName="id")
+     * @var ServiceProvider
+     */
+    protected $serviceProvider;
 
     /**
      * Get id
@@ -114,30 +115,6 @@ class OAuthAccessToken
     }
 
     /**
-     * Set userId
-     *
-     * @param integer $userId
-     *
-     * @return OAuthAccessToken
-     */
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId
-     *
-     * @return integer
-     */
-    public function getUserId()
-    {
-        return $this->userId;
-    }
-
-    /**
      * Set foreignUserId
      *
      * @param string $foreignUserId
@@ -162,58 +139,39 @@ class OAuthAccessToken
     }
 
     /**
-     * Set serviceProviderId
-     *
-     * @param integer $serviceProviderId
-     *
-     * @return OAuthAccessToken
+     * @return User
      */
-    public function setServiceProviderId($serviceProviderId)
+    public function getUser()
     {
-        $this->serviceProviderId = $serviceProviderId;
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get serviceProviderId
-     *
-     * @return integer
+     * @return mixed
      */
-    public function getServiceProviderId()
+    public function getServiceProvider()
     {
-        return $this->serviceProviderId;
-    }
-
-    public function getUserOAuthAccessTokens($userId)
-    {
-//        $stmt = $this->conn->prepare("
-//            SELECT * FROM oauth_access_tokens WHERE user_id = :userId
-//        ");
-//        $stmt->execute([':userId' => $userId]);
-//        return $stmt->fetchAll();
-        return [];
+        return $this->serviceProvider;
     }
 
     /**
-     * @param $userId
-     * @param $providerId
-     * @param $foreignUserId
-     * @param $accessToken
-     * @param $accessTokenSecret
+     * @param ServiceProvider $serviceProvider
+     * @return $this
      */
-    public function store(
-        $userId,
-        $providerId,
-        $foreignUserId,
-        $accessToken,
-        $accessTokenSecret
-    ) {
-        $this->setUserId($userId)
-            ->setServiceProviderId($providerId)
-            ->setForeignUserId($foreignUserId)
-            ->setToken($accessToken)
-            ->setSecret($accessTokenSecret);
+    public function setServiceProvider(ServiceProvider $serviceProvider)
+    {
+        $this->serviceProvider = $serviceProvider;
 
         return $this;
     }

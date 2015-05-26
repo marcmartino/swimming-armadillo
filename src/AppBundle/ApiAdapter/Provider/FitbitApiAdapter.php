@@ -75,6 +75,8 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         );
 
         $serviceFactory = new ServiceFactory();
+        $httpClient = new CurlClient();
+        $serviceFactory->setHttpClient($httpClient);
         $serviceFactory->registerService('FitBit', 'AppBundle\\OAuth\\FitBit');
 
         /** @var $fitbitService FitBit */
@@ -91,7 +93,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
 
         // Consume data for the last day (should be changed)
         $from = $this->getStartConsumeDateTime();
-        $to = new DateTime;
+        $to = (new DateTime)->modify('-1 day');
 
         // We have to fetch food results with one request per day
         $this->consumeFood($from, $to);
@@ -165,8 +167,8 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
 
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUserId($securityContext->getToken()->getUser()->getId())
-            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setUser($securityContext->getToken()->getUser())
+            ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken())
             ->setSecret($accessToken->getAccessTokenSecret());
 

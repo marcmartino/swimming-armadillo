@@ -12,6 +12,7 @@ var generatedMod = drawGen.func({
     curveFitting: true,
     pointColor: "green",
     invertedY: true,
+    curveColor: "green",
     yFormat: function (d) {
 	console.log("y format running");
 	console.log(d);

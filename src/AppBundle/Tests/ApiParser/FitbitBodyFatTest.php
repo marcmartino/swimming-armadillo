@@ -35,4 +35,6 @@ class FitbitBodyFatTest extends \PHPUnit_Framework_TestCase{
         $measurement = $results['measurements'][1];
         $this->assertEquals(13.5, $measurement->getUnits());
     }
+
+    public function testParseErrorRateLimitExceeded
 }

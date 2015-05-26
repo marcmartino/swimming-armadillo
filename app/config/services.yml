@@ -96,11 +96,19 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.initialize, method: processEvent }
 
+    happystats_user.login_listener:
+        class: 'AppBundle\EventListener\LoginConsumeApis'
+        arguments: ['@doctrine.orm.entity_manager', '@api_adapter_factory', '@security.context', '@logger']
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.interactive_login', method: processEvent }
+
 
     # Form
-    acme_user.registration.form.type:
+    happystats_user.registration.form.type:
         class: AppBundle\Form\Type\RegistrationFormType
         arguments:
           - 'AppBundle\Entity\User'
         tags:
             - { name: form.type, alias: happystats_user_registration }
+
+

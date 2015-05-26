@@ -13,6 +13,7 @@ use AppBundle\Entity\Provider;
 use AppBundle\Provider\Providers;
 use AppBundle\UnitType\UnitType;
 use Doctrine\ORM\EntityManager;
+use OAuth\Common\Http\Client\CurlClient;
 use OAuth\OAuth2\Token\StdOAuth2Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\AutomaticOAuth2;
@@ -129,8 +130,8 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUserId($securityContext->getToken()->getUser()->getId())
-            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setUser($securityContext->getToken()->getUser())
+            ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken());
 
         $this->em->persist($accessTokenObj);
@@ -157,6 +158,8 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
         );
 
         $serviceFactory = new ServiceFactory();
+        $httpClient = new CurlClient();
+        $serviceFactory->setHttpClient($httpClient);
         $serviceFactory->registerService('AutomaticOAuth2', 'AppBundle\\OAuth\\AutomaticOAuth2');
 
         // Commented out scopes do not seem to work at this time.
