@@ -97,10 +97,13 @@ class MeasurementEvent
 
     /**
      * @param mixed $user
+     * @return $this
      */
     public function setUser($user)
     {
         $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -134,10 +137,13 @@ class MeasurementEvent
 
     /**
      * @param ServiceProvider $serviceProvider
+     * @return $this
      */
     public function setServiceProvider($serviceProvider)
     {
         $this->serviceProvider = $serviceProvider;
+
+        return $this;
     }
 }
 

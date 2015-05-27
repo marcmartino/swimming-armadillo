@@ -95,10 +95,13 @@ class Measurement
 
     /**
      * @param MeasurementEvent $measurementEvent
+     * @return $this
      */
     public function setMeasurementEvent($measurementEvent)
     {
         $this->measurementEvent = $measurementEvent;
+
+        return $this;
     }
 
     /**
@@ -111,10 +114,13 @@ class Measurement
 
     /**
      * @param MeasurementType $measurementType
+     * @return $this
      */
     public function setMeasurementType($measurementType)
     {
         $this->measurementType = $measurementType;
+
+        return $this;
     }
 
     /**
@@ -127,10 +133,13 @@ class Measurement
 
     /**
      * @param UnitType $unitType
+     * @return $this
      */
     public function setUnitType($unitType)
     {
         $this->unitType = $unitType;
+
+        return $this;
     }
 }
 

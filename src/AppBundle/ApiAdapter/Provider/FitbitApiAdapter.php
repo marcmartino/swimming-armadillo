@@ -113,9 +113,9 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
 
             /** @var MeasurementEvent $measurementEvent */
             foreach ($fitbitResults['measurement_events'] as $measurementEvent) {
-                $measurementEvent->setEventTime($dateFrom);
-                $measurementEvent->setProviderId($this->getServiceProvider()->getId());
-                $measurementEvent->setUser($this->getUser());
+                $measurementEvent->setEventTime($dateFrom)
+                    ->setServiceProvider($this->getServiceProvider())
+                    ->setUser($this->getUser());
                 $this->em->persist($measurementEvent);
             }
 
@@ -146,8 +146,8 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($weightResults['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
-            $measurementEvent->setUser($this->getUser());
+            $measurementEvent->setServiceProvider($this->getServiceProvider())
+                ->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }
     }
