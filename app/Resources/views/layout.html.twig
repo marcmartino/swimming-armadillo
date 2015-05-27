@@ -4,7 +4,6 @@
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="google-site-verification" content="HI9ZIrJCJLbJcepPq48fclVmeSrSL_8WiI8hRY63LPs" />
         {% javascripts
             '@AppBundle/Resources/public/vendor/modernizr/modernizr.js'
             '@AppBundle/Resources/public/vendor/jquery/dist/jquery.js'
@@ -29,6 +28,9 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
     </head>
     <body>
+    {% if app.environment == 'prod' %}
+        {% include 'layout/google_analytics.html.twig' %}
+    {% endif %}
     {% include 'layout/header.html.twig' %}
     {% block body %}{% endblock %}
         {% block javascripts%}
