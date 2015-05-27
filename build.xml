@@ -201,7 +201,6 @@
             depends="phploc-ci,phpcs-ci,phpmd-ci"
             description="Generate project documentation using phpDox">
         <exec executable="${toolsdir}phpdox" dir="${basedir}/build" taskname="phpdox"/>
-        <arg value="--file=${basedir}/build/phpdox.xml" />
 
         <property name="phpdox.done" value="true"/>
     </target>
