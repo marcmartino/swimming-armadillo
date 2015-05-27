@@ -44,13 +44,13 @@ class User extends BaseUser
     /**
      * @ORM\OneToMany(targetEntity="MeasurementEvent", mappedBy="user")
      * @var MeasurementEvent[]
-     **/
+     */
     private $measurementEvents;
 
     /**
      * @ORM\OneToMany(targetEntity="OAuthAccessToken", mappedBy="user")
      * @var OAuthAccessToken[]
-     **/
+     */
     private $oauthAccessTokens;
 
     public function __construct()
