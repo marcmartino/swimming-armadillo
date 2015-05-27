@@ -196,15 +196,16 @@
         <property name="phpunit.done" value="true"/>
     </target>
 
-    <target name="phpdox"
-            unless="phpdox.done"
-            depends="phploc-ci,phpcs-ci,phpmd-ci"
-            description="Generate project documentation using phpDox">
-        <exec executable="${toolsdir}phpdox" dir="${basedir}/build" taskname="phpdox"/>
-        <arg value="--file=${basedir}/build/phpdox.xml" />
+    <!-- TODO enable phpdox ->
+    <!--<target name="phpdox"-->
+            <!--unless="phpdox.done"-->
+            <!--depends="phploc-ci,phpcs-ci,phpmd-ci"-->
+            <!--description="Generate project documentation using phpDox">-->
+        <!--<exec executable="${toolsdir}phpdox" dir="${basedir}/build" taskname="phpdox"/>-->
+        <!--<arg value="--file=${basedir}/build/phpdox.xml" />-->
 
-        <property name="phpdox.done" value="true"/>
-    </target>
+        <!--<property name="phpdox.done" value="true"/>-->
+    <!--</target>-->
     <target name="copy-parameters" description="Copy parameters.yml file">
         <exec executable="cp" failonerror="true">
             <arg path="app/config/parameters.yml.dist" />
