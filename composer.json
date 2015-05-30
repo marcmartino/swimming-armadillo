@@ -23,7 +23,8 @@
         "doctrine/migrations": "1.0.*@dev",
         "doctrine/doctrine-migrations-bundle": "2.1.*@dev",
         "friendsofsymfony/user-bundle": "~2.0@dev",
-	"mandrill/mandrill": "dev-master"
+        "mandrill/mandrill": "dev-master",
+        "mailchimp/mailchimp": "^2.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",

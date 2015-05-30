@@ -92,7 +92,7 @@ services:
 
     event.listener.registration_initialized:
         class: AppBundle\EventListener\FOSUserBundleRegistrationInitialized
-        arguments: ["@doctrine.orm.entity_manager"]
+        arguments: ["@doctrine.orm.entity_manager", "@happystats.mailchimp", '%mailchimp.user_list_id%']
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.initialize, method: processEvent }
 
@@ -112,3 +112,7 @@ services:
             - { name: form.type, alias: happystats_user_registration }
 
 
+    # Mailchimp
+    happystats.mailchimp:
+        class: Mailchimp
+        arguments: ['%mailchimp.api_key%']
