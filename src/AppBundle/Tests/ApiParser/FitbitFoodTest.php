@@ -2,6 +2,7 @@
 namespace AppBundle\Tests\ApiParser;
 use AppBundle\ApiParser\FitbitFood;
 use AppBundle\Entity\Measurement;
+use AppBundle\Persistence\EntityManagerPersistence;
 
 /**
  * Class FitbitFoodTest
@@ -11,7 +12,6 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
 {
     public function testParse()
     {
-        $this->markTestIncomplete('Need to fix');
         $unitType = $this->getMock('\AppBundle\Entity\UnitType');
         $unitType->expects($this->any())
             ->method('getId')
@@ -23,7 +23,7 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(50));
 
         $unitTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
+            ->getMockBuilder('\AppBundle\Entity\UnitTypeRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $unitTypeRepository->expects($this->any())
@@ -31,7 +31,7 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($unitType));
 
         $measuremenTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
+            ->getMockBuilder('\AppBundle\Entity\MeasurementTypeRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $measuremenTypeRepository->expects($this->any())
@@ -46,11 +46,10 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($unitTypeRepository));
 
-
-
+        $persistence = new EntityManagerPersistence();
 
         $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitFood.json');
-        $parser = new FitbitFood($entityManager);
+        $parser = new FitbitFood($unitTypeRepository, $measuremenTypeRepository, $persistence);
         $results = $parser->parse($responseBody);
 
         /** @var Measurement $calorieMeasurement */

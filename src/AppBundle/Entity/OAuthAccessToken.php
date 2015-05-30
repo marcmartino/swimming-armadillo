@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * OAuthAccessToken
  *
  * @ORM\Table()
+ * @ORM\Entity
  */
 class OAuthAccessToken
 {

@@ -4,9 +4,6 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
     guzzle:
         class: GuzzleHttp\Client
@@ -64,11 +61,17 @@ services:
     correlator.pearson:
         class: AppBundle\Correlator\Pearson
 
+    happy_stats.persistence:
+        class: AppBundle\Persistence\EntityManagerPersistence
+
 
     # Api Parsers
     api_parser.fitbit_food:
       class: AppBundle\ApiParser\FitbitFood
-      arguments: ["@doctrine.orm.entity_manager"]
+      arguments:
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurmentType")
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:UnitType")
+        - @happy_stats.persistence
 
     api_parser.fitbit_bodyfat:
       class: AppBundle\ApiParser\FitbitBodyFat

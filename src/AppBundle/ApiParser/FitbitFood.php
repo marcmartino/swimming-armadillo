@@ -3,7 +3,10 @@ namespace AppBundle\ApiParser;
 use AppBundle\ApiParser\Fitbit\AbstractFitbitApiParser;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Entity\MeasurementTypeRepository;
+use AppBundle\Entity\UnitTypeRepository;
 use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\Persistence\PersistenceInterface;
 use AppBundle\UnitType\UnitType;
 
 /**
@@ -12,6 +15,35 @@ use AppBundle\UnitType\UnitType;
  */
 class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
 {
+    /**
+     * @var UnitTypeRepository
+     */
+    protected $unitTypes;
+    /**
+     * @var MeasurementTypeRepository
+     */
+    protected $measurementTypes;
+    /**
+     * @var PersistenceInterface
+     */
+    protected $persist;
+
+    /**
+     * @param UnitTypeRepository $unitTypes
+     * @param MeasurementTypeRepository $measurementTypes
+     * @param PersistenceInterface $persist
+     */
+    public function __construct(
+        UnitTypeRepository $unitTypes,
+        MeasurementTypeRepository $measurementTypes,
+        PersistenceInterface $persist
+    )
+    {
+        $this->unitTypes = $unitTypes;
+        $this->measurementTypes = $measurementTypes;
+        $this->persist = $persist;
+    }
+
     /**
      * Create objects/arrays from an api response body
      *
@@ -29,7 +61,7 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
         ];
 
         $measurementEvent = new MeasurementEvent;
-        $this->em->persist($measurementEvent);
+        $this->persist->persist($measurementEvent);
 
         $calorieMeasurement = $this->getSummaryMeasurement(UnitType::CALORIES, MeasurementType::DAILY_CALORIES,
             $json['summary']['calories']);
@@ -58,8 +90,8 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
 
         /** @var Measurement $measurement */
         foreach ($results['measurements'] as $measurement) {
-            $measurement->setMeasurementEventId($measurementEvent->getId());
-            $this->em->persist($measurement);
+            $measurement->setMeasurementEvent($measurementEvent);
+            $this->persist->persist($measurement);
         }
 
         return $results;
@@ -73,14 +105,14 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
      */
     protected function getSummaryMeasurement($unitTypeSlug, $measurementTypeSlug, $units)
     {
-        $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-            ->findOneBy(['slug' => $unitTypeSlug])->getId();
-        $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-            ->findOneBy(['slug' => $measurementTypeSlug])->getId();
+        $unitTypeId = $this->unitTypes
+            ->findOneBy(['slug' => $unitTypeSlug]);
+        $measurementTypeId = $this->measurementTypes
+            ->findOneBy(['slug' => $measurementTypeSlug]);
         $measurement = (new Measurement)
             ->setUnits($units)
-            ->setUnitsTypeId($unitTypeId)
-            ->setMeasurementTypeId($measurementTypeId);
+            ->setUnitType($unitTypeId)
+            ->setMeasurementType($measurementTypeId);
 
         return $measurement;
     }
