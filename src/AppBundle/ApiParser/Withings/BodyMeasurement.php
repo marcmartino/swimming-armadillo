@@ -16,7 +16,6 @@ use Exception;
  */
 class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterface
 {
-
     /**
      * Create objects/arrays from an api response body
      * Should return an array of measurements and measurement events like this:
@@ -49,7 +48,7 @@ class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterf
 
             $measurementEvent->setEventTime($datetime);
 
-            $this->em->persist($measurementEvent);
+            $this->persist->persist($measurementEvent);
 
             $measures = $measureGroup['measures'];
 
@@ -89,18 +88,18 @@ class BodyMeasurement extends AbstractEntityApiParser implements ApiParserInterf
 
                 }
 
-                $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-                    ->findOneBy(['slug' => $unitsTypeSlug])->getId();
-                $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-                    ->findOneBy(['slug' => $measurementTypeSlug])->getId();
+                $unitType = $this->unitTypes
+                    ->findOneBy(['slug' => $unitsTypeSlug]);
+                $measurementType = $this->measurementTypes
+                    ->findOneBy(['slug' => $measurementTypeSlug]);
 
                 $measurement = (new Measurement)
-                    ->setMeasurementEventId($measurementEvent->getId())
-                    ->setUnitsTypeId($unitTypeId)
-                    ->setMeasurementTypeId($measurementTypeId)
+                    ->setMeasurementEvent($measurementEvent)
+                    ->setUnitType($unitType)
+                    ->setMeasurementType($measurementType)
                     ->setUnits($units);
 
-                $this->em->persist($measurement);
+                $this->persist->persist($measurement);
 
                 $results['measurements'][] = $measurement;
             }

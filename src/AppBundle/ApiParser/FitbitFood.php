@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\ApiParser;
+
 use AppBundle\ApiParser\Fitbit\AbstractFitbitApiParser;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
@@ -15,35 +16,6 @@ use AppBundle\UnitType\UnitType;
  */
 class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
 {
-    /**
-     * @var UnitTypeRepository
-     */
-    protected $unitTypes;
-    /**
-     * @var MeasurementTypeRepository
-     */
-    protected $measurementTypes;
-    /**
-     * @var PersistenceInterface
-     */
-    protected $persist;
-
-    /**
-     * @param UnitTypeRepository $unitTypes
-     * @param MeasurementTypeRepository $measurementTypes
-     * @param PersistenceInterface $persist
-     */
-    public function __construct(
-        UnitTypeRepository $unitTypes,
-        MeasurementTypeRepository $measurementTypes,
-        PersistenceInterface $persist
-    )
-    {
-        $this->unitTypes = $unitTypes;
-        $this->measurementTypes = $measurementTypes;
-        $this->persist = $persist;
-    }
-
     /**
      * Create objects/arrays from an api response body
      *
@@ -95,25 +67,5 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
         }
 
         return $results;
-    }
-
-    /**
-     * @param $unitTypeSlug
-     * @param $measurementTypeSlug
-     * @param $units
-     * @return Measurement
-     */
-    protected function getSummaryMeasurement($unitTypeSlug, $measurementTypeSlug, $units)
-    {
-        $unitTypeId = $this->unitTypes
-            ->findOneBy(['slug' => $unitTypeSlug]);
-        $measurementTypeId = $this->measurementTypes
-            ->findOneBy(['slug' => $measurementTypeSlug]);
-        $measurement = (new Measurement)
-            ->setUnits($units)
-            ->setUnitType($unitTypeId)
-            ->setMeasurementType($measurementTypeId);
-
-        return $measurement;
     }
 }

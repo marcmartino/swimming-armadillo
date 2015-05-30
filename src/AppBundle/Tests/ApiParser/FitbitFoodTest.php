@@ -8,7 +8,7 @@ use AppBundle\Persistence\EntityManagerPersistence;
  * Class FitbitFoodTest
  * @package AppBundle\Tests\ApiParser
  */
-class FitbitFoodTest extends \PHPUnit_Framework_TestCase
+class FitbitFoodTest extends AbstractApiParserTest
 {
     public function testParse()
     {
@@ -22,18 +22,13 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(50));
 
-        $unitTypeRepository = $this
-            ->getMockBuilder('\AppBundle\Entity\UnitTypeRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $unitTypeRepository = $this->getUnitTypes();
         $unitTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($unitType));
 
-        $measuremenTypeRepository = $this
-            ->getMockBuilder('\AppBundle\Entity\MeasurementTypeRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $measuremenTypeRepository = $this->getMeasurementTypes();
         $measuremenTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($measurementType));

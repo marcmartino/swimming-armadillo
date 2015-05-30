@@ -12,17 +12,11 @@ use PHPUnit_Framework_TestCase;
  * Class FitbitWeightTest
  * @package AppBundle\Tests\ApiParser
  */
-class FitbitWeightTest extends PHPUnit_Framework_TestCase {
+class FitbitWeightTest extends AbstractApiParserTest {
     public function testParse()
     {
-        $this->markTestIncomplete('Need to fix');
-        $entityManager = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitWeight.json');
-        $parser = new FitbitWeight($entityManager);
+        $parser = new FitbitWeight($this->getUnitTypes(), $this->getMeasurementTypes(), $this->getPersistence());
         $results = $parser->parse($responseBody);
 
         $this->assertCount(2, $results['measurements']);
