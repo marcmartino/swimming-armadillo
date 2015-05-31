@@ -17,7 +17,8 @@ services:
 
     user_data:
         class: AppBundle\UserData\UserData
-        arguments: ["@database_connection", "@entity_measurement_type"]
+        arguments:
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:Measurement")
 
     entity_provider:
         class: AppBundle\Entity\Provider
