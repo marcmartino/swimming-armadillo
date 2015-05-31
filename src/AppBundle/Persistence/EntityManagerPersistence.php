@@ -1,27 +1,39 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Nate
- * Date: 5/30/15
- * Time: 1:18 PM
- */
-
 namespace AppBundle\Persistence;
 
+use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Class EntityManagerPersistence
+ * @package AppBundle\Persistence
+ */
 class EntityManagerPersistence implements PersistenceInterface
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @param EntityManagerInterface $em
+     */
+    public function __construct(
+        EntityManagerInterface $em
+    ) {
+        $this->em = $em;
+    }
+
     /**
      * @param $entity
      * @return mixed
      */
     public function persist($entity)
     {
-        // TODO: Implement persist() method.
+        return $this->em->persist($entity);
     }
 
     public function flush()
     {
-        // TODO: Implement flush() method.
+        return $this->em->flush();
     }
 }

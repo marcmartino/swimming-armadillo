@@ -63,7 +63,7 @@ services:
 
     happy_stats.persistence:
         class: AppBundle\Persistence\EntityManagerPersistence
-
+        arguments: [ "@doctrine.orm.default_entity_manager" ]
 
     # Api Parsers
     api_parser.abstract:
@@ -89,7 +89,6 @@ services:
       class: AppBundle\ApiParser\Withings\BodyMeasurement
       parent: api_parser.abstract
 
-
     # Event Listeners
     event.listener.registration_completed:
         class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted
@@ -109,7 +108,6 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'security.interactive_login', method: processEvent }
 
-
     # Form
     happystats_user.registration.form.type:
         class: AppBundle\Form\Type\RegistrationFormType
@@ -117,5 +115,3 @@ services:
           - 'AppBundle\Entity\User'
         tags:
             - { name: form.type, alias: happystats_user_registration }
-
-
