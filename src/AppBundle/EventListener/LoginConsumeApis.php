@@ -34,6 +34,9 @@ class LoginConsumeApis
 
     /**
      * @param EntityManagerInterface $em
+     * @param ProviderApiAdapterFactory $providerApiAdapterFactory
+     * @param SecurityContextInterface $securityContext
+     * @param LoggerInterface $logger
      */
     public function __construct(
         EntityManagerInterface $em,

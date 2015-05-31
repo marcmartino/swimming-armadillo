@@ -66,24 +66,28 @@ services:
 
 
     # Api Parsers
+    api_parser.abstract:
+      abstract: true
+      arguments:
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:UnitType")
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementType")
+        - @happy_stats.persistence
+
     api_parser.fitbit_food:
       class: AppBundle\ApiParser\FitbitFood
-      arguments:
-        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurmentType")
-        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:UnitType")
-        - @happy_stats.persistence
+      parent: api_parser.abstract
 
     api_parser.fitbit_bodyfat:
       class: AppBundle\ApiParser\FitbitBodyFat
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
     api_parser.fitbit_weight:
       class: AppBundle\ApiParser\FitbitWeight
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
     api_parser.withings_body_measurement:
       class: AppBundle\ApiParser\Withings\BodyMeasurement
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
 
     # Event Listeners

@@ -92,8 +92,8 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         $this->storage->storeAccessToken('FitBit', $token);
 
         // Consume data for the last day (should be changed)
-        $from = $this->getStartConsumeDateTime();
-        $to = (new DateTime)->modify('-1 day');
+        $from = $this->getStartConsumeDateTime()->modify('-1 day');
+        $to = (new DateTime)->modify('-2 days');
 
         // We have to fetch food results with one request per day
         $this->consumeFood($from, $to);

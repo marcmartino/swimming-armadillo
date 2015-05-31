@@ -38,7 +38,7 @@ class UserData
      */
     public function getUserData($measurementTypeId, $userId, $startDatetime = null, $endDatetime = null)
     {
-        $query = "SELECT me.event_time, m.units, m.units_type_id
+        $query = "SELECT me.event_time, m.units, m.unit_type_id
             FROM measurementevent me INNER JOIN measurement m
             ON me.id = m.measurement_event_id
             WHERE m.measurement_type_id = :measurementType
