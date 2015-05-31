@@ -1,25 +1,24 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
-use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
-use AppBundle\ApiAdapter\ApiAdapterInterface;
-use AppBundle\ApiParser\Withings\BodyMeasurement;
-use AppBundle\Entity\MeasurementEvent;
-use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\Entity\ServiceProvider;
-use AppBundle\Entity\User;
-use AppBundle\Provider\Providers;
-use Doctrine\ORM\EntityManager;
-use OAuth\Common\Http\Client\CurlClient;
-use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\ServiceFactory;
+use AppBundle\Entity\User;
+use Doctrine\ORM\EntityManager;
+use AppBundle\Provider\Providers;
 use AppBundle\OAuth\WithingsOAuth;
+use AppBundle\Entity\ServiceProvider;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use OAuth\Common\Consumer\Credentials;
+use AppBundle\Entity\OAuthAccessToken;
+use AppBundle\Entity\MeasurementEvent;
+use OAuth\Common\Http\Client\CurlClient;
 use OAuth\Common\Service\ServiceInterface;
+use AppBundle\ApiAdapter\ApiAdapterInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
+use AppBundle\ApiParser\Withings\BodyMeasurement;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class WithingsApiAdapter
@@ -33,7 +32,9 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
     protected $bodyMeasurement;
 
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
+     * @param EntityManager $em
+     * @param User $user
      */
     public function __construct(
         ContainerInterface $container,
@@ -42,7 +43,6 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
     ) {
         parent::__construct($container, $em, $user);
         $this->storage = $this->container->get('token_storage_session');;
-
         $this->service = $this->createWithingsService();
         $this->em = $em;
 
@@ -89,7 +89,7 @@ class WithingsApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterIn
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($results['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId())
+            $measurementEvent->setServiceProvider($this->getServiceProvider())
                 ->setUser($this->getUser());
             $this->em->persist($measurementEvent);
         }

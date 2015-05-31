@@ -4,6 +4,7 @@ namespace AppBundle\Tests\ApiParser\Withings;
 use AppBundle\ApiParser\Withings\BodyMeasurement;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Tests\ApiParser\AbstractApiParserTest;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -11,11 +12,10 @@ use Exception;
 /**
  * Class BodyMeasurementTest
  */
-class BodyMeasurementTest extends \PHPUnit_Framework_TestCase
+class BodyMeasurementTest extends AbstractApiParserTest
 {
     public function testParse()
     {
-        $this->markTestIncomplete('Need to fix');
         $unitType = $this->getMock('\AppBundle\Entity\UnitType');
         $unitType->expects($this->any())
             ->method('getId')
@@ -26,32 +26,18 @@ class BodyMeasurementTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(50));
 
-        $unitTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $unitTypeRepository = $this->getUnitTypes();
         $unitTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($unitType));
 
-        $measuremenTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $measuremenTypeRepository = $this->getMeasurementTypes();
         $measuremenTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($measurementType));
 
-        $entityManager = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValue($unitTypeRepository));
-
         $responseBody = file_get_contents(__DIR__ . '/../../Resources/ApiParser/Withings/bodymeasures.json');
-        $parser = new BodyMeasurement($entityManager);
+        $parser = new BodyMeasurement($unitTypeRepository, $measuremenTypeRepository, $this->getPersistence());
         $results = $parser->parse($responseBody);
 
         $this->assertCount(5, $results['measurements']);
@@ -73,14 +59,8 @@ class BodyMeasurementTest extends \PHPUnit_Framework_TestCase
      */
     public function testParse247()
     {
-        $this->markTestIncomplete('Need to fix');
-        $entityManager = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $responseBody = file_get_contents(__DIR__ . '/../../Resources/ApiParser/Withings/bodymeasures247.json');
-        $parser = new BodyMeasurement($entityManager);
+        $parser = new BodyMeasurement($this->getUnitTypes(), $this->getMeasurementTypes(), $this->getPersistence());
         $parser->parse($responseBody);
     }
 } 

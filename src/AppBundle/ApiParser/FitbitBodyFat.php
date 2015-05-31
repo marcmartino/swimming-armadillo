@@ -33,18 +33,18 @@ class FitbitBodyFat extends AbstractFitbitApiParser implements ApiParserInterfac
 
             $measurementEvent = (new MeasurementEvent)
                 ->setEventTime(new \DateTime($fatMeasurement['date'] . ' ' . $fatMeasurement['time']));
-            $this->em->persist($measurementEvent);
+            $this->persist->persist($measurementEvent);
 
-            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-                ->findOneBy(['slug' => UnitType::PERCENT])->getId();
-            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-                ->findOneBy(['slug' => MeasurementType::FAT_RATIO])->getId();
+            $unitType = $this->unitTypes
+                ->findOneBy(['slug' => UnitType::PERCENT]);
+            $measurementType = $this->measurementTypes
+                ->findOneBy(['slug' => MeasurementType::FAT_RATIO]);
             $measurement = (new Measurement)
-                ->setMeasurementEventId($measurementEvent->getId())
+                ->setMeasurementEvent($measurementEvent)
                 ->setUnits($fatMeasurement['fat'])
-                ->setUnitsTypeId($unitTypeId)
-                ->setMeasurementTypeId($measurementTypeId);
-            $this->em->persist($measurement);
+                ->setUnitType($unitType)
+                ->setMeasurementType($measurementType);
+            $this->persist->persist($measurement);
 
             $results['measurement_events'][] = $measurementEvent;
             $results['measurements'][] = $measurement;

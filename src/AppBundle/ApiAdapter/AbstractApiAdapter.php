@@ -77,7 +77,7 @@ abstract class AbstractApiAdapter {
         $measurementEventRepo = $this->em->getRepository('AppBundle:MeasurementEvent');
         /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
         $lastMeasurementEvent = $measurementEventRepo->findOneBy(
-            ['user' => $this->getUser(), 'providerId' => $this->getServiceProvider()->getId()],
+            ['user' => $this->getUser(), 'serviceProvider' => $this->getServiceProvider()],
             ['eventTime' => 'DESC']
         );
         if (empty($lastMeasurementEvent)) {

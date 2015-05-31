@@ -1,9 +1,13 @@
 <?php
 namespace AppBundle\ApiParser;
+
 use AppBundle\ApiParser\Fitbit\AbstractFitbitApiParser;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
+use AppBundle\Entity\MeasurementTypeRepository;
+use AppBundle\Entity\UnitTypeRepository;
 use AppBundle\MeasurementType\MeasurementType;
+use AppBundle\Persistence\PersistenceInterface;
 use AppBundle\UnitType\UnitType;
 
 /**
@@ -29,7 +33,7 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
         ];
 
         $measurementEvent = new MeasurementEvent;
-        $this->em->persist($measurementEvent);
+        $this->persist->persist($measurementEvent);
 
         $calorieMeasurement = $this->getSummaryMeasurement(UnitType::CALORIES, MeasurementType::DAILY_CALORIES,
             $json['summary']['calories']);
@@ -58,30 +62,10 @@ class FitbitFood extends AbstractFitbitApiParser implements ApiParserInterface
 
         /** @var Measurement $measurement */
         foreach ($results['measurements'] as $measurement) {
-            $measurement->setMeasurementEventId($measurementEvent->getId());
-            $this->em->persist($measurement);
+            $measurement->setMeasurementEvent($measurementEvent);
+            $this->persist->persist($measurement);
         }
 
         return $results;
-    }
-
-    /**
-     * @param $unitTypeSlug
-     * @param $measurementTypeSlug
-     * @param $units
-     * @return Measurement
-     */
-    protected function getSummaryMeasurement($unitTypeSlug, $measurementTypeSlug, $units)
-    {
-        $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-            ->findOneBy(['slug' => $unitTypeSlug])->getId();
-        $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-            ->findOneBy(['slug' => $measurementTypeSlug])->getId();
-        $measurement = (new Measurement)
-            ->setUnits($units)
-            ->setUnitsTypeId($unitTypeId)
-            ->setMeasurementTypeId($measurementTypeId);
-
-        return $measurement;
     }
 }

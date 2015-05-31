@@ -2,16 +2,16 @@
 namespace AppBundle\Tests\ApiParser;
 use AppBundle\ApiParser\FitbitFood;
 use AppBundle\Entity\Measurement;
+use AppBundle\Persistence\EntityManagerPersistence;
 
 /**
  * Class FitbitFoodTest
  * @package AppBundle\Tests\ApiParser
  */
-class FitbitFoodTest extends \PHPUnit_Framework_TestCase
+class FitbitFoodTest extends AbstractApiParserTest
 {
     public function testParse()
     {
-        $this->markTestIncomplete('Need to fix');
         $unitType = $this->getMock('\AppBundle\Entity\UnitType');
         $unitType->expects($this->any())
             ->method('getId')
@@ -22,18 +22,13 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(50));
 
-        $unitTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $unitTypeRepository = $this->getUnitTypes();
         $unitTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($unitType));
 
-        $measuremenTypeRepository = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $measuremenTypeRepository = $this->getMeasurementTypes();
         $measuremenTypeRepository->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($measurementType));
@@ -46,11 +41,10 @@ class FitbitFoodTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($unitTypeRepository));
 
-
-
+        $persistence = new EntityManagerPersistence();
 
         $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitFood.json');
-        $parser = new FitbitFood($entityManager);
+        $parser = new FitbitFood($unitTypeRepository, $measuremenTypeRepository, $persistence);
         $results = $parser->parse($responseBody);
 
         /** @var Measurement $calorieMeasurement */

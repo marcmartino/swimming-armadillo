@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * UnitType
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="UnitTypeRepository")
  */
 class UnitType
 {

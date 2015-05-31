@@ -33,21 +33,21 @@ class FitbitWeight extends AbstractFitbitApiParser implements ApiParserInterface
             $measurementEvent = (new MeasurementEvent)
                 ->setEventTime(new \DateTime($weightMeasurement['date'] . ' ' . $weightMeasurement['time']));
 
-            $this->em->persist($measurementEvent);
+            $this->persist->persist($measurementEvent);
 
             $results['measurement_events'][] = $measurementEvent;
 
-            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-                ->findOneBy(['slug' => UnitType::GRAMS])->getId();
-            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-                ->findOneBy(['slug' => MeasurementType::WEIGHT])->getId();
+            $unitType = $this->unitTypes
+                ->findOneBy(['slug' => UnitType::GRAMS]);
+            $measurementType = $this->measurementTypes
+                ->findOneBy(['slug' => MeasurementType::WEIGHT]);
             $measurement = (new Measurement)
-                ->setMeasurementEventId($measurementEvent->getId())
+                ->setMeasurementEvent($measurementEvent)
                 ->setUnits(($weightMeasurement['weight'] * 1000))
-                ->setUnitsTypeId($unitTypeId)
-                ->setMeasurementTypeId($measurementTypeId);
+                ->setUnitType($unitType)
+                ->setMeasurementType($measurementType);
 
-            $this->em->persist($measurement);
+            $this->persist->persist($measurement);
 
             $results['measurements'][] = $measurement;
         }
