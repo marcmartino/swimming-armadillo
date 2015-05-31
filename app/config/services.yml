@@ -4,10 +4,6 @@ parameters:
 #    parameter_name: value
 
 services:
-
-    guzzle:
-        class: GuzzleHttp\Client
-
     token_storage_session:
         class: OAuth\Common\Storage\Session
 
