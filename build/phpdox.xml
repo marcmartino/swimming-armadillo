@@ -6,7 +6,7 @@
         </collector>
 
         <generator output="build">
-            <build engine="html" enabled="true" output="${basedir}/api">
+            <build engine="html" enabled="true" output="api">
                 <file extension="html" />
             </build>
         </generator>
