@@ -33,7 +33,8 @@
         "sebastian/phpcpd": "dev-master",
         "pdepend/pdepend": "2.0.*",
         "phploc/phploc": "dev-master",
-        "theseer/phpdox": "dev-master"
+        "theseer/phpdox": "dev-master",
+        "mockery/mockery": "dev-master"
     },
     "scripts": {
         "post-root-package-install": [

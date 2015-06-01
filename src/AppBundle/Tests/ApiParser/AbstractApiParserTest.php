@@ -1,7 +1,8 @@
 <?php
 namespace AppBundle\Tests\ApiParser;
 
-use AppBundle\Persistence\EntityManagerPersistence;
+use AppBundle\Persistence\PersistenceInterface;
+use Mockery;
 
 /**
  * Class AbstractApiParserTest
@@ -25,8 +26,11 @@ abstract class AbstractApiParserTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
+    /**
+     * @return Mockery\MockInterface
+     */
     public function getPersistence()
     {
-        return new EntityManagerPersistence();
+        return Mockery::mock('AppBundle\Persistence\PersistenceInterface', ['persist' => true]);
     }
 }

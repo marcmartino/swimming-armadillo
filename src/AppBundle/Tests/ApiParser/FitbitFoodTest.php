@@ -41,10 +41,8 @@ class FitbitFoodTest extends AbstractApiParserTest
             ->method('getRepository')
             ->will($this->returnValue($unitTypeRepository));
 
-        $persistence = new EntityManagerPersistence();
-
         $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitFood.json');
-        $parser = new FitbitFood($unitTypeRepository, $measuremenTypeRepository, $persistence);
+        $parser = new FitbitFood($unitTypeRepository, $measuremenTypeRepository, $this->getPersistence());
         $results = $parser->parse($responseBody);
 
         /** @var Measurement $calorieMeasurement */
