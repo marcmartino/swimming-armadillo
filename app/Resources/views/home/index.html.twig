@@ -4,6 +4,8 @@
 	.daySummary {
 		
 		margin-bottom: 10px;
+		margin-left: 1%;
+
 	}
 	.daySummary > h1 {
 		margin: 0;
@@ -32,5 +34,7 @@
 				</a>
 			{% endfor %}
 		</div>
+        {% else  %}
+		You have no updates in this past week. Please authenticate your data sources <a href="/providers">here</a> or contact us at contact@happystats.io for assistance.
 	{% endfor %}
 {% endblock %}
