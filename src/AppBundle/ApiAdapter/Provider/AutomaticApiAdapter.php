@@ -114,7 +114,7 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
                 ->findOneBy(['slug' => MeasurementType::DRIVE_TIME]);
             $measurementObj->setMeasurementEvent($measurementEventObj)
                 ->setMeasurementType($measurementType)
-                ->setUnitsType($unitType)
+                ->setUnitType($unitType)
                 ->setUnits($driveTime);
             $this->em->persist($measurementObj);
         }
