@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <phpdox xmlns="http://xml.phpdox.net/config">
-    <project name="name-of-project" source="src" workdir="build/phpdox">
+    <project name="name-of-project" source="${basedir}/src" workdir="${basedir}/build/phpdox">
         <collector publiconly="false">
             <include mask="*.php" />
         </collector>
 
         <generator output="build">
-            <build engine="html" enabled="true" output="api">
+            <build engine="html" enabled="true" output="${basedir}/build/api">
                 <file extension="html" />
             </build>
         </generator>
