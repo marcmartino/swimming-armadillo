@@ -34,7 +34,7 @@ class ProviderController extends Controller
     public function authorizeAction($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
-        $apiAdapter = $this->get('api_adapter.withings');
+        $apiAdapter = $this->get('api_adapter.automatic');
         return new RedirectResponse((string) $apiAdapter->getAuthorizationUri());
     }
 
@@ -44,7 +44,7 @@ class ProviderController extends Controller
     public function providerCallback($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
-        $apiAdapter = $this->get('api_adapter.withings');
+        $apiAdapter = $this->get('api_adapter.automatic');
 
         // Handle the callback (store oauth token, ..., ...)
         $apiAdapter->handleCallback();

@@ -20,6 +20,7 @@ services:
           - [setHttpClient, ["@oauth.curl_client"]]
           - [registerService, ["FitBit", "AppBundle\\OAuth\\FitBit"]]
           - [registerService, ["WithingsOAuth", "AppBundle\\OAuth\\WithingsOAuth"]]
+          - [registerService, ["AutomaticOAuth2", "AppBundle\\OAuth\\AutomaticOAuth2"]]
 
     oauth.fitbit_client:
         class: AppBundle\OAuth\Fitbit
@@ -74,6 +75,47 @@ services:
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
           - "@api_parser.withings_body_measurement"
+
+    api_adapter.automatic_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %automatic_consumer_key%
+          - %automatic_consumer_secret%
+          - %automatic_callback_uri%
+
+    oauth.automatic_client:
+        class: AppBundle\OAuth\AutomaticOAuth2
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+          - "AutomaticOAuth2"
+          - "@api_adapter.automatic_credentials"
+          - "@token_storage_session"
+          - ["scope:public", "scope:user:profile", "scope:location", "scope:vehicle:profile", "scope:vehicle:events", "scope:trip", "scope:behavior"]
+
+    api_adapter.automatic:
+        class: AppBundle\ApiAdapter\Provider\AutomaticApiAdapter
+        arguments:
+          - "@oauth.automatic_client"
+          - "@security.context"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+
+#    return $service = $serviceFactory->createService('AutomaticOAuth2', $credentials, $this->storage, [
+#                AutomaticOAuth2::SCOPE_PUBLIC,
+#                AutomaticOAuth2::SCOPE_USER_PROFILE,
+#    //            AutomaticOAuth2::SCOPE_USER_FOLLOW,
+#                AutomaticOAuth2::SCOPE_LOCATION,
+#    //            AutomaticOAuth2::SCOPE_CURRENT_LOCATION,
+#                AutomaticOAuth2::SCOPE_VEHICLE_PROFILE,
+#                AutomaticOAuth2::SCOPE_VEHICLE_EVENTS,
+#    //            AutomaticOAuth2::SCOPE_VEHICLE_VIN,
+#                AutomaticOAuth2::SCOPE_TRIP,
+#                AutomaticOAuth2::SCOPE_BEHAVIOR
+#            ]);
+
+
 
     user_data:
         class: AppBundle\UserData\UserData

@@ -4,23 +4,24 @@ namespace AppBundle\ApiAdapter\Provider;
 use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
-use AppBundle\Entity\MeasurementType as MeasurementTypeService;
-use AppBundle\Entity\UnitType as UnitTypeService;
-use AppBundle\Entity\User;
+use AppBundle\Entity\MeasurementEventRepository;
+use AppBundle\Entity\OAuthAccessTokenRepository;
+use AppBundle\Entity\ServiceProviderRepository;
 use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\Entity\OAuthAccessToken;
 use AppBundle\Entity\Provider;
+use AppBundle\Persistence\PersistenceInterface;
 use AppBundle\Provider\Providers;
 use AppBundle\UnitType\UnitType;
-use Doctrine\ORM\EntityManager;
 use OAuth\Common\Http\Client\CurlClient;
+use OAuth\OAuth2\Service\ServiceInterface;
 use OAuth\OAuth2\Token\StdOAuth2Token;
 use OAuth\ServiceFactory;
 use AppBundle\OAuth\AutomaticOAuth2;
 use OAuth\Common\Consumer\Credentials;
 use AppBundle\ApiAdapter\ApiAdapterInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Class AutomaticApiAdapter
@@ -29,45 +30,25 @@ use Symfony\Component\Security\Core\SecurityContext;
 class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
 {
     /**
-     * @var ContainerInterface
+     * {@inheritDoc}
      */
-    protected $container;
-    /**
-     * @var AutomaticOAuth2
-     */
-    protected $service;
-    /**
-     * @var UnitTypeService
-     */
-    protected $unitTypeService;
-
-    /**
-     * @param ContainerInterface $container
-     * @param EntityManager $em
-     * @param User $user
-     */
-    public function __construct(ContainerInterface $container, EntityManager $em, User $user)
+    public function __construct(
+        ServiceInterface $httpClient,
+        SecurityContextInterface $securityContext,
+        PersistenceInterface $persistence,
+        ServiceProviderRepository $serviceProviders,
+        OAuthAccessTokenRepository $oauthAccessTokens,
+        MeasurementEventRepository $measurementEvents
+    )
     {
-        parent::__construct($container, $em, $user);
-        $this->container = $container;
-        $this->storage = $this->container->get('token_storage_session');
-
-        $this->consumerKey = $this->container->getParameter('automatic_consumer_key');
-        $this->consumerSecret = $this->container->getParameter('automatic_consumer_secret');
-        $this->callbackUri = $this->container->getParameter('automatic_callback_uri');
-
-        $this->service = $this->createService();
-        $this->unitTypeService = $this->container->get('entity_unit_type');
-    }
-
-    /**
-     * Return URI for oauth authorization
-     *
-     * @return string
-     */
-    public function getAuthorizationUri()
-    {
-        return $this->getService()->getAuthorizationUri();
+        parent::__construct(
+            $httpClient,
+            $securityContext,
+            $persistence,
+            $serviceProviders,
+            $oauthAccessTokens,
+            $measurementEvents
+        );
     }
 
     /**
@@ -79,7 +60,7 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
         $token = new StdOAuth2Token($oauthAccessToken->getToken());
         $this->storage->storeAccessToken('AutomaticOAuth2', $token);
 
-        $response = $this->getService()->request('/trips');
+        $response = $this->getHttpClient()->request('/trips');
 
         $trips = $this->consumeTrips($response);
 
@@ -123,7 +104,7 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
     public function handleCallback()
     {
-        $accessToken = $this->getService()->requestAccessToken($_GET['code']);
+        $accessToken = $this->getHttpClient()->requestAccessToken($_GET['code']);
 
         /** @var SecurityContext $securityContext */
         $securityContext = $this->container->get('security.context');
@@ -204,7 +185,17 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
      */
     public function getServiceProvider()
     {
-        return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
+        return $provider = $this->getServiceProviders()
             ->findOneBy(['slug' => Providers::AUTOMATIC]);
+    }
+
+    /**
+     * Return URI for oauth authorization
+     *
+     * @return string
+     */
+    public function getAuthorizationUri()
+    {
+        return $this->getHttpClient()->getAuthorizationUri();
     }
 }
