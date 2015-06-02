@@ -54,70 +54,9 @@ abstract class AbstractApiAdapter {
         return $this->service;
     }
 
-    /**
-     * Get the date and time to start consuming a service provider's api
-     *
-     * @return DateTime
-     */
-    public function getStartConsumeDateTime()
-    {
-        if($dateTime = $this->getLastMeasurementEventDateTime()) {
-            return $dateTime;
-        }
-        return $this->getDefaultConsumeDateTime();
-    }
 
-    /**
-     * Get date and time of the most recent data we have for this service provider
-     *
-     * @return bool|\DateTime
-     */
-    public function getLastMeasurementEventDateTime()
-    {
-        $measurementEventRepo = $this->em->getRepository('AppBundle:MeasurementEvent');
-        /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
-        $lastMeasurementEvent = $measurementEventRepo->findOneBy(
-            ['user' => $this->getUser(), 'serviceProvider' => $this->getServiceProvider()],
-            ['eventTime' => 'DESC']
-        );
-        if (empty($lastMeasurementEvent)) {
-            return false;
-        }
-        return $lastMeasurementEvent->getEventTime();
-    }
 
-    /**
-     * Returns default start time for consuming provider apis, override if necessary
-     *
-     * @return DateTime
-     */
-    public function getDefaultConsumeDateTime()
-    {
-        return (new DateTime)->modify('-1 month');
-    }
 
-    /**
-     * @throws UserNotAuthenticatedWithServiceProvider
-     * @return null|OauthAccessToken
-     */
-    public function getUserOauthToken()
-    {
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-        $user = $securityContext->getToken()->getUser();
-
-        $oauthToken = $this->em->getRepository('AppBundle:OAuthAccessToken')
-            ->findOneBy([
-                'user' => $user,
-                'serviceProvider' => $this->getServiceProvider()
-            ]);
-        
-        if (empty($oauthToken)) {
-            throw new UserNotAuthenticatedWithServiceProvider("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
-        }
-
-        return $oauthToken;
-    }
 
     /**
      * @return User

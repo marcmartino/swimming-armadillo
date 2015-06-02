@@ -23,17 +23,13 @@ class EntityManagerPersistence implements PersistenceInterface
         $this->em = $em;
     }
 
-    /**
-     * @param $entity
-     * @return mixed
-     */
     public function persist($entity)
     {
-        return $this->em->persist($entity);
+        $this->em->persist($entity);
     }
 
     public function flush()
     {
-        return $this->em->flush();
+        $this->em->flush();
     }
 }

@@ -65,9 +65,9 @@ class ProviderController extends Controller
     public function providerConsume($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
-        $factory = $this->get('api_adapter_factory');
-        $factory->setUser($this->getUser());
-        $apiAdapter = $factory->getApiAdapter($providerSlug);
+//        $factory = $this->get('api_adapter_factory');
+//        $factory->setUser($this->getUser());
+        $apiAdapter = $this->get('api_adapter.fitbit');
         try {
             $apiAdapter->consumeData();
         } catch (OAuthException $e) {

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * MeasurementEvent
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="MeasurementEventRepository")
  */
 class MeasurementEvent
 {

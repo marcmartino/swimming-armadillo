@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * ServiceProvider
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="ServiceProviderRepository")
  */
 class ServiceProvider
 {

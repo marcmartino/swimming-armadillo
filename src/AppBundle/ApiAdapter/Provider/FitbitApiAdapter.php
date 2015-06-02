@@ -1,86 +1,84 @@
 <?php
 namespace AppBundle\ApiAdapter\Provider;
 
-use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
-use AppBundle\ApiParser\FitbitBodyFat;
-use AppBundle\ApiParser\FitbitFood;
-use AppBundle\ApiParser\FitbitWeight;
-use AppBundle\Entity\User;
-use DateTime;
-use OAuth\Common\Http\Client\CurlClient;
-use OAuth\OAuth1\Token\StdOAuth1Token;
-use OAuth\ServiceFactory;
-use Doctrine\ORM\EntityManager;
-use OAuth\OAuth1\Service\FitBit;
+use AppBundle\ApiParser\ApiParserInterface;
+use AppBundle\Entity\MeasurementEventRepository;
+use AppBundle\Entity\OAuthAccessTokenRepository;
+use AppBundle\Entity\ServiceProviderRepository;
+use AppBundle\Exception\UserNotAuthenticatedWithServiceProvider;
+use AppBundle\Persistence\PersistenceInterface;
 use AppBundle\Provider\Providers;
-use AppBundle\Entity\Measurement;
-use OAuth\Common\Storage\Session;
+use DateTime;
+use OAuth\OAuth1\Service\AbstractService;
+use OAuth\OAuth1\Service\ServiceInterface;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use AppBundle\Entity\ServiceProvider;
-use OAuth\Common\Consumer\Credentials;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\ApiAdapter\ApiAdapterInterface;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * Class FitbitApiAdapter
  * @package AppBundle\ApiAdapter\Provider
  */
-class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
+class FitbitApiAdapter
 {
-    /** @var ContainerInterface */
-    protected $container;
-    /** @var FitBit */
-    protected $service;
-    /** @var Session */
-    protected $storage;
-    /** @var EntityManager */
-    protected $em;
-    /** @var FitbitFood */
+    /** @var ServiceInterface */
+    protected $httpClient;
+    /** @var AdvancedUserInterface */
+    protected $user;
+    /** @var ApiParserInterface */
     protected $fitbitFood;
-    /** @var FitbitBodyFat  */
+    /** @var ApiParserInterface  */
     protected $fitbitBodyFat;
-    /** @var FitbitWeight */
+    /** @var ApiParserInterface */
     protected $fitbitWeight;
-
-    public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        User $user
-    )
-    {
-        parent::__construct($container, $em, $user);
-        $this->container = $container;
-        $this->storage = $this->container->get('token_storage_session');
-
-        $this->service = $this->createService();
-        $this->em = $em;
-
-        $this->fitbitFood = $this->container->get('api_parser.fitbit_food');
-        $this->fitbitBodyFat = $this->container->get('api_parser.fitbit_bodyfat');
-        $this->fitbitWeight = $this->container->get('api_parser.fitbit_weight');
-    }
+    /** @var PersistenceInterface */
+    private $persistence;
+    /** @var ServiceProvider */
+    protected $serviceProvider;
+    /** @var OAuthAccessTokenRepository */
+    protected $oauthAccessTokens;
+    /**
+     * @var MeasurementEventRepository
+     */
+    private $measurementEvents;
 
     /**
-     * @return \OAuth\Common\Service\ServiceInterface
-     * @throws \OAuth\Common\Exception\Exception
+     * @param AbstractService $httpClient
+     * @param SecurityContextInterface $securityContext
+     * @param ApiParserInterface $fitbitFood
+     * @param ApiParserInterface $fitbitBodyFat
+     * @param ApiParserInterface $fitbitWeight
+     * @param PersistenceInterface $persistence
+     * @param ServiceProviderRepository $serviceProviders
+     * @param OAuthAccessTokenRepository $oauthAccessTokens
+     * @param MeasurementEventRepository $measurementEvents
      */
-    protected function createService()
+    public function __construct(
+        AbstractService $httpClient,
+        SecurityContextInterface $securityContext,
+        ApiParserInterface $fitbitFood,
+        ApiParserInterface $fitbitBodyFat,
+        ApiParserInterface $fitbitWeight,
+        PersistenceInterface $persistence,
+        ServiceProviderRepository $serviceProviders,
+        OAuthAccessTokenRepository $oauthAccessTokens,
+        MeasurementEventRepository $measurementEvents
+    )
     {
-        $credentials = new Credentials(
-            $this->container->getParameter('fitbit_consumer_key'),
-            $this->container->getParameter('fitbit_consumer_secret'),
-            $this->container->getParameter('fitbit_callback_uri')
-        );
-
-        $serviceFactory = new ServiceFactory();
-        $httpClient = new CurlClient();
-        $serviceFactory->setHttpClient($httpClient);
-        $serviceFactory->registerService('FitBit', 'AppBundle\\OAuth\\FitBit');
-
-        /** @var $fitbitService FitBit */
-        return $fitbitService = $serviceFactory->createService('FitBit', $credentials, $this->storage);
+        $this->httpClient = $httpClient;
+        // TODO I don't like this, it would be better to inject the user
+        $this->user = $securityContext->getToken()->getUser();
+        $this->fitbitFood = $fitbitFood;
+        $this->fitbitBodyFat = $fitbitBodyFat;
+        $this->fitbitWeight = $fitbitWeight;
+        $this->persistence = $persistence;
+        $this->serviceProviders = $serviceProviders;
+        $this->oauthAccessTokens = $oauthAccessTokens;
+        $this->measurementEvents = $measurementEvents;
     }
 
     public function consumeData()
@@ -89,25 +87,29 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         $userOauthToken = $this->getUserOauthToken();
         $token = new StdOAuth1Token($userOauthToken->getToken());
         $token->setAccessTokenSecret($userOauthToken->getSecret());
-        $this->storage->storeAccessToken('FitBit', $token);
+        $this->getHttpClient()->getStorage()->storeAccessToken('FitBit', $token);
 
         // Consume data for the last day (should be changed)
-        $from = $this->getStartConsumeDateTime()->modify('-1 day');
-        $to = (new DateTime)->modify('-2 days');
+        $from = $this->getStartConsumeDateTime();
+        $to = $this->getEndConsumeDateTime();
 
         // We have to fetch food results with one request per day
         $this->consumeFood($from, $to);
         $this->consumeBodyFat($from, $to);
         $this->consumeWeight($from, $to);
 
-        $this->em->flush();
+        $this->persistence->flush();
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeFood(DateTime $dateFrom, DateTime $dateTo)
     {
         while ($dateFrom <= $dateTo) {
             $uri = '/user/-/foods/log/date/' . $dateFrom->format('Y-m-d') . '.json';
-            $response = $this->getService()->request($uri);
+            $response = $this->getHttpClient()->request($uri);
 
             $fitbitResults = $this->fitbitFood->parse($response);
 
@@ -116,31 +118,39 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
                 $measurementEvent->setEventTime($dateFrom)
                     ->setServiceProvider($this->getServiceProvider())
                     ->setUser($this->getUser());
-                $this->em->persist($measurementEvent);
+                $this->persistence->persist($measurementEvent);
             }
 
             $dateFrom->modify('+1 day');
         }
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeBodyFat(DateTime $dateFrom, DateTime $dateTo)
     {
         $uri = '/user/-/body/log/fat/date/' . $dateFrom->format('Y-m-d') . '/' . $dateTo->format('Y-m-d') . '.json';
-        $response = $this->getService()->request($uri);
+        $response = $this->getHttpClient()->request($uri);
         $bodyfatResults = $this->fitbitBodyFat->parse($response);
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($bodyfatResults['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setServiceProvider($this->getServiceProvider());
             $measurementEvent->setUser($this->getUser());
-            $this->em->persist($measurementEvent);
+            $this->persistence->persist($measurementEvent);
         }
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeWeight(Datetime $dateFrom, DateTime $dateTo)
     {
         $uri = '/user/-/body/log/weight/date/' . $dateFrom->format('Y-m-d') . '/' . $dateTo->format('Y-m-d') . '.json';
-        $response = $this->getService()->request($uri);
+        $response = $this->getHttpClient()->request($uri);
 
         $weightResults = $this->fitbitWeight->parse($response);
 
@@ -148,32 +158,36 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
         foreach ($weightResults['measurement_events'] as $measurementEvent) {
             $measurementEvent->setServiceProvider($this->getServiceProvider())
                 ->setUser($this->getUser());
-            $this->em->persist($measurementEvent);
+            $this->persistence->persist($measurementEvent);
         }
     }
 
-    public function handleCallback()
+    /**
+     * Request and store an access token for the user
+     *
+     * @param $oauthToken
+     * @param $oauthVerifier
+     * @return mixed|void
+     */
+    public function handleCallback($oauthToken, $oauthVerifier)
     {
-        $token = $this->storage->retrieveAccessToken('FitBit');
+        $token = $this->getHttpClient()->getStorage()->retrieveAccessToken('FitBit');
 
-        $accessToken = $this->getService()->requestAccessToken(
-            $_GET['oauth_token'],
-            $_GET['oauth_verifier'],
+        $accessToken = $this->getHttpClient()->requestAccessToken(
+            $oauthToken,
+            $oauthVerifier,
             $token->getRequestTokenSecret()
         );
 
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUser($securityContext->getToken()->getUser())
+            ->setUser($this->getUser())
             ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken())
             ->setSecret($accessToken->getAccessTokenSecret());
 
-        $this->em->persist($accessTokenObj);
-        $this->em->flush();
+        $this->persistence->persist($accessTokenObj);
+        $this->persistence->flush();
     }
 
     /**
@@ -183,7 +197,103 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInte
      */
     public function getServiceProvider()
     {
-        return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
-            ->findOneBy(['slug' => Providers::FITBIT]);
+        return $this->serviceProviders->findOneBy(['slug' => Providers::FITBIT]);
+    }
+
+    /**
+     * @return AbstractService
+     */
+    public function getHttpClient()
+    {
+        return $this->httpClient;
+    }
+
+    /**
+     * Return URI for oauth authorization
+     *
+     * @return string
+     */
+    public function getAuthorizationUri()
+    {
+        $token = $this->getHttpClient()->requestRequestToken();
+        return $this->getHttpClient()->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()));
+    }
+
+    /**
+     * @return AdvancedUserInterface
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @throws UserNotAuthenticatedWithServiceProvider
+     * @return null|OauthAccessToken
+     */
+    public function getUserOauthToken()
+    {
+        $user = $this->getUser();
+
+        $oauthToken = $this->oauthAccessTokens
+            ->findOneBy([
+                'user' => $user,
+                'serviceProvider' => $this->getServiceProvider()
+            ]);
+
+        if (empty($oauthToken)) {
+            throw new UserNotAuthenticatedWithServiceProvider("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
+        }
+
+        return $oauthToken;
+    }
+
+    /**
+     * Get the date and time to start consuming a service provider's api
+     *
+     * @return DateTime
+     */
+    public function getStartConsumeDateTime()
+    {
+        if($dateTime = $this->getLastMeasurementEventDateTime()) {
+            return $dateTime;
+        }
+        return $this->getDefaultConsumeDateTime();
+    }
+
+    /**
+     * Get date and time of the most recent data we have for this service provider
+     *
+     * @return bool|\DateTime
+     */
+    public function getLastMeasurementEventDateTime()
+    {
+        /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
+        $lastMeasurementEvent = $this->measurementEvents->findOneBy(
+            ['user' => $this->getUser(), 'serviceProvider' => $this->getServiceProvider()],
+            ['eventTime' => 'DESC']
+        );
+        if (empty($lastMeasurementEvent)) {
+            return false;
+        }
+        return $lastMeasurementEvent->getEventTime();
+    }
+
+    /**
+     * Returns default start time for consuming provider apis, override if necessary
+     *
+     * @return DateTime
+     */
+    public function getDefaultConsumeDateTime()
+    {
+        return (new DateTime)->modify('-1 month');
+    }
+
+    /**
+     * @return DateTime
+     */
+    private function getEndConsumeDateTime()
+    {
+        return (new DateTime);
     }
 }

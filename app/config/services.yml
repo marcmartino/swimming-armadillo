@@ -11,6 +11,42 @@ services:
         class: AppBundle\ApiAdapter\ProviderApiAdapterFactory
         arguments: ["@service_container", "@doctrine.orm.entity_manager"]
 
+    oauth.curl_client:
+        class: OAuth\Common\Http\Client\CurlClient
+
+    oauth.service_factory:
+        class: OAuth\ServiceFactory
+        calls:
+          - [setHttpClient, ["@oauth.curl_client"]]
+
+    oauth.fitbit_client:
+        class: AppBundle\OAuth\Fitbit
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+            - "FitBit"
+            - "@api_adapter.fitbit_credentials"
+            - "@token_storage_session"
+
+    api_adapter.fitbit_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %fitbit_consumer_key%
+          - %fitbit_consumer_secret%
+          - %fitbit_callback_uri%
+
+    api_adapter.fitbit:
+        class: AppBundle\ApiAdapter\Provider\FitbitApiAdapter
+        arguments:
+          - "@oauth.fitbit_client"
+          - "@security.context"
+          - "@api_parser.fitbit_food"
+          - "@api_parser.fitbit_bodyfat"
+          - "@api_parser.fitbit_weight"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+
     user_data:
         class: AppBundle\UserData\UserData
         arguments:

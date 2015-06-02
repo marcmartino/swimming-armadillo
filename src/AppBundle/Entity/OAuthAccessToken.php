@@ -3,12 +3,13 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * OAuthAccessToken
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="OAuthAccessTokenRepository")
  */
 class OAuthAccessToken
 {
@@ -45,7 +46,7 @@ class OAuthAccessToken
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="oauthAccessTokens")
-     * @var User
+     * @var AdvancedUserInterface
      */
     protected $user;
 
@@ -139,7 +140,7 @@ class OAuthAccessToken
     }
 
     /**
-     * @return User
+     * @return AdvancedUserInterface
      */
     public function getUser()
     {
@@ -147,7 +148,7 @@ class OAuthAccessToken
     }
 
     /**
-     * @param User $user
+     * @param AdvancedUserInterface $user
      * @return $this
      */
     public function setUser($user)
