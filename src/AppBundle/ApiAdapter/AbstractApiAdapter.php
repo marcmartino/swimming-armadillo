@@ -1,65 +1,62 @@
 <?php
 namespace AppBundle\ApiAdapter;
-
-use AppBundle\Entity\User;
-use AppBundle\Exception\UserNotAuthenticatedWithServiceProvider;
+use AppBundle\Entity\MeasurementEventRepository;
+use AppBundle\Entity\OAuthAccessTokenRepository;
+use AppBundle\Entity\ServiceProvider;
+use AppBundle\Entity\ServiceProviderRepository;
+use AppBundle\Persistence\PersistenceInterface;
+use AppBundle\Provider\Providers;
 use DateTime;
-use Doctrine\ORM\EntityManager;
-use AppBundle\Entity\OAuthAccessToken;
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use OAuth\Common\Service\ServiceInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
+/**
+ * Class AbstractApiAdapter
+ * @package AppBundle\ApiAdapter
+ */
 abstract class AbstractApiAdapter {
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-    /**
-     * @var \OAuth\OAuth1\Service\AbstractService
-     */
-    protected $service;
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var User */
+    /** @var ServiceInterface */
+    protected $httpClient;
+    /** @var AdvancedUserInterface */
     protected $user;
+    /** @var PersistenceInterface */
+    protected $persistence;
+    /** @var ServiceProvider */
+    protected $serviceProvider;
+    /** @var OAuthAccessTokenRepository */
+    protected $oauthAccessTokens;
+    /** @var MeasurementEventRepository*/
+    protected $measurementEvents;
 
-    /**
-     * @param ContainerInterface $container
-     * @param EntityManager $em
-     * @param User $user
-     */
     public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        User $user
-    ) {
-        $this->container = $container;
-        $this->em = $em;
-        $this->user = $user;
-    }
-
-    /**
-     * Return a ServiceProvider object for this ApiAdapter
-     * @return mixed
-     */
-    public abstract function getServiceProvider();
-
-    /**
-     * @return \OAuth\OAuth1\Service\AbstractService
-     */
-    public function getService()
+        ServiceInterface $httpClient,
+        SecurityContextInterface $securityContext,
+        PersistenceInterface $persistence,
+        ServiceProviderRepository $serviceProviders,
+        OAuthAccessTokenRepository $oauthAccessTokens,
+        MeasurementEventRepository $measurementEvents
+    )
     {
-        return $this->service;
+        $this->httpClient = $httpClient;
+        // TODO I don't like this, it would be better to inject the user
+        $this->user = $securityContext->getToken()->getUser();
+        $this->persistence = $persistence;
+        $this->serviceProviders = $serviceProviders;
+        $this->oauthAccessTokens = $oauthAccessTokens;
+        $this->measurementEvents = $measurementEvents;
     }
 
-
-
-
+    /**
+     * @return ServiceInterface
+     */
+    public function getHttpClient()
+    {
+        return $this->httpClient;
+    }
 
     /**
-     * @return User
+     * @return AdvancedUserInterface
      */
     public function getUser()
     {
@@ -67,11 +64,126 @@ abstract class AbstractApiAdapter {
     }
 
     /**
-     * @param User $user
+     * @return PersistenceInterface
      */
-    public function setUser($user)
+    public function getPersistence()
     {
-        $this->user = $user;
+        return $this->persistence;
     }
 
+    /**
+     * @return ServiceProviderRepository
+     */
+    public function getServiceProviders()
+    {
+        return $this->serviceProviders;
+    }
+
+    /**
+     * Return a service provider entity for fitbit
+     *
+     * @return null|ServiceProvider
+     */
+    public function getServiceProvider()
+    {
+        return $this->serviceProviders->findOneBy(['slug' => Providers::FITBIT]);
+    }
+
+    /**
+     * @return OAuthAccessTokenRepository
+     */
+    public function getOauthAccessTokens()
+    {
+        return $this->oauthAccessTokens;
+    }
+
+    /**
+     * @return MeasurementEventRepository
+     */
+    public function getMeasurementEvents()
+    {
+        return $this->measurementEvents;
+    }
+
+    /**
+     * Return URI for oauth authorization
+     *
+     * @return string
+     */
+    public function getAuthorizationUri()
+    {
+        $token = $this->getHttpClient()->requestRequestToken();
+        return $this->getHttpClient()->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()));
+    }
+
+    /**
+     * @throws UserNotAuthenticatedWithServiceProvider
+     * @return null|OauthAccessToken
+     */
+    public function getUserOauthToken()
+    {
+        $user = $this->getUser();
+
+        $oauthToken = $this->oauthAccessTokens
+            ->findOneBy([
+                'user' => $user,
+                'serviceProvider' => $this->getServiceProvider()
+            ]);
+
+        if (empty($oauthToken)) {
+            throw new UserNotAuthenticatedWithServiceProvider("User has not authenticated service provider: " . $this->getServiceProvider()->getSlug());
+        }
+
+        return $oauthToken;
+    }
+
+
+    /**
+     * Get the date and time to start consuming a service provider's api
+     *
+     * @return DateTime
+     */
+    public function getStartConsumeDateTime()
+    {
+        if($dateTime = $this->getLastMeasurementEventDateTime()) {
+            return $dateTime;
+        }
+        return $this->getDefaultConsumeDateTime();
+    }
+
+    /**
+     * Get date and time of the most recent data we have for this service provider
+     *
+     * @return bool|\DateTime
+     */
+    public function getLastMeasurementEventDateTime()
+    {
+        /** @var \AppBundle\Entity\MeasurementEvent|bool $lastMeasurementEvent */
+        $lastMeasurementEvent = $this->measurementEvents->findOneBy(
+            ['user' => $this->getUser(), 'serviceProvider' => $this->getServiceProvider()],
+            ['eventTime' => 'DESC']
+        );
+        if (empty($lastMeasurementEvent)) {
+            return false;
+        }
+        return $lastMeasurementEvent->getEventTime();
+    }
+
+    /**
+     * Returns default start time for consuming provider apis, override if necessary
+     *
+     * @return DateTime
+     */
+    public function getDefaultConsumeDateTime()
+    {
+        return (new DateTime)->modify('-1 month');
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getEndConsumeDateTime()
+    {
+        return (new DateTime);
+    }
 }

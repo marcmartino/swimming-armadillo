@@ -18,6 +18,8 @@ services:
         class: OAuth\ServiceFactory
         calls:
           - [setHttpClient, ["@oauth.curl_client"]]
+          - [registerService, ["FitBit", "AppBundle\\OAuth\\FitBit"]]
+          - [registerService, ["WithingsOAuth", "AppBundle\\OAuth\\WithingsOAuth"]]
 
     oauth.fitbit_client:
         class: AppBundle\OAuth\Fitbit
@@ -39,13 +41,39 @@ services:
         arguments:
           - "@oauth.fitbit_client"
           - "@security.context"
-          - "@api_parser.fitbit_food"
-          - "@api_parser.fitbit_bodyfat"
-          - "@api_parser.fitbit_weight"
           - "@happy_stats.persistence"
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+          - "@api_parser.fitbit_food"
+          - "@api_parser.fitbit_bodyfat"
+          - "@api_parser.fitbit_weight"
+
+    oauth.withings_client:
+        class: AppBundle\OAuth\WithingsOAuth
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+            - "WithingsOAuth"
+            - "@api_adapter.withings_credentials"
+            - "@token_storage_session"
+
+    api_adapter.withings_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %withings_consumer_key%
+          - %withings_consumer_secret%
+          - %withings_callback_uri%
+
+    api_adapter.withings:
+        class: AppBundle\ApiAdapter\Provider\WithingsApiAdapter
+        arguments:
+          - "@oauth.withings_client"
+          - "@security.context"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+          - "@api_parser.withings_body_measurement"
 
     user_data:
         class: AppBundle\UserData\UserData

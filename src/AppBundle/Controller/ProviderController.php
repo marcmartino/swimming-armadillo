@@ -34,9 +34,7 @@ class ProviderController extends Controller
     public function authorizeAction($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
-        $factory = $this->get('api_adapter_factory');
-        $factory->setUser($this->getUser());
-        $apiAdapter = $factory->getApiAdapter($providerSlug);
+        $apiAdapter = $this->get('api_adapter.withings');
         return new RedirectResponse((string) $apiAdapter->getAuthorizationUri());
     }
 
@@ -46,9 +44,7 @@ class ProviderController extends Controller
     public function providerCallback($providerSlug)
     {
         /** @var ProviderApiAdapterFactory $factory */
-        $factory = $this->get('api_adapter_factory');
-        $factory->setUser($this->getUser());
-        $apiAdapter = $factory->getApiAdapter($providerSlug);
+        $apiAdapter = $this->get('api_adapter.withings');
 
         // Handle the callback (store oauth token, ..., ...)
         $apiAdapter->handleCallback();
@@ -67,7 +63,7 @@ class ProviderController extends Controller
         /** @var ProviderApiAdapterFactory $factory */
 //        $factory = $this->get('api_adapter_factory');
 //        $factory->setUser($this->getUser());
-        $apiAdapter = $this->get('api_adapter.fitbit');
+        $apiAdapter = $this->get('api_adapter.withings');
         try {
             $apiAdapter->consumeData();
         } catch (OAuthException $e) {

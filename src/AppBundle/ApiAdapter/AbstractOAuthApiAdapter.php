@@ -6,5 +6,4 @@ namespace AppBundle\ApiAdapter;
  * @package AppBundle\ApiAdapter
  */
 abstract class AbstractOAuthApiAdapter extends AbstractApiAdapter {
-
 }
