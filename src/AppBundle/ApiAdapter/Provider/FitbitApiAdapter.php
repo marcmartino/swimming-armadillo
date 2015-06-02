@@ -72,9 +72,11 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter
         $to = $this->getEndConsumeDateTime();
 
         // We have to fetch food results with one request per day
+        $from1 = clone $from;
+        $from2 = clone $from;
         $this->consumeFood($from, $to);
-        $this->consumeBodyFat($from, $to);
-        $this->consumeWeight($from, $to);
+        $this->consumeBodyFat($from1, $to);
+        $this->consumeWeight($from2, $to);
 
         $this->persistence->flush();
     }
@@ -100,6 +102,7 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter
             }
 
             $dateFrom->modify('+1 day');
+            return;
         }
     }
 
@@ -166,5 +169,13 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter
 
         $this->persistence->persist($accessTokenObj);
         $this->persistence->flush();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getEndConsumeDateTime()
+    {
+        return (new DateTime)->modify('-1 day');
     }
 }
