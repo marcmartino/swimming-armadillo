@@ -102,7 +102,6 @@ class FitbitApiAdapter extends AbstractOAuthApiAdapter
             }
 
             $dateFrom->modify('+1 day');
-            return;
         }
     }
 
