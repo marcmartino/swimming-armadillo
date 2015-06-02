@@ -85,17 +85,14 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
     {
         $accessToken = $this->getHttpClient()->requestAccessToken($_GET['code']);
 
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUser($securityContext->getToken()->getUser())
+            ->setUser($this->getUser())
             ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken());
 
-        $this->em->persist($accessTokenObj);
-        $this->em->flush();
+        $this->persistence->persist($accessTokenObj);
+        $this->persistence->flush();
     }
 
     /**
