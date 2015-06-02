@@ -2,6 +2,7 @@
 namespace AppBundle\ApiAdapter\Provider;
 
 use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
+use AppBundle\ApiParser\Automatic\Trips;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\MeasurementEventRepository;
@@ -29,6 +30,9 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
 {
+    /** @var Trips */
+    protected $trips;
+
     /**
      * {@inheritDoc}
      */
@@ -38,7 +42,8 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
         PersistenceInterface $persistence,
         ServiceProviderRepository $serviceProviders,
         OAuthAccessTokenRepository $oauthAccessTokens,
-        MeasurementEventRepository $measurementEvents
+        MeasurementEventRepository $measurementEvents,
+        Trips $trips
     )
     {
         parent::__construct(
@@ -49,6 +54,8 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
             $oauthAccessTokens,
             $measurementEvents
         );
+
+        $this->trips = $trips;
     }
 
     /**
@@ -58,48 +65,20 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
     {
         $oauthAccessToken = $this->getUserOauthToken();
         $token = new StdOAuth2Token($oauthAccessToken->getToken());
-        $this->storage->storeAccessToken('AutomaticOAuth2', $token);
+        $this->httpClient->getStorage()->storeAccessToken('AutomaticOAuth2', $token);
 
         $response = $this->getHttpClient()->request('/trips');
 
-        $trips = $this->consumeTrips($response);
+        $results = $this->trips->parse($response);
 
-        foreach ($trips['events'] as $measurementEvent) {
-            $measurementEventObj = new MeasurementEvent();
-            $eventTime = new \DateTime($measurementEvent['event_time']);
-            $measurementEventObj->setEventTime($eventTime)
-                ->setServiceProvider($this->getServiceProvider())
+        /** @var MeasurementEvent $measurementEvent */
+        foreach ($results['measurement_events'] as $measurementEvent) {
+            $measurementEvent->setServiceProvider($this->getServiceProvider())
                 ->setUser($this->getUser());
-            $this->em->persist($measurementEventObj);
-
-            $measurement = $measurementEvent['measurements'];
-            // Store drive distance
-            $distance = $measurement['distance'];
-            $measurementObj = new Measurement();
-            $unitType = $this->em->getRepository('AppBundle:UnitType')
-                ->findOneBy(['slug' => UnitType::METERS]);
-            $measurementType = $this->em->getRepository('AppBundle:MeasurementType')
-                ->findOneBy(['slug' => MeasurementType::DRIVE_DISTANCE]);
-            $measurementObj->setMeasurementEvent($measurementEventObj)
-                ->setMeasurementType($measurementType)
-                ->setUnitType($unitType)
-                ->setUnits($distance);
-            $this->em->persist($measurementObj);
-
-            // Store drive time
-            $driveTime = $measurement['drive_time'];
-            $measurementObj = new Measurement();
-            $unitType = $this->em->getRepository('AppBundle:UnitType')
-                ->findOneBy(['slug' => UnitType::SECONDS]);
-            $measurementType = $this->em->getRepository('AppBundle:MeasurementType')
-                ->findOneBy(['slug' => MeasurementType::DRIVE_TIME]);
-            $measurementObj->setMeasurementEvent($measurementEventObj)
-                ->setMeasurementType($measurementType)
-                ->setUnitType($unitType)
-                ->setUnits($driveTime);
-            $this->em->persist($measurementObj);
+            $this->getPersistence()->persist($measurementEvent);
         }
-        $this->em->flush();
+
+        $this->getPersistence()->flush();
     }
 
     public function handleCallback()
@@ -117,66 +96,6 @@ class AutomaticApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterI
 
         $this->em->persist($accessTokenObj);
         $this->em->flush();
-    }
-
-    /**
-     * @return AutomaticOAuth2
-     */
-    public function getService()
-    {
-        return $this->service;
-    }
-
-    /**
-     * @return AutomaticOAuth2
-     */
-    public function createService()
-    {
-        $credentials = new Credentials(
-            $this->consumerKey,
-            $this->consumerSecret,
-            $this->callbackUri
-        );
-
-        $serviceFactory = new ServiceFactory();
-        $httpClient = new CurlClient();
-        $serviceFactory->setHttpClient($httpClient);
-        $serviceFactory->registerService('AutomaticOAuth2', 'AppBundle\\OAuth\\AutomaticOAuth2');
-
-        // Commented out scopes do not seem to work at this time.
-        /** @var AutomaticOAuth2 $service */
-        return $service = $serviceFactory->createService('AutomaticOAuth2', $credentials, $this->storage, [
-            AutomaticOAuth2::SCOPE_PUBLIC,
-            AutomaticOAuth2::SCOPE_USER_PROFILE,
-//            AutomaticOAuth2::SCOPE_USER_FOLLOW,
-            AutomaticOAuth2::SCOPE_LOCATION,
-//            AutomaticOAuth2::SCOPE_CURRENT_LOCATION,
-            AutomaticOAuth2::SCOPE_VEHICLE_PROFILE,
-            AutomaticOAuth2::SCOPE_VEHICLE_EVENTS,
-//            AutomaticOAuth2::SCOPE_VEHICLE_VIN,
-            AutomaticOAuth2::SCOPE_TRIP,
-            AutomaticOAuth2::SCOPE_BEHAVIOR
-        ]);
-    }
-
-    /**
-     * @param $responseBody
-     * @return array
-     */
-    public function consumeTrips($responseBody)
-    {
-        $tripEvents = ['events' => []];
-        $json = json_decode($responseBody, true);
-        foreach ($json as $event) {
-            $driveTime = ($event['end_time'] - $event['start_time']) / 1000;
-            $tripEvent = [
-                'event_time' => date('Y-m-d H:i:s', $event['start_time'] / 1000),
-                'measurements' => ['distance' => $event['distance_m'], 'drive_time' => $driveTime]
-            ];
-            $tripEvents['events'][] = $tripEvent;
-        }
-
-        return $tripEvents;
     }
 
     /**

@@ -4,6 +4,7 @@ use AppBundle\Entity\MeasurementEventRepository;
 use AppBundle\Entity\OAuthAccessTokenRepository;
 use AppBundle\Entity\ServiceProvider;
 use AppBundle\Entity\ServiceProviderRepository;
+use AppBundle\Exception\UserNotAuthenticatedWithServiceProvider;
 use AppBundle\Persistence\PersistenceInterface;
 use AppBundle\Provider\Providers;
 use DateTime;

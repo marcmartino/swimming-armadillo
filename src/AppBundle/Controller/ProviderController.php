@@ -63,7 +63,7 @@ class ProviderController extends Controller
         /** @var ProviderApiAdapterFactory $factory */
 //        $factory = $this->get('api_adapter_factory');
 //        $factory->setUser($this->getUser());
-        $apiAdapter = $this->get('api_adapter.withings');
+        $apiAdapter = $this->get('api_adapter.automatic');
         try {
             $apiAdapter->consumeData();
         } catch (OAuthException $e) {
