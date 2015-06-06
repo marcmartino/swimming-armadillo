@@ -219,6 +219,6 @@ services:
         class: AppBundle\Controller\ProviderController
         arguments:
           - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
-          - "@security.context"
-          - "@templating"
-          - "@service_container"
+          - @security.context
+          - @templating
+          - @service_container

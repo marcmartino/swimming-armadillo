@@ -66,7 +66,6 @@ class ProviderController extends Controller
         foreach ($oauthAccessTokens as $token) {
             $authenticatedProviders[] = $token->getServiceProvider()->getId();
         }
-        print_r($authenticatedProviders);
         return $this->templating->renderResponse("provider/providers.html.twig", [
             'providers' => $providers,
             'authenticatedProviders' => $authenticatedProviders
