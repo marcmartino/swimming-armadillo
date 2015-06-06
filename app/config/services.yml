@@ -213,3 +213,12 @@ services:
     happystats.mailchimp:
         class: Mailchimp
         arguments: ['%mailchimp.api_key%']
+
+    # Controllers
+    app.controller.provider_controller:
+        class: AppBundle\Controller\ProviderController
+        arguments:
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - "@security.context"
+          - "@templating"
+          - "@service_container"
