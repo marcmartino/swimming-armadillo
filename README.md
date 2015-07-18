@@ -25,3 +25,7 @@ http://localhost:8000/userdata/....
 ## Installing Composer
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/bin/composer
+
+## Installing Postgres + PDO (TODO)
+install homebrew
+install php56 with pdo + pgsql
