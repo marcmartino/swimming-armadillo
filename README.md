@@ -21,3 +21,7 @@ http://localhost:8000/userdata/heartrate
 http://localhost:8000/userdata/fatratio
 http://localhost:8000/userdata/height
 http://localhost:8000/userdata/....
+
+## Installing Composer
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/bin/composer
