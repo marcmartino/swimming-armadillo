@@ -4,7 +4,12 @@
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+    {% if app.user %}
+    ga('create', 'UA-63192196-1', { 'userId': '{{ app.user.googleUserId }}' });
+    {% else %}
     ga('create', 'UA-63192196-1', 'auto');
+    {% endif %}
+
     ga('send', 'pageview');
 
 </script>
