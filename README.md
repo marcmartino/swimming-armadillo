@@ -5,13 +5,15 @@ swimming-armadillo
 1. 'composer install'
 2. 'php app/console doctrine:database:create'
 3. Steps 2- of "Updating"
+4. Add hdlbit.com to your hosts file (127.0.0.1)
+5. Disable apache if need be
 
 ## Updating
 
 1. 'composer update'
 2. 'php app/console doctrine:schema:update --force'
 3. 'php app/console doctrine:migrations:migrate'
-4. 'php app/console server:run'
+4. 'sudo php app/console server:run hdlbit.com:80 -v'
 5. http://localhost:8000/withings/authorize
 
 ## Some API Stuff
