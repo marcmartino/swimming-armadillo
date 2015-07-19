@@ -28,7 +28,6 @@ class Version20150718164713 extends AbstractMigration implements ContainerAwareI
      */
     public function up(Schema $schema)
     {
-        echo "ENV: " . $this->container->get('kernel')->getEnvironment();
         if(in_array($this->container->get('kernel')->getEnvironment(), array('test', 'dev'))) {
             $code = new RegistrationCode;
             $code->setCode($this->container->get('kernel')->getEnvironment());
