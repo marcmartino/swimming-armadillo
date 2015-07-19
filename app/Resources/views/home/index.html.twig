@@ -25,7 +25,7 @@
 						{% for dayData in measurementInfo.data  %}
 							<div class="dayMeasure" >
 								<span class="units small-6 columns" >
-									{{ dayData.units }} {{ dayData.unit_type }}</span>
+									{{ dayData.units }} {{ dayData.unit_type_id }}</span>
 								<span class="measureTime small-6 columns" >
 									{{ dayData.event_time|date("ga") }}</span>
 							</div>
