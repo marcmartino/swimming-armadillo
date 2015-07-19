@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\ApiAdapter;
 use AppBundle\Entity\User;
+use AppBundle\Provider\Providers;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -37,12 +38,19 @@ class ProviderApiAdapterFactory
 
     /**
      * @param $providerSlug
+     * @throws \Exception
      * @return ApiAdapterInterface
      */
     public function getApiAdapter($providerSlug)
     {
-        $fullyQualifiedName = "AppBundle\\ApiAdapter\\Provider\\" . ucfirst($providerSlug) . "ApiAdapter";
-        return new $fullyQualifiedName($this->container, $this->em, $this->user);
+        if ($providerSlug == Providers::WITHINGS) {
+            return $this->container->get('api_adapter.withings');
+        } else if ($providerSlug == Providers::AUTOMATIC) {
+            return $this->container->get('api_adapter.automatic');
+        } else if ($providerSlug == Providers::FITBIT) {
+            return $this->container->get('api_adapter.fitbit');
+        }
+        throw new \Exception('Unknown service provider ' . $providerSlug);
     }
 
     /**
@@ -56,7 +64,7 @@ class ProviderApiAdapterFactory
     /**
      * @param User $user
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
     }

@@ -16,3 +16,5 @@ build/*
 !build/phpmd.xml
 !build/phpunit.xml
 !build/phpdox.xml
+
+cache.properties

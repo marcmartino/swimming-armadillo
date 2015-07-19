@@ -10,17 +10,11 @@ use DateTime;
  * Class FitbitBodyFatTest
  * @package AppBundle\Tests\ApiParser
  */
-class FitbitBodyFatTest extends \PHPUnit_Framework_TestCase{
+class FitbitBodyFatTest extends AbstractApiParserTest {
     public function testParse()
     {
-        $this->markTestIncomplete('Need to fix');
-        $entityManager = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $responseBody = file_get_contents(__DIR__ . '/../Resources/ApiParser/fitbitBodyFat.json');
-        $parser = new FitbitBodyFat($entityManager);
+        $parser = new FitbitBodyFat($this->getUnitTypes(), $this->getMeasurementTypes(), $this->getPersistence());
         $results = $parser->parse($responseBody);
         
         $this->assertCount(2, $results['measurements']);

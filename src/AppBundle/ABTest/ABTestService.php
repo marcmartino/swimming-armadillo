@@ -3,9 +3,7 @@
 namespace AppBundle\ABTest;
 
 use AppBundle\Entity\ABTest;
-use AppBundle\Entity\Insight;
 use AppBundle\Entity\User;
-use Doctrine\DBAL\Driver\Connection;
 use AppBundle\Insight\InsightService;
 
 class ABTestService {

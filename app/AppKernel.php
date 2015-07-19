@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new \FOS\UserBundle\FOSUserBundle(),
+            new HappyStats\StatisticsBundle\HappyStatsStatisticsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

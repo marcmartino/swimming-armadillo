@@ -1,0 +1,4 @@
+services:
+#    happy_stats_statistics.example:
+#        class: HappyStats\StatisticsBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]

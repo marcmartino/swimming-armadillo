@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\ApiParser;
 
+use AppBundle\ApiParser\Fitbit\AbstractFitbitApiParser;
 use AppBundle\Entity\Measurement;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\MeasurementType\MeasurementType;
@@ -10,7 +11,7 @@ use AppBundle\UnitType\UnitType;
  * Class FitbitBodyFat
  * @package AppBundle\ApiParser
  */
-class FitbitBodyFat extends AbstractEntityApiParser implements ApiParserInterface {
+class FitbitBodyFat extends AbstractFitbitApiParser implements ApiParserInterface {
 
     /**
      * Create objects/arrays from an api response body
@@ -20,6 +21,7 @@ class FitbitBodyFat extends AbstractEntityApiParser implements ApiParserInterfac
      */
     public function parse($responseBody)
     {
+        $this->parseError($responseBody);
         $json = json_decode($responseBody, true);
 
         $results = [
@@ -31,18 +33,18 @@ class FitbitBodyFat extends AbstractEntityApiParser implements ApiParserInterfac
 
             $measurementEvent = (new MeasurementEvent)
                 ->setEventTime(new \DateTime($fatMeasurement['date'] . ' ' . $fatMeasurement['time']));
-            $this->em->persist($measurementEvent);
+            $this->persist->persist($measurementEvent);
 
-            $unitTypeId = $this->em->getRepository('AppBundle:UnitType')
-                ->findOneBy(['slug' => UnitType::PERCENT])->getId();
-            $measurementTypeId = $this->em->getRepository('AppBundle:MeasurementType')
-                ->findOneBy(['slug' => MeasurementType::FAT_RATIO])->getId();
+            $unitType = $this->unitTypes
+                ->findOneBy(['slug' => UnitType::PERCENT]);
+            $measurementType = $this->measurementTypes
+                ->findOneBy(['slug' => MeasurementType::FAT_RATIO]);
             $measurement = (new Measurement)
-                ->setMeasurementEventId($measurementEvent->getId())
+                ->setMeasurementEvent($measurementEvent)
                 ->setUnits($fatMeasurement['fat'])
-                ->setUnitsTypeId($unitTypeId)
-                ->setMeasurementTypeId($measurementTypeId);
-            $this->em->persist($measurement);
+                ->setUnitType($unitType)
+                ->setMeasurementType($measurementType);
+            $this->persist->persist($measurement);
 
             $results['measurement_events'][] = $measurementEvent;
             $results['measurements'][] = $measurement;

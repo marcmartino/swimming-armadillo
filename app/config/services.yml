@@ -4,13 +4,6 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
-
-    guzzle:
-        class: GuzzleHttp\Client
-
     token_storage_session:
         class: OAuth\Common\Storage\Session
 
@@ -18,9 +11,102 @@ services:
         class: AppBundle\ApiAdapter\ProviderApiAdapterFactory
         arguments: ["@service_container", "@doctrine.orm.entity_manager"]
 
+    oauth.curl_client:
+        class: OAuth\Common\Http\Client\CurlClient
+
+    oauth.service_factory:
+        class: OAuth\ServiceFactory
+        calls:
+          - [setHttpClient, ["@oauth.curl_client"]]
+          - [registerService, ["FitBit", "AppBundle\\OAuth\\FitBit"]]
+          - [registerService, ["WithingsOAuth", "AppBundle\\OAuth\\WithingsOAuth"]]
+          - [registerService, ["AutomaticOAuth2", "AppBundle\\OAuth\\AutomaticOAuth2"]]
+
+    oauth.fitbit_client:
+        class: AppBundle\OAuth\Fitbit
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+            - "FitBit"
+            - "@api_adapter.fitbit_credentials"
+            - "@token_storage_session"
+
+    api_adapter.fitbit_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %fitbit_consumer_key%
+          - %fitbit_consumer_secret%
+          - %fitbit_callback_uri%
+
+    api_adapter.fitbit:
+        class: AppBundle\ApiAdapter\Provider\FitbitApiAdapter
+        arguments:
+          - "@oauth.fitbit_client"
+          - "@security.context"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+          - "@api_parser.fitbit_food"
+          - "@api_parser.fitbit_bodyfat"
+          - "@api_parser.fitbit_weight"
+
+    oauth.withings_client:
+        class: AppBundle\OAuth\WithingsOAuth
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+            - "WithingsOAuth"
+            - "@api_adapter.withings_credentials"
+            - "@token_storage_session"
+
+    api_adapter.withings_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %withings_consumer_key%
+          - %withings_consumer_secret%
+          - %withings_callback_uri%
+
+    api_adapter.withings:
+        class: AppBundle\ApiAdapter\Provider\WithingsApiAdapter
+        arguments:
+          - "@oauth.withings_client"
+          - "@security.context"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+          - "@api_parser.withings_body_measurement"
+
+    api_adapter.automatic_credentials:
+        class: OAuth\Common\Consumer\Credentials
+        arguments:
+          - %automatic_consumer_key%
+          - %automatic_consumer_secret%
+          - %automatic_callback_uri%
+
+    oauth.automatic_client:
+        class: AppBundle\OAuth\AutomaticOAuth2
+        factory: [ "@oauth.service_factory", createService ]
+        arguments:
+          - "AutomaticOAuth2"
+          - "@api_adapter.automatic_credentials"
+          - "@token_storage_session"
+          - ["scope:public", "scope:user:profile", "scope:location", "scope:vehicle:profile", "scope:vehicle:events", "scope:trip", "scope:behavior"]
+
+    api_adapter.automatic:
+        class: AppBundle\ApiAdapter\Provider\AutomaticApiAdapter
+        arguments:
+          - "@oauth.automatic_client"
+          - "@security.context"
+          - "@happy_stats.persistence"
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:OAuthAccessToken")
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementEvent")
+          - "@api_parser.automatic_trips"
+
     user_data:
         class: AppBundle\UserData\UserData
-        arguments: ["@database_connection", "@entity_measurement_type"]
+        arguments:
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:Measurement")
 
     entity_provider:
         class: AppBundle\Entity\Provider
@@ -64,37 +150,75 @@ services:
     correlator.pearson:
         class: AppBundle\Correlator\Pearson
 
+    happy_stats.persistence:
+        class: AppBundle\Persistence\EntityManagerPersistence
+        arguments: [ "@doctrine.orm.default_entity_manager" ]
 
     # Api Parsers
+    api_parser.abstract:
+      abstract: true
+      arguments:
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:UnitType")
+        - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:MeasurementType")
+        - @happy_stats.persistence
+
     api_parser.fitbit_food:
       class: AppBundle\ApiParser\FitbitFood
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
     api_parser.fitbit_bodyfat:
       class: AppBundle\ApiParser\FitbitBodyFat
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
     api_parser.fitbit_weight:
       class: AppBundle\ApiParser\FitbitWeight
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
     api_parser.withings_body_measurement:
       class: AppBundle\ApiParser\Withings\BodyMeasurement
-      arguments: ["@doctrine.orm.entity_manager"]
+      parent: api_parser.abstract
 
+    api_parser.automatic_trips:
+      class: AppBundle\ApiParser\Automatic\Trips
+      parent: api_parser.abstract
 
     # Event Listeners
-    kernel.listener.your_listener_name:
+    event.listener.registration_completed:
         class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted
         arguments: ["@service_container", "@router"]
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed, method: processEvent }
 
+    event.listener.registration_initialized:
+        class: AppBundle\EventListener\FOSUserBundleRegistrationInitialized
+        arguments: ["@doctrine.orm.entity_manager", "@happystats.mailchimp", '%mailchimp.user_list_id%']
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize, method: processEvent }
+
+    happystats_user.login_listener:
+        class: 'AppBundle\EventListener\LoginConsumeApis'
+        arguments: ['@doctrine.orm.entity_manager', '@api_adapter_factory', '@security.context', '@logger']
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.interactive_login', method: processEvent }
 
     # Form
-    acme_user.registration.form.type:
+    happystats_user.registration.form.type:
         class: AppBundle\Form\Type\RegistrationFormType
         arguments:
           - 'AppBundle\Entity\User'
         tags:
             - { name: form.type, alias: happystats_user_registration }
+
+    # Mailchimp
+    happystats.mailchimp:
+        class: Mailchimp
+        arguments: ['%mailchimp.api_key%']
+
+    # Controllers
+    app.controller.provider_controller:
+        class: AppBundle\Controller\ProviderController
+        arguments:
+          - @=service("doctrine.orm.default_entity_manager").getRepository("AppBundle:ServiceProvider")
+          - @security.context
+          - @templating
+          - @service_container

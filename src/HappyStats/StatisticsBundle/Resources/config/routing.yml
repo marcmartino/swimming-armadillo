@@ -1,0 +1,3 @@
+happy_stats_statistics_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: HappyStatsStatisticsBundle:Default:index }

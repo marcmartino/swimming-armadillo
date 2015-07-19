@@ -3,8 +3,6 @@ namespace AppBundle\Controller;
 
 
 use AppBundle\Correlator\SimpleSlope;
-use AppBundle\Entity\Measurement;
-use AppBundle\MeasurementType\MeasurementType;
 use AppBundle\UserData\UserData;
 use Exception;
 use InvalidArgumentException;

@@ -3,13 +3,14 @@
 namespace AppBundle\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * MeasurementEvent
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="MeasurementEventRepository")
  */
 class MeasurementEvent
 {
@@ -30,17 +31,27 @@ class MeasurementEvent
     private $eventTime;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="provider_id", type="integer")
-     */
-    private $providerId;
-
-    /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="measurementEvents")
      * @var User
      */
     private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Measurement", mappedBy="measurementEvent")
+     * @var Measurement[]
+     **/
+    private $measurements;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ServiceProvider")
+     * @var ServiceProvider
+     */
+    private $serviceProvider;
+
+    public function __construct()
+    {
+        $this->measurements = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -77,45 +88,6 @@ class MeasurementEvent
     }
 
     /**
-     * Set providerId
-     *
-     * @param integer $providerId
-     *
-     * @return MeasurementEvent
-     */
-    public function setProviderId($providerId)
-    {
-        $this->providerId = $providerId;
-
-        return $this;
-    }
-
-    /**
-     * Get providerId
-     *
-     * @return integer
-     */
-    public function getProviderId()
-    {
-        return $this->providerId;
-    }
-
-    /**
-     * @param DateTime $eventTime
-     * @param $providerId
-     * @return int - the id of the newly created measurement_event
-     */
-    public function store(
-        DateTime $eventTime,
-        $providerId
-    ) {
-        $this->setEventTime($eventTime)
-            ->setProviderId($providerId);
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getUser()
@@ -125,10 +97,53 @@ class MeasurementEvent
 
     /**
      * @param mixed $user
+     * @return $this
      */
     public function setUser($user)
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Measurement[]
+     */
+    public function getMeasurements()
+    {
+        return $this->measurements->toArray();
+    }
+
+    /**
+     * @param Measurement $measurement
+     * @return $this
+     */
+    public function addMeasurement(Measurement $measurement)
+    {
+        if (!$this->measurements->contains($measurement)) {
+            $this->measurements->add($measurement);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ServiceProvider
+     */
+    public function getServiceProvider()
+    {
+        return $this->serviceProvider;
+    }
+
+    /**
+     * @param ServiceProvider $serviceProvider
+     * @return $this
+     */
+    public function setServiceProvider($serviceProvider)
+    {
+        $this->serviceProvider = $serviceProvider;
+
+        return $this;
     }
 }
 

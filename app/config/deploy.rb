@@ -17,7 +17,7 @@ set :permission_method,   :acl
 set :use_set_permissions, true
 set :use_composer, true
 set :update_vendors, true
-set :composer_options,  "--prefer-dist"
+set :composer_options,  "--prefer-dist --no-dev"
 set :dump_assetic_assets, true
 
 set  :keep_releases,  5

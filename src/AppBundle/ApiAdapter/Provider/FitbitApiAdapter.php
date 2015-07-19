@@ -2,182 +2,179 @@
 namespace AppBundle\ApiAdapter\Provider;
 
 use AppBundle\ApiAdapter\AbstractOAuthApiAdapter;
-use AppBundle\ApiParser\FitbitBodyFat;
-use AppBundle\ApiParser\FitbitFood;
-use AppBundle\ApiParser\FitbitWeight;
-use AppBundle\Entity\User;
+use AppBundle\ApiParser\ApiParserInterface;
+use AppBundle\Entity\MeasurementEventRepository;
+use AppBundle\Entity\OAuthAccessTokenRepository;
+use AppBundle\Entity\ServiceProviderRepository;
+use AppBundle\Persistence\PersistenceInterface;
 use DateTime;
-use OAuth\ServiceFactory;
-use Doctrine\ORM\EntityManager;
-use OAuth\OAuth1\Service\FitBit;
-use AppBundle\Provider\Providers;
-use AppBundle\Entity\Measurement;
-use OAuth\Common\Storage\Session;
-use AppBundle\Entity\ServiceProvider;
-use OAuth\Common\Consumer\Credentials;
+use OAuth\OAuth1\Service\ServiceInterface;
+use OAuth\OAuth1\Token\StdOAuth1Token;
 use AppBundle\Entity\MeasurementEvent;
 use AppBundle\Entity\OAuthAccessToken;
-use AppBundle\ApiAdapter\ApiAdapterInterface;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Class FitbitApiAdapter
  * @package AppBundle\ApiAdapter\Provider
  */
-class FitbitApiAdapter extends AbstractOAuthApiAdapter implements ApiAdapterInterface
+class FitbitApiAdapter extends AbstractOAuthApiAdapter
 {
-    /** @var ContainerInterface */
-    protected $container;
-    /** @var FitBit */
-    protected $service;
-    /** @var Session */
-    protected $storage;
-    /** @var EntityManager */
-    protected $em;
-    /** @var FitbitFood */
+    /** @var ApiParserInterface */
     protected $fitbitFood;
-    /** @var FitbitBodyFat  */
+    /** @var ApiParserInterface  */
     protected $fitbitBodyFat;
-    /** @var FitbitWeight */
+    /** @var ApiParserInterface */
     protected $fitbitWeight;
 
+    /**
+     * {@inheritDoc}
+     * @param ApiParserInterface $fitbitFood
+     * @param ApiParserInterface $fitbitBodyFat
+     * @param ApiParserInterface $fitbitWeight
+     */
     public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        User $user
+        ServiceInterface $httpClient,
+        SecurityContextInterface $securityContext,
+        PersistenceInterface $persistence,
+        ServiceProviderRepository $serviceProviders,
+        OAuthAccessTokenRepository $oauthAccessTokens,
+        MeasurementEventRepository $measurementEvents,
+        ApiParserInterface $fitbitFood,
+        ApiParserInterface $fitbitBodyFat,
+        ApiParserInterface $fitbitWeight
     )
     {
-        parent::__construct($container, $em, $user);
-        $this->container = $container;
-        $this->storage = $this->container->get('token_storage_session');
-
-        $this->service = $this->createService();
-        $this->em = $em;
-
-        $this->fitbitFood = $this->container->get('api_parser.fitbit_food');
-        $this->fitbitBodyFat = $this->container->get('api_parser.fitbit_bodyfat');
-        $this->fitbitWeight = $this->container->get('api_parser.fitbit_weight');
-    }
-
-    /**
-     * @return \OAuth\Common\Service\ServiceInterface
-     * @throws \OAuth\Common\Exception\Exception
-     */
-    protected function createService()
-    {
-        $credentials = new Credentials(
-            $this->container->getParameter('fitbit_consumer_key'),
-            $this->container->getParameter('fitbit_consumer_secret'),
-            $this->container->getParameter('fitbit_callback_uri')
+        parent::__construct(
+            $httpClient,
+            $securityContext,
+            $persistence,
+            $serviceProviders,
+            $oauthAccessTokens,
+            $measurementEvents
         );
-
-        $serviceFactory = new ServiceFactory();
-        $serviceFactory->registerService('FitBit', 'AppBundle\\OAuth\\FitBit');
-
-        /** @var $fitbitService FitBit */
-        return $fitbitService = $serviceFactory->createService('FitBit', $credentials, $this->storage);
+        $this->fitbitFood = $fitbitFood;
+        $this->fitbitBodyFat = $fitbitBodyFat;
+        $this->fitbitWeight = $fitbitWeight;
     }
 
     public function consumeData()
     {
         // Ensure the user has authenticated with fitbit
         $userOauthToken = $this->getUserOauthToken();
+        $token = new StdOAuth1Token($userOauthToken->getToken());
+        $token->setAccessTokenSecret($userOauthToken->getSecret());
+        $this->getHttpClient()->getStorage()->storeAccessToken('FitBit', $token);
 
         // Consume data for the last day (should be changed)
         $from = $this->getStartConsumeDateTime();
-        $to = new DateTime;
+        $to = $this->getEndConsumeDateTime();
 
         // We have to fetch food results with one request per day
+        $from1 = clone $from;
+        $from2 = clone $from;
         $this->consumeFood($from, $to);
-        $this->consumeBodyFat($from, $to);
-        $this->consumeWeight($from, $to);
+        $this->consumeBodyFat($from1, $to);
+        $this->consumeWeight($from2, $to);
 
-        $this->em->flush();
+        $this->persistence->flush();
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeFood(DateTime $dateFrom, DateTime $dateTo)
     {
         while ($dateFrom <= $dateTo) {
-
             $uri = '/user/-/foods/log/date/' . $dateFrom->format('Y-m-d') . '.json';
-            $response = $this->getService()->request($uri);
+            $response = $this->getHttpClient()->request($uri);
 
             $fitbitResults = $this->fitbitFood->parse($response);
 
             /** @var MeasurementEvent $measurementEvent */
             foreach ($fitbitResults['measurement_events'] as $measurementEvent) {
-                $measurementEvent->setEventTime($dateFrom);
-                $measurementEvent->setProviderId($this->getServiceProvider()->getId());
-                $measurementEvent->setUser($this->getUser());
-                $this->em->persist($measurementEvent);
+                $measurementEvent->setEventTime($dateFrom)
+                    ->setServiceProvider($this->getServiceProvider())
+                    ->setUser($this->getUser());
+                $this->persistence->persist($measurementEvent);
             }
 
             $dateFrom->modify('+1 day');
         }
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeBodyFat(DateTime $dateFrom, DateTime $dateTo)
     {
         $uri = '/user/-/body/log/fat/date/' . $dateFrom->format('Y-m-d') . '/' . $dateTo->format('Y-m-d') . '.json';
-        $response = $this->getService()->request($uri);
+        $response = $this->getHttpClient()->request($uri);
         $bodyfatResults = $this->fitbitBodyFat->parse($response);
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($bodyfatResults['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
+            $measurementEvent->setServiceProvider($this->getServiceProvider());
             $measurementEvent->setUser($this->getUser());
-            $this->em->persist($measurementEvent);
+            $this->persistence->persist($measurementEvent);
         }
     }
 
+    /**
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     */
     public function consumeWeight(Datetime $dateFrom, DateTime $dateTo)
     {
         $uri = '/user/-/body/log/weight/date/' . $dateFrom->format('Y-m-d') . '/' . $dateTo->format('Y-m-d') . '.json';
-        $response = $this->getService()->request($uri);
+        $response = $this->getHttpClient()->request($uri);
 
         $weightResults = $this->fitbitWeight->parse($response);
 
         /** @var MeasurementEvent $measurementEvent */
         foreach ($weightResults['measurement_events'] as $measurementEvent) {
-            $measurementEvent->setProviderId($this->getServiceProvider()->getId());
-            $measurementEvent->setUser($this->getUser());
-            $this->em->persist($measurementEvent);
+            $measurementEvent->setServiceProvider($this->getServiceProvider())
+                ->setUser($this->getUser());
+            $this->persistence->persist($measurementEvent);
         }
     }
 
-    public function handleCallback()
+    /**
+     * Request and store an access token for the user
+     *
+     * @param $oauthToken
+     * @param $oauthVerifier
+     * @return mixed|void
+     */
+    public function handleCallback($oauthToken, $oauthVerifier)
     {
-        $token = $this->storage->retrieveAccessToken('FitBit');
+        $token = $this->getHttpClient()->getStorage()->retrieveAccessToken('FitBit');
 
-        $accessToken = $this->getService()->requestAccessToken(
-            $_GET['oauth_token'],
-            $_GET['oauth_verifier'],
+        $accessToken = $this->getHttpClient()->requestAccessToken(
+            $oauthToken,
+            $oauthVerifier,
             $token->getRequestTokenSecret()
         );
 
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('security.context');
-
         // Store the newly created access token
         $accessTokenObj = (new OAuthAccessToken)
-            ->setUserId($securityContext->getToken()->getUser()->getId())
-            ->setServiceProviderId($this->getServiceProvider()->getId())
+            ->setUser($this->getUser())
+            ->setServiceProvider($this->getServiceProvider())
             ->setToken($accessToken->getAccessToken())
             ->setSecret($accessToken->getAccessTokenSecret());
 
-        $this->em->persist($accessTokenObj);
-        $this->em->flush();
+        $this->persistence->persist($accessTokenObj);
+        $this->persistence->flush();
     }
 
     /**
-     * Return a service provider entity for fitbit
-     *
-     * @return null|ServiceProvider
+     * @return DateTime
      */
-    public function getServiceProvider()
+    public function getEndConsumeDateTime()
     {
-        return $provider = $this->em->getRepository('AppBundle:ServiceProvider')
-            ->findOneBy(['slug' => Providers::FITBIT]);
+        return (new DateTime)->modify('-1 day');
     }
 }

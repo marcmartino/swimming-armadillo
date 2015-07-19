@@ -48,7 +48,6 @@
         <div class="section-container tabs" data-section="tabs">
             <section>
                 <div class="content" data-section-content>
-                    <p>
                     <div class="row">
                         <div class="large-12 columns">
                             <div class="signup-panel">
@@ -57,7 +56,7 @@
                                     <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
                                     <div class="row collapse">
                                         <div class="small-12  columns">
-                                            <input type="text" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email" />
+                                            <input type="text" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email" autofocus/>
                                         </div>
                                     </div>
                                     <div class="row collapse">
@@ -69,12 +68,12 @@
                                 </form>
                             </div>
                         </div>
-                    </div></p>
+                    </div>
                 </div>
             </section>
         </div>
-        <div style="text-align:center">
-            <a href="{{ path('fos_user_registration_register') }}" class="button">{{ 'Sign Up Here'|trans }}</a>
+        <div class="panel radius">
+            <a href="{{ path('fos_user_registration_register') }}">{{ 'New Users: Register Here'|trans }}</a>
         </div>
     <div>
 {% endblock %}

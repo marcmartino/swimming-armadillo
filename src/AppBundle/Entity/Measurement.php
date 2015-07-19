@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Measurement
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="MeasurementRepository")
  */
 class Measurement
 {
@@ -22,33 +22,34 @@ class Measurement
     private $id;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="measurement_event_id", type="integer")
-     */
-    private $measurementEventId;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="measurement_type_id", type="integer")
-     */
-    private $measurementTypeId;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="units_type_id", type="integer")
-     */
-    private $unitsTypeId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="units", type="decimal")
      */
     private $units;
 
+    /**
+     * @var MeasurementEvent
+     * @ORM\ManyToOne(targetEntity="MeasurementEvent", inversedBy="measurements")
+     * @ORM\JoinColumn(name="measurement_event_id", referencedColumnName="id")
+     */
+    private $measurementEvent;
+
+    /**
+     * (e.g. weight, height, daily calories, drive distance)
+     * @var MeasurementType
+     * @ORM\ManyToOne(targetEntity="MeasurementType")
+     * @ORM\JoinColumn(name="measurement_type_id", referencedColumnName="id")
+     */
+    private $measurementType;
+
+    /**
+     * (e.g. kilograms, meters, calories, kilometers)
+     * @var UnitType
+     * @ORM\ManyToOne(targetEntity="UnitType")
+     * @ORM\JoinColumn(name="unit_type_id", referencedColumnName="id")
+     */
+    private $unitType;
 
     /**
      * Get id
@@ -58,78 +59,6 @@ class Measurement
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set measurementEventId
-     *
-     * @param integer $measurementEventId
-     *
-     * @return Measurement
-     */
-    public function setMeasurementEventId($measurementEventId)
-    {
-        $this->measurementEventId = $measurementEventId;
-
-        return $this;
-    }
-
-    /**
-     * Get measurementEventId
-     *
-     * @return integer
-     */
-    public function getMeasurementEventId()
-    {
-        return $this->measurementEventId;
-    }
-
-    /**
-     * Set measurementTypeId
-     *
-     * @param integer $measurementTypeId
-     *
-     * @return Measurement
-     */
-    public function setMeasurementTypeId($measurementTypeId)
-    {
-        $this->measurementTypeId = $measurementTypeId;
-
-        return $this;
-    }
-
-    /**
-     * Get measurementTypeId
-     *
-     * @return integer
-     */
-    public function getMeasurementTypeId()
-    {
-        return $this->measurementTypeId;
-    }
-
-    /**
-     * Set unitsTypeId
-     *
-     * @param integer $unitsTypeId
-     *
-     * @return Measurement
-     */
-    public function setUnitsTypeId($unitsTypeId)
-    {
-        $this->unitsTypeId = $unitsTypeId;
-
-        return $this;
-    }
-
-    /**
-     * Get unitsTypeId
-     *
-     * @return integer
-     */
-    public function getUnitsTypeId()
-    {
-        return $this->unitsTypeId;
     }
 
     /**
@@ -157,24 +86,60 @@ class Measurement
     }
 
     /**
-     * @param $measurementEventId
-     * @param $measurementTypeId
-     * @param $unitsTypeId
-     * @param $units
-     * @return Measurement
+     * @return MeasurementEvent
      */
-    public function store(
-        $measurementEventId,
-        $measurementTypeId,
-        $unitsTypeId,
-        $units
-    ) {
-        $measurement = (new Measurement)
-            ->setMeasurementEventId($measurementEventId)
-            ->setMeasurementTypeId($measurementTypeId)
-            ->setUnitsTypeId($unitsTypeId)
-            ->setUnits($units);
-        return $measurement;
+    public function getMeasurementEvent()
+    {
+        return $this->measurementEvent;
+    }
+
+    /**
+     * @param MeasurementEvent $measurementEvent
+     * @return $this
+     */
+    public function setMeasurementEvent($measurementEvent)
+    {
+        $this->measurementEvent = $measurementEvent;
+
+        return $this;
+    }
+
+    /**
+     * @return MeasurementType
+     */
+    public function getMeasurementType()
+    {
+        return $this->measurementType;
+    }
+
+    /**
+     * @param MeasurementType $measurementType
+     * @return $this
+     */
+    public function setMeasurementType($measurementType)
+    {
+        $this->measurementType = $measurementType;
+
+        return $this;
+    }
+
+    /**
+     * @return UnitType
+     */
+    public function getUnitType()
+    {
+        return $this->unitType;
+    }
+
+    /**
+     * @param UnitType $unitType
+     * @return $this
+     */
+    public function setUnitType($unitType)
+    {
+        $this->unitType = $unitType;
+
+        return $this;
     }
 }
 

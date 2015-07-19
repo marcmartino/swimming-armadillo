@@ -36,3 +36,7 @@ parameters:
 
     # Mandrill (Email Notifications) Configuration
     mandrill.api_key: garblegarble
+
+    # Mailchimp (Email Lists) Configuration
+    mailchimp.api_key: garblegarblegarblegarble
+    mailchimp.user_list_id: garble
