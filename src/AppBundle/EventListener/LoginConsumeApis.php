@@ -4,6 +4,7 @@ namespace AppBundle\EventListener;
 use AppBundle\ApiAdapter\ProviderApiAdapterFactory;
 use AppBundle\Exception\ApiParserException;
 use Doctrine\ORM\EntityManagerInterface;
+use OAuth\Common\Exception\Exception as OAuthException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
@@ -46,7 +47,6 @@ class LoginConsumeApis
     )
     {
         $this->em = $em;
-        $providerApiAdapterFactory->setUser($securityContext->getToken()->getUser());
         $this->providerApiAdapterFactory = $providerApiAdapterFactory;
         $this->securityContext = $securityContext;
         $this->logger = $logger;
@@ -60,6 +60,8 @@ class LoginConsumeApis
     public function processEvent(
         InteractiveLoginEvent $event
     ) {
+        $this->providerApiAdapterFactory->setUser($this->securityContext->getToken()->getUser());
+
         /** @var \AppBundle\Entity\User $user */
         $user = $this->securityContext->getToken()->getUser();
         $accessTokens = $user->getOauthAccessTokens();
@@ -73,7 +75,9 @@ class LoginConsumeApis
                 try {
                     $apiAdapter->consumeData();
                 } catch (ApiParserException $e) {
-                    $this->logger->log('error', $e->getMessage());
+                    $this->logger->log('error', $e->getMessage() . " - userId: " . $user->getId());
+                } catch (OAuthException $e) {
+                    $this->logger->log('error', $e->getMessage() . " - userId: " . $user->getId());
                 }
             }
             $serviceProviderSlugs[] = $serviceProvider->getSlug();
