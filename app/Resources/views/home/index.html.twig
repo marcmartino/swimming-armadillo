@@ -1,0 +1,52 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+	<style type="text/css">
+	.daySummary {
+		
+		margin-bottom: 30px;
+		margin-left: 1%;
+		border: 1px solid gray;
+
+
+	}
+	.daySummary > h1 {
+		border-bottom: 1px solid gray;
+		margin: 0 1% ;
+		padding: 0 1%;
+	}
+	.dayMeasurement {
+		display: block;
+		margin: 0 1% 5px;
+		padding: 0 1%;
+	}
+	.daySummary > h1 {
+		margin: 0;
+	}
+	</style>
+
+	{% for dayString, dayData in data %}
+		<div class="daySummary row" >
+			<h1>{{ dayString|date("F jS") }}</h1>
+			{% for measurementInfo in dayData %}
+				<a class="dayMeasurement" 
+					href="/graph/measure?measure={{ measurementInfo.measurementObj.slug  }}" >
+					<div class="dayMeasurementLabel" >
+						{{ measurementInfo.measurementObj.name }}
+					</div>
+					<div class="dayMeasurements" >
+						{% for dayData in measurementInfo.data  %}
+							<div class="dayMeasure" >
+								<span class="units small-6 columns" >
+									{{ dayData.units }} {{ dayData.unit_type_id }}</span>
+								<span class="measureTime small-6 columns" >
+									{{ dayData.event_time|date("ga") }}</span>
+							</div>
+						{% endfor %}
+					</div>
+				</a>
+			{% endfor %}
+		</div>
+        {% else  %}
+		You have no updates in this past week. Please authenticate your data sources <a href="/providers">here</a> or contact us at contact@happystats.io for assistance.
+	{% endfor %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    Index!!
+{% for datum in data %}
+{{ dump(datum) }}
+{% endfor %}
+{% endblock %}
