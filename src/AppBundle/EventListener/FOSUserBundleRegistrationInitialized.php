@@ -53,6 +53,10 @@ class FOSUserBundleRegistrationInitialized {
                 // Disable accounts without a valid code
                 $user->setEnabled(false);
             }
+
+            $googleUserId = uniqid();
+            $user->setGoogleUserId($googleUserId);
+
             $this->addUserToMailchimp($formFields['email']);
         }
     }

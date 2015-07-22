@@ -4,9 +4,10 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\EntityRepository;
 
 /**
- * Class UnitTypeRepository
+ * Class UserLoginRepository
  * @package AppBundle\Entity
  */
-class UnitTypeRepository extends EntityRepository {
+class UserLoginRepository extends EntityRepository
+{
 
 }

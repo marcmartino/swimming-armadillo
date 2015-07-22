@@ -26,10 +26,8 @@ class User extends BaseUser
      * @ORM\Column(type="string", nullable=true, length=255)
      * @Assert\NotBlank(message="Please enter your name.", groups={"Registration", "Profile"})
      * @Assert\Length(
-     *     min=3,
      *     max="255",
-     *     minMessage="The name is too short.",
-     *     maxMessage="The name is too long.",
+     *     maxMessage="Wow, that's a long name! Please abbreviate to 255 characters or less.",
      *     groups={"Registration", "Profile"}
      * )
      */
@@ -40,6 +38,13 @@ class User extends BaseUser
      * @ORM\JoinColumn(name="registrationcode_id", referencedColumnName="id")
      **/
     protected $registrationCode;
+
+    /**
+     * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/user-id
+     * @ORM\Column(type="string", nullable=true, length=255))
+     * @var string
+     */
+    protected $googleUserId;
 
     /**
      * @ORM\OneToMany(targetEntity="MeasurementEvent", mappedBy="user")
@@ -133,5 +138,21 @@ class User extends BaseUser
     public function setOauthAccessTokens($oauthAccessTokens)
     {
         $this->oauthAccessTokens = $oauthAccessTokens;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGoogleUserId()
+    {
+        return $this->googleUserId;
+    }
+
+    /**
+     * @param string $googleUserId
+     */
+    public function setGoogleUserId($googleUserId)
+    {
+        $this->googleUserId = $googleUserId;
     }
 }
