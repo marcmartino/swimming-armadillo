@@ -1,7 +1,7 @@
 <?php
 namespace AppBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
+use AppBundle\Entity\RegistrationCodeRepository;
 use FOS\UserBundle\Event\UserEvent;
 use Mailchimp;
 use Mailchimp_Error;
@@ -12,24 +12,23 @@ use Mailchimp_Error;
  */
 class FOSUserBundleRegistrationInitialized {
 
-    /** @var EntityManagerInterface */
-    protected $em;
+    /** @var RegistrationCodeRepository */
+    protected $registrationCodes;
     /** @var Mailchimp */
     protected $mailchimp;
     /** @var string - the id of the user mailing list with Mailchimp */
     protected $mailingListId;
 
     /**
-     * @param EntityManagerInterface $em
+     * @param RegistrationCodeRepository $registrationCodes
      * @param Mailchimp $mailchimp
      * @param $mailingListId
      */
     public function __construct(
-        EntityManagerInterface $em,
+        RegistrationCodeRepository $registrationCodes,
         Mailchimp $mailchimp,
         $mailingListId
     ) {
-        $this->em = $em;
         $this->mailchimp = $mailchimp;
         $this->mailingListId = $mailingListId;
     }
@@ -45,8 +44,8 @@ class FOSUserBundleRegistrationInitialized {
         $formFields = $request->get('fos_user_registration_form');
         // If the form has been submitted
         if (!empty($formFields)) {
-            $registrationCode = $this->em->getRepository('AppBundle:RegistrationCode')
-                ->findOneBy(['code' => $formFields['registrationCodeCode']]);
+            $registrationCode = $this->registrationCodes
+                ->findOneByCode($formFields['registrationCodeCode']);
             if (!empty($registrationCode)) {
                 $user->setRegistrationCode($registrationCode);
             } else {

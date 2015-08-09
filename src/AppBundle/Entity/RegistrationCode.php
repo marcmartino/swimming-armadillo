@@ -5,7 +5,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="RegistrationCodeRepository")
  * Class RegistrationCode
  * @package AppBundle\Entity
  */
