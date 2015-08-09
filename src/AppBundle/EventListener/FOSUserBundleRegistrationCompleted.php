@@ -3,9 +3,9 @@ namespace AppBundle\EventListener;
 
 use Mandrill;
 use Mandrill_Error;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class FOSUserBundleRegistrationCompleted
@@ -13,27 +13,36 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FOSUserBundleRegistrationCompleted
 {
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var Mandrill */
+    protected $mandrill;
     /** @var RouterInterface  */
     protected $router;
 
     /**
-     * @param ContainerInterface $container
+     * @param Mandrill $mandrill
+     * @param RouterInterface $router
+     * @internal param ContainerInterface $container
      */
     public function __construct(
-        ContainerInterface $container,
-        RouterInterface $router
+        Mandrill $mandrill,
+        RouterInterface $router,
+        LoggerInterface $logger
     ) {
-        $this->container = $container;
+        $this->mandrill = $mandrill;
         $this->router = $router;
     }
 
-    public function processEvent(FilterUserResponseEvent $event)
+    /**
+     * Send a welcome email to newly registered users
+     *
+     * @param FilterUserResponseEvent $event
+     * @throws Mandrill_Error
+     * @throws \Exception
+     */
+    public function sendWelcomeEmail(FilterUserResponseEvent $event)
     {
         $user = $event->getUser();
         try {
-            $mandrill = new Mandrill($this->container->getParameter('mandrill.api_key'));
             $template_name = 'RegistrationConfirmation';
             $template_content = [
                 [
@@ -42,20 +51,15 @@ class FOSUserBundleRegistrationCompleted
                 ]
             ];
             $message = [
-                'subject' => 'Welcome to hdlbit!',
+                'subject' => 'Welcome to HappyStats!',
                 'text' => 'html',
-                'from_email' => 'hello@happystats.io',
+                'from_email' => 'marc@happystats.io',
                 'to' => [
                     [
                         'email' => $user->getEmail()
                     ]
                 ],
                 'global_merge_vars' => [
-// Enable if we desire email confirmations
-//                    [
-//                        'name' => 'confirmation_url',
-//                        'content' => $this->router->generate('fos_user_registration_confirm', array('token' => $user->getConfirmationToken()), true)
-//                    ],
                     [
                         'name' => 'email_address',
                         'content' => $user->getEmail()
@@ -63,11 +67,9 @@ class FOSUserBundleRegistrationCompleted
                 ]
             ];
 
-            $result = $mandrill->messages->sendTemplate($template_name, $template_content, $message);
+            $this->mandrill->messages->sendTemplate($template_name, $template_content, $message);
         } catch(Mandrill_Error $e) {
-            // Mandrill errors are thrown as exceptions
             echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
-            // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
             throw $e;
         }
     }

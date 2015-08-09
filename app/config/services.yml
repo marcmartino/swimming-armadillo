@@ -185,9 +185,9 @@ services:
     # Event Listeners
     event.listener.registration_completed:
         class: AppBundle\EventListener\FOSUserBundleRegistrationCompleted
-        arguments: ["@service_container", "@router"]
+        arguments: ["@happystats.mandrill", "@router"]
         tags:
-            - { name: kernel.event_listener, event: fos_user.registration.completed, method: processEvent }
+            - { name: kernel.event_listener, event: fos_user.registration.completed, method: sendWelcomeEmail }
 
     event.listener.registration_initialized:
         class: AppBundle\EventListener\FOSUserBundleRegistrationInitialized
@@ -222,6 +222,11 @@ services:
         class: Mailchimp
         arguments: ['%mailchimp.api_key%']
 
+    # Mandrill
+    happystats.mandrill:
+        class: Mandrill
+        arguments: [ %mandrill.api_key% ]
+
     # Controllers
     app.controller.provider_controller:
         class: AppBundle\Controller\ProviderController
@@ -230,3 +235,4 @@ services:
           - @security.context
           - @templating
           - @service_container
+
