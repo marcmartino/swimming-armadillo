@@ -16,7 +16,7 @@ class InsightService {
 
     public function getInsightSlugs()
     {
-        return ['weight', 'fatratio'];
+        return ['weight', 'fatratio', 'standarderror'];
     }
 
     public function getInsights(\AppBundle\Entity\ABTest $abTest, User $user)
